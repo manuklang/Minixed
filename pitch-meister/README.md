@@ -20,6 +20,8 @@ Für den Zugriff im Team die Datei auf einen beliebigen Webserver legen.
 | **Sales-Points** | Generelle und produktbezogene Sales-Points, mit Anzeige, in welchen Szenen sie verwendet werden |
 | **Storyboard** | Segment-Übersicht mit Timings und Kategorien, Zeitleiste, Szenenboard mit Drag & Drop |
 | **Szenen-Seite** | Bezeichnung, Dauer, Segment, Bild/Clip, Produkte in der Szene, Kategorien, Rezept an/aus mit Kategorie, Beschreibung, Sales-Points, Text/VO, Rezept und Zutaten, Animationen, Kommentare |
+| **Dispo** | Pro Projekt: Titel, Location mit Karten-Link, Termine (Aufbau- und Drehtage), Team intern/extern mit Position, Einsatztagen und Kontakt; pro Tag Ablauf mit Uhrzeit, To Do, Bemerkung und verknüpfter Storyboard-Szene, Hinweise (Fahrgemeinschaften usw.) und Checkliste; Anfahrt & Parken mit Lageplan; eigenes Druck-/PDF-Layout |
+| **Moodboard** | Bilder, Videos und Audio hochladen (auch per Drag & Drop oder Einfügen) oder verlinken; Links werden erkannt (YouTube mit Vorschaubild, Vimeo, Spotify, MP3/MP4, Bilder, Websites); eigenes Vorschaubild für Links; Gruppen und Filter |
 | **Animationen** | Vorschau (Bild/Video), Beschreibung, mit Szenen verknüpft |
 | **B-Rolls** | Erweiterbare Liste mit Status und Szenenbezug |
 | **Post-Shooting** | Missing Scenes und Nachdrehs mit Priorität |
@@ -29,10 +31,10 @@ Für den Zugriff im Team die Datei auf einen beliebigen Webserver legen.
 
 ## Daten
 
-Die Daten liegen im `localStorage` des Browsers. Das heißt: pro Browser bzw. Gerät getrennt, und der Benutzer-Login ist eine
+Die Daten liegen im `localStorage` des Browsers, hochgeladene Bilder, Videos und Audio in IndexedDB. Das heißt: pro Browser bzw. Gerät getrennt, und der Benutzer-Login ist eine
 Zuordnung, keine echte Authentifizierung. Ein Austausch zwischen Geräten läuft über *Export → Projekt JSON / Komplett-Backup*
-und *Projekte → JSON importieren*. Bilder werden beim Hochladen auf max. 1280 px verkleinert; Videos sind auf 4 MB begrenzt,
-größere Clips werden als Link eingetragen.
+und *Projekte → JSON importieren*. Bilder werden beim Hochladen auf max. 1600 px verkleinert, Video und Audio sind auf 200 MB pro Datei begrenzt.
+JSON-Exporte enthalten die Medien eingebettet.
 
 Für echten Mehrbenutzerbetrieb über das Web (gemeinsame Datenbank, Server-Login) wäre der nächste Schritt ein Backend.
 Das Datenmodell ist dafür bereits als JSON vorhanden.

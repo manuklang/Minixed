@@ -183,6 +183,57 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .history{max-height:360px;overflow:auto}
 .history td{font-size:13px}
 .done td{color:var(--faint);text-decoration:line-through}
+.daychip{cursor:pointer;padding:3px 9px;position:relative;user-select:none}
+.daychip input{position:absolute;opacity:0;width:0;height:0}
+.daychip.on{background:var(--brandSoft);border-color:var(--brand2);color:var(--brand)}
+.daychip:focus-within{box-shadow:0 0 0 3px var(--brandSoft)}
+.dayhead{display:grid;grid-template-columns:160px 160px 1fr auto;gap:10px;align-items:end}
+.entry{display:grid;grid-template-columns:110px minmax(0,1fr) 170px auto;gap:10px;align-items:start;padding:10px 0;border-bottom:1px solid var(--line)}
+.entry textarea{min-height:44px}
+.entry .scn{font-size:12.5px;margin-top:4px}
+.people{font-size:13px;color:var(--muted);margin:4px 0 10px}
+.chk{display:flex;gap:8px;align-items:center;padding:4px 0}
+.chk.done input[type=text],.chk.done input:not([type]){text-decoration:line-through;color:var(--faint)}
+.teamtbl td{padding:6px 8px}
+.teamtbl input{padding:6px 8px}
+.grouprow td{background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.1em;color:var(--muted);text-align:center}
+.mood{columns:270px;column-gap:16px}
+.mitem{break-inside:avoid;margin-bottom:16px;background:var(--panel);border:1px solid var(--line);border-radius:12px;overflow:hidden;box-shadow:var(--shadow);display:inline-block;width:100%}
+.mprev{position:relative;background:var(--panel2)}
+.mprev img,.mprev video{width:100%;display:block;max-height:420px;object-fit:cover}
+.mprev video{background:#000;object-fit:contain}
+.mprev .kind{position:absolute;left:8px;top:8px;background:rgba(15,25,45,.72);color:#fff;font-size:11px;padding:2px 8px;border-radius:6px;letter-spacing:.04em;pointer-events:none}
+.ph{aspect-ratio:16/9;display:grid;place-items:center;align-content:center;gap:4px;background:linear-gradient(135deg,var(--brandSoft),var(--panel2));color:var(--muted);font-size:13px;text-align:center;padding:10px;word-break:break-all}
+.ph .g{font-size:32px;color:var(--brand2);line-height:1}
+.lcard{display:block;position:relative;text-decoration:none;color:inherit}
+.lcard .ph + .play{display:none}
+.lcard .play{position:absolute;inset:0;display:grid;place-items:center;font-size:38px;color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.7)}
+.aud audio{width:100%;display:block;padding:8px;background:var(--panel2)}
+.aud img{width:100%;aspect-ratio:16/9;object-fit:cover;display:block}
+.mbody{padding:10px 12px;display:flex;flex-direction:column;gap:6px}
+.mbody input,.mbody textarea{padding:6px 8px;font-size:13.5px}
+.mbody textarea{min-height:54px}
+.mbody .src{font-size:12px;color:var(--faint);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.moodbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.moodbar .url{flex:1 1 320px;display:flex;gap:8px;min-width:0}
+.filters{display:flex;gap:6px;flex-wrap:wrap}
+.filters button{border:1px solid var(--line);background:var(--panel);border-radius:999px;padding:4px 12px;cursor:pointer;font-size:13px;color:var(--muted)}
+.filters button.on{background:var(--brand);border-color:var(--brand);color:var(--onBrand)}
+.dropzone{border:1.5px dashed var(--line2);border-radius:var(--r);padding:16px;text-align:center;color:var(--muted);margin-bottom:16px;font-size:14px}
+body.filedrag .dropzone{border-color:var(--brand2);background:var(--brandSoft);color:var(--brand)}
+@media (max-width:860px){ .dayhead{grid-template-columns:1fr 1fr} .dayhead>*:nth-child(3){grid-column:1/-1} .entry{grid-template-columns:90px minmax(0,1fr) auto} .entry>.note{grid-column:2} }
+.pr .dispo-h{display:flex;justify-content:space-between;gap:20pt;align-items:flex-start}
+.pr .dispo-h h1{font-size:24pt;font-weight:700;letter-spacing:.02em;margin:0}
+.pr .dispo-h h1 span{font-weight:300}
+.pr .big{font-size:13pt;margin:4pt 0}
+.pr .termine td{border:0;padding:1pt 10pt 1pt 0;font-size:12pt}
+.pr hr{border:0;border-top:1pt solid #333;margin:10pt 0}
+.pr .dayt{background:#e6e6e6;padding:2pt 6pt;display:inline-block;font-weight:700;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pr .ablauf td{border:0;border-bottom:.5pt solid #ddd;padding:5pt 6pt}
+.pr .ablauf th{background:none;border:0;border-bottom:1pt solid #333}
+.pr .grp td{text-align:center;font-weight:700;background:#f2f2f2;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pr .dayblock{page-break-inside:avoid;margin-top:14pt}
+.pr .gray{color:#777}
 .modal{position:fixed;inset:0;background:rgba(10,15,25,.45);display:grid;place-items:center;z-index:60;padding:16px}
 .mbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(440px,100%);box-shadow:var(--shadow)}
 .mbox p{margin:0 0 16px}
@@ -283,7 +334,8 @@ let ui = { view: S.lastView || 'projects', sceneId: null, segFilter: 'all', scen
 let saveTimer = null;
 
 function load() { try { const d = JSON.parse(localStorage.getItem(KEY)); return d && d.projects ? migrate(d) : null; } catch (e) { return null; } }
-function migrate(d) { d.users = d.users || []; d.projects.forEach(p => { p.categories ||= [...DEFAULT_CATS]; p.recipeCategories ||= [...DEFAULT_RCATS]; ['hosts','history','salesPoints','segments','scenes','animations','brolls','post','notes'].forEach(k => p[k] ||= []); p.setDesign ||= {images: [], specs: '', colors: []}; p.offer ||= {overview: '', price: '', items: []}; }); return d; }
+function migrate(d) { d.users = d.users || []; d.projects.forEach(p => { p.categories ||= [...DEFAULT_CATS]; p.recipeCategories ||= [...DEFAULT_RCATS]; ['hosts','history','salesPoints','segments','scenes','animations','brolls','post','notes'].forEach(k => p[k] ||= []); p.setDesign ||= {images: [], specs: '', colors: []}; p.offer ||= {overview: '', price: '', items: []}; p.dispo ||= newDispo(); p.dispo.days ||= []; p.dispo.team ||= []; p.dispo.location ||= { name: '', address: '', link: '' }; p.moodboard ||= []; }); return d; }
+function newDispo() { return { title: 'Disposition Infomercial', company: '', location: { name: '', address: '', link: '' }, days: [], team: [], parking: '', parkingImage: null }; }
 function save(now) {
   clearTimeout(saveTimer);
   const run = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); setStatus('Gespeichert ' + new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})); } catch (e) { toast('Speichern fehlgeschlagen – Browser-Speicher voll? Große Bilder/Videos entfernen oder als JSON sichern.'); setStatus('Nicht gespeichert'); } };
@@ -291,6 +343,33 @@ function save(now) {
   now ? run() : (saveTimer = setTimeout(run, 350));
 }
 function setStatus(t) { const el = $('#status'); if (el) el.textContent = t; }
+/* Medien (Bilder, Video, Audio) liegen in IndexedDB – localStorage (~5 MB) reicht dafür nicht.
+   Im State steht nur { type, ref }; ältere Einträge mit { src: dataURL } funktionieren weiter. */
+const MEDIA = new Map(); let idb = null;
+function idbOpen() { return new Promise((res, rej) => { let r; try { r = indexedDB.open('pitchmeister-media', 1); } catch (e) { return rej(e); } r.onupgradeneeded = () => r.result.createObjectStore('blobs'); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+function idbDo(mode, fn) { return new Promise((res, rej) => { const tx = idb.transaction('blobs', mode); const r = fn(tx.objectStore('blobs')); tx.oncomplete = () => res(r && r.result); tx.onerror = () => rej(tx.error); tx.onabort = () => rej(tx.error); }); }
+async function putBlob(blob) {
+  if (idb) { const id = 'm' + uid(); await idbDo('readwrite', st => st.put(blob, id)); MEDIA.set(id, URL.createObjectURL(blob)); return { ref: id }; }
+  if (blob.size > 3 * 1024 * 1024) throw new Error('Datei zu groß für den Browser-Speicher (max. 3 MB ohne IndexedDB).');
+  return { src: await readURL(blob) };
+}
+async function getBlob(ref) { return idb ? idbDo('readonly', st => st.get(ref)) : null; }
+async function loadMedia(cleanup) {
+  try {
+    if (!idb) idb = await idbOpen();
+    const keys = await idbDo('readonly', st => st.getAllKeys()); const all = JSON.stringify(S);
+    for (const k of keys) {
+      if (!all.includes(k)) { if (cleanup) await idbDo('readwrite', st => st.delete(k)); continue; }
+      if (MEDIA.has(k)) continue;
+      const b = await getBlob(k); if (b) MEDIA.set(k, URL.createObjectURL(b));
+    }
+  } catch (e) { idb = null; }
+}
+const msrc = m => !m ? '' : m.ref ? (MEDIA.get(m.ref) || '') : (m.src || '');
+function dataURLtoBlob(u) { const [h, d] = u.split(','); const mime = (h.match(/data:([^;,]+)/) || [])[1] || 'application/octet-stream'; if (!/;base64/.test(h)) return new Blob([decodeURIComponent(d)], { type: mime }); const bin = atob(d); const a = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) a[i] = bin.charCodeAt(i); return new Blob([a], { type: mime }); }
+async function walkMedia(o, fn) { if (Array.isArray(o)) { for (const x of o) await walkMedia(x, fn); } else if (o && typeof o === 'object') { await fn(o); for (const k in o) if (o[k] && typeof o[k] === 'object') await walkMedia(o[k], fn); } }
+async function inlineMedia(obj) { const c = clone(obj); await walkMedia(c, async o => { if (o.ref && typeof o.ref === 'string') { const b = await getBlob(o.ref); if (b) { o.src = await readURL(b); delete o.ref; } } }); return c; }
+async function externalizeMedia(obj) { if (!idb) return; await walkMedia(obj, async o => { if (typeof o.src === 'string' && o.src.startsWith('data:') && o.src.length > 20000 && o.type) { Object.assign(o, await putBlob(dataURLtoBlob(o.src))); delete o.src; } }); }
 const P = () => S.projects.find(p => p.id === S.activeProjectId);
 const me = () => S.users.find(u => u.id === S.currentUser);
 const userById = id => S.users.find(u => u.id === id);
@@ -308,10 +387,11 @@ function log(msg, key = msg) {
 /* path binding: "scenes.<id>.name" -> arrays resolved by id */
 function resolve(obj, keys) { for (const k of keys) { if (obj == null) return undefined; obj = Array.isArray(obj) ? obj.find(x => x.id === k) : obj[k]; } return obj; }
 function setPath(root, path, val) { const keys = path.split('.'); const last = keys.pop(); const o = resolve(root, keys); if (o) o[last] = val; return o; }
-const SECTION = { title:'Projekttitel', duration:'Showdauer', studio:'Studio', studioContact:'Studio-Kontakt', shootingDate:'Drehtermin', strategy:'Strategisches Konzept', hosts:'Host', setDesign:'Set-Design', offer:'Angebot', salesPoints:'Sales-Point', segments:'Segment', scenes:'Szene', animations:'Animation', brolls:'B-Roll', post:'Post-Shooting', notes:'Notiz' };
-const FIELD = { name:'Name', duration:'Dauer', description:'Beschreibung', textVO:'Text/VO', recipe:'Rezept', ingredients:'Zutaten', recipeOn:'Rezept an/aus', recipeCategory:'Rezeptkategorie', segmentId:'Segment', text:'Text', itemId:'Produkt', contact:'Kontakt', role:'Rolle', specs:'Spezifikationen', overview:'Übersicht', price:'Preis', size:'Größe', spec:'Spezifikation', title:'Titel', link:'Link', caption:'Bildunterschrift', status:'Status', done:'erledigt', mediaUrl:'Clip-Link', priority:'Priorität', sceneId:'Szene', hex:'Farbe' };
+const SECTION = { title:'Projekttitel', duration:'Showdauer', studio:'Studio', studioContact:'Studio-Kontakt', shootingDate:'Drehtermin', strategy:'Strategisches Konzept', hosts:'Host', setDesign:'Set-Design', offer:'Angebot', salesPoints:'Sales-Point', segments:'Segment', scenes:'Szene', animations:'Animation', brolls:'B-Roll', post:'Post-Shooting', notes:'Notiz', moodboard:'Moodboard-Element' };
+const FIELD = { name:'Name', duration:'Dauer', description:'Beschreibung', textVO:'Text/VO', recipe:'Rezept', ingredients:'Zutaten', recipeOn:'Rezept an/aus', recipeCategory:'Rezeptkategorie', segmentId:'Segment', text:'Text', itemId:'Produkt', contact:'Kontakt', role:'Rolle', specs:'Spezifikationen', overview:'Übersicht', price:'Preis', size:'Größe', spec:'Spezifikation', title:'Titel', link:'Link', caption:'Bildunterschrift', status:'Status', done:'erledigt', mediaUrl:'Clip-Link', priority:'Priorität', sceneId:'Szene', hex:'Farbe', note:'Notiz', tag:'Gruppe', thumb:'Vorschaubild', url:'Link' };
 function describe(path) {
   const keys = path.split('.'); const p = P();
+  if (keys[0] === 'dispo') { const dy = keys[1] === 'days' && keys[2] ? p.dispo.days.find(x => x.id === keys[2]) : null; return 'Dispo' + (dy ? ` „${dy.label || dayLong(dy)}“` : keys[1] === 'team' ? ': Team' : '') + ' geändert'; }
   const sec = SECTION[keys[0]] || keys[0];
   if (keys.length === 1) return sec + ' geändert';
   if (keys[0] === 'setDesign' || keys[0] === 'offer') {
@@ -342,7 +422,7 @@ function newProject(title = 'Neues Projekt') {
   const seg = { id: uid(), name: 'Opener' };
   return { id: uid(), title, duration: 1710, studio: '', studioContact: '', shootingDate: '', userIds: S?.currentUser ? [S.currentUser] : [], strategy: '', hosts: [], history: [], created: Date.now(), updated: Date.now(),
     setDesign: { images: [], specs: '', colors: [] }, offer: { overview: '', price: '', items: [] }, salesPoints: [], segments: [seg], scenes: [], animations: [], brolls: [], post: [], notes: [],
-    categories: [...DEFAULT_CATS], recipeCategories: [...DEFAULT_RCATS] };
+    categories: [...DEFAULT_CATS], recipeCategories: [...DEFAULT_RCATS], dispo: newDispo(), moodboard: [] };
 }
 function newScene(segId, name = 'Neue Szene') { return { id: uid(), segmentId: segId, name, duration: 60, categories: [], recipeOn: false, recipeCategory: '', recipe: '', ingredients: '', media: null, mediaUrl: '', itemIds: [], description: '', textVO: '', salesPointIds: [], comments: [] }; }
 function seed() {
@@ -383,6 +463,26 @@ function seed() {
   p.brolls = [{ id: uid(), name: 'Gemüse fällt in Behälter (Slow-Mo)', description: '120 fps, Top-Shot', sceneId: p.scenes[3].id, done: false }, { id: uid(), name: 'Familie am Esstisch', description: 'Warme Lichtstimmung', sceneId: '', done: false }];
   p.post = [{ id: uid(), text: 'Pick-up: Close-up Behälterdeckel einrasten', sceneId: p.scenes[9].id, priority: 'hoch', done: false }];
   p.notes = [{ id: uid(), title: 'Referenz: Schnittrhythmus Opener', link: '', text: 'Schnelle Schnitte (1–1,5 s) im Cold Open, danach ruhiger.', image: null }];
+  // Demo-Dispo (Aufbau wie eine echte Drehdisposition, Namen sind Platzhalter)
+  const day = (date, label, title, entries, extra = {}) => ({ id: uid(), date, label, title, notes: '', checklist: [], entries: entries.map(([time, todo, note = '', sceneId = '']) => ({ id: uid(), time, todo, note, sceneId })), ...extra });
+  const S_ = i => p.scenes[i].id;
+  const d0 = day('2027-02-15', 'Aufbautag', 'Aufbau und Vorbereitung + Probe für Kamera', [['vor 9:00', 'Ankunft im Büro'], ['09:00', 'Wochenproduktionsmeeting'], ['09:30', 'Abfahrt ab Büro'], ['10:00', 'Ankunft Team im Studio'], ['16:00', 'Ende Aufbau']], {
+    notes: 'Fahrgemeinschaften:\nProducer + Best Girl – eigenes Auto\nDOP – Sprinter mit Kran\n\nRückfahrt: Sprinter (DOP, Best Boy), Rest mit eigenen Autos',
+    checklist: ['Ausladen', 'Set aufbauen', 'Kran aufbauen', 'Set ausrichten inkl. Hintergrund', 'Kameras einstellen / einrichten, Signale', 'Einleuchten', 'Soundcheck', 'Outfitcheck (ohne Host)'].map(t => ({ id: uid(), text: t, done: false })) });
+  const d1 = day('2027-02-16', 'Drehtag 1', 'Drehtag 1', [['08:00', 'Ankunft Team Büro'], ['08:30', 'Ankunft Team im Studio\nAnkunft Kamera 2'], ['09:00', 'Ankunft Hosts + Maske'], ['10:00', 'Szene 1.2 („Host-Intro & Produktreveal“)', '(1 h)', S_(1)], ['11:00', 'Szene 2.1 („Zwiebeln 5×5“)', '(1,5 h)', S_(3)], ['12:30', 'Mittagspause (muss jmd. abholen)', '30 Min'], ['13:00', 'Szene 2.3 („Obstsalat 10×10“)', '(1,5 h)', S_(5)], ['14:30', 'Szene 2.4 („Lachs-Tatar“)', '(1,5 h)', S_(6)], ['16:00', 'Re-Set für morgen']]);
+  const d2 = day('2027-02-17', 'Drehtag 2', 'Drehtag 2', [['07:30', 'Ankunft Team Büro'], ['08:00', 'Ankunft Team im Studio'], ['09:00', 'Szene 2.5 („Zucchini-Spaghetti“)', '(1 h)', S_(7)], ['10:00', 'Szene 1.3 („Testimonial Hausfrau“)', '(ca. 2 h)', S_(2)], ['12:30', 'Mittagspause', '45 Min'], ['13:15', 'PITCHES: Szene 3.2 („Angebot / Preis“)\nSzene 3.3 („Call to Action“)', '(1 h)', S_(10)], ['14:15', 'Ggf. B-Rolls: Beauty-Shots Produkt', '(30 Min)']]);
+  const tm = (name, position, group, days, contact = '') => ({ id: uid(), name, position, group, dayIds: days.map(x => x.id), contact });
+  p.dispo = { title: 'Disposition Infomercial', company: 'Produktion', location: { name: 'Studio Köln, Halle 3', address: 'Musterstraße 1\n50667 Köln', link: '' },
+    days: [d0, d1, d2],
+    team: [tm('Name 1', 'Leitung Abteilung, Skript', 'intern', [d0, d1, d2]), tm('Name 2', 'Producer', 'intern', [d0, d1, d2], 'Telefon'), tm('Name 3', 'Regie', 'intern', [d0, d1, d2], 'Telefon'), tm('Name 4', 'Schnittliste', 'intern', [d1, d2]), tm('Name 5', 'DOP + Kamera 1', 'intern', [d0, d1, d2]), tm('Name 6', 'Best Boy', 'intern', [d2]),
+      tm('Extern 1', 'Kamera 2', 'extern', [d1, d2]), tm('Extern 2', 'Host', 'extern', [d1, d2]), tm('Extern 3', 'Köchin / Expertin', 'extern', [d1]), tm('Extern 4', 'Visagistin', 'extern', [d1]), tm('Extern 5', 'Testimonial', 'extern', [d2])],
+    parking: 'Parkmöglichkeiten hinter dem Studiogebäude – auch zum Ausladen dorthin.', parkingImage: null };
+  const sw = (a, b) => 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560"><defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="${a}"/><stop offset="1" stop-color="${b}"/></linearGradient></defs><rect width="800" height="560" fill="url(#g)"/></svg>`);
+  p.moodboard = [
+    { id: uid(), kind: 'image', source: 'upload', file: { type: 'image', src: sw('#1f3d74', '#3fb39b') }, title: 'Farbwelt Set', note: 'Markenblau + Mint als Akzent, Arbeitsfläche hell.', tag: 'Set', ts: Date.now(), by: null },
+    { id: uid(), kind: 'image', source: 'upload', file: { type: 'image', src: sw('#efe6d8', '#e0a21b') }, title: 'Lichtstimmung Rezepte', note: 'Warm, Food-Look, weiches Seitenlicht.', tag: 'Licht', ts: Date.now(), by: null },
+    { id: uid(), kind: 'link', source: 'link', url: 'https://www.pexels.com/de-de/suche/showk%C3%BCche/', provider: 'pexels.com', title: 'Referenzen Showküche', note: 'Stock-Recherche für das Set-Design.', tag: 'Set', ts: Date.now(), by: null }
+  ];
   d.projects.push(p); d.activeProjectId = p.id;
   return d;
 }
@@ -399,13 +499,15 @@ const IC = {
   broll: '<rect x="2" y="7" width="14" height="10" rx="2"/><path d="m16 11 6-3v8l-6-3"/>',
   post: '<path d="M10 6h11M10 12h11M10 18h11M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/>',
   notes: '<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+  dispo: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7 14h4M7 17h7"/>',
+  mood: '<rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/>',
   analysis: '<path d="M3 3v18h18"/><path d="M8 16v-3M13 16V9M18 16V6"/>',
   export: '<path d="M12 3v12m-5-5 5 5 5-5M4 21h16"/>'
 };
 const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
 const NAV = [
   ['Projekt', [['projects','Projekte'],['details','Projekt-Details'],['set','Set-Design'],['offer','Angebot'],['sp','Sales-Points']]],
-  ['Produktion', [['storyboard','Storyboard'],['anim','Animationen'],['broll','B-Rolls'],['post','Post-Shooting'],['notes','Notizen & Inspiration']]],
+  ['Produktion', [['storyboard','Storyboard'],['dispo','Dispo'],['mood','Moodboard'],['anim','Animationen'],['broll','B-Rolls'],['post','Post-Shooting'],['notes','Notizen & Inspiration']]],
   ['Auswertung', [['analysis','Analyse'],['export','Export & Druck']]]
 ];
 
@@ -417,11 +519,13 @@ const durInp = (path, val) => `<input data-bind="${path}" data-type="dur" data-r
 const sel = (path, val, opts, attrs = '') => `<select data-bind="${path}" ${attrs}>${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(val ?? '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
 const del = (action, data, title = 'Löschen') => `<button class="icon-btn" data-action="${action}" ${Object.entries(data).map(([k, v]) => `data-${k}="${esc(v)}"`).join(' ')} title="${title}" aria-label="${title}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`;
 function mediaTag(m, cls = '') {
-  if (!m || !m.src) return '';
-  return m.type === 'video' ? `<video class="${cls}" src="${esc(m.src)}" muted playsinline controls preload="metadata"></video>` : `<img class="${cls}" src="${esc(m.src)}" alt="">`;
+  const src = msrc(m); if (!src) return '';
+  if (m.type === 'audio') return `<audio class="${cls}" src="${esc(src)}" controls preload="metadata"></audio>`;
+  return m.type === 'video' ? `<video class="${cls}" src="${esc(src)}" muted playsinline controls preload="metadata"></video>` : `<img class="${cls}" src="${esc(src)}" alt="">`;
 }
 function sceneThumb(s) {
-  if (s.media?.src) return s.media.type === 'video' ? `<video src="${esc(s.media.src)}" muted preload="metadata"></video>` : `<img src="${esc(s.media.src)}" alt="">`;
+  const ms = msrc(s.media);
+  if (ms) return s.media.type === 'video' ? `<video src="${esc(ms)}" muted preload="metadata"></video>` : `<img src="${esc(ms)}" alt="">`;
   if (s.mediaUrl && /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl)) return `<img src="${esc(s.mediaUrl)}" alt="">`;
   return 'Kein Bild';
 }
@@ -439,7 +543,7 @@ function render() {
   const fa = document.activeElement, fb = fa?.dataset?.bind, fs = fa && 'selectionStart' in fa ? fa.selectionStart : null;
   const scroll = $('main')?.scrollTop || 0;
 
-  const counts = p ? { sp: p.salesPoints.length, storyboard: p.scenes.length, anim: p.animations.length, broll: p.brolls.length, post: p.post.filter(x => !x.done).length, notes: p.notes.length, offer: p.offer.items.length } : {};
+  const counts = p ? { sp: p.salesPoints.length, storyboard: p.scenes.length, anim: p.animations.length, broll: p.brolls.length, post: p.post.filter(x => !x.done).length, notes: p.notes.length, offer: p.offer.items.length, dispo: p.dispo.days.length, mood: p.moodboard.length } : {};
   app.innerHTML = `
   <header class="top">
     <div class="logo"><span class="mark">PM</span><span><b>PITCH-MEISTER</b> 2.0</span></div>
@@ -551,7 +655,7 @@ function vOffer(p) {
   </div>
   <div class="card"><h2>Bestandteile / Produkte <span class="faint small">(${p.offer.items.length})</span></h2>
   ${p.offer.items.length ? p.offer.items.map(it => `<div class="listrow" style="grid-template-columns:auto 1.2fr 1fr 2fr auto">
-      <div class="item-img" data-action="upload" data-mode="set" data-path="offer.items.${it.id}.image" data-accept="image/*" title="Bild hochladen">${it.image ? `<img src="${esc(it.image.src)}" alt="">` : '+ Bild'}</div>
+      <div class="item-img" data-action="upload" data-mode="set" data-path="offer.items.${it.id}.image" data-accept="image/*" title="Bild hochladen">${msrc(it.image) ? `<img src="${esc(msrc(it.image))}" alt="">` : '+ Bild'}</div>
       <div class="stack" style="--x:0">${field('Name', inp(`offer.items.${it.id}.name`, it.name))}<span class="small faint">In ${usage(it.id)} Szene(n) · ${p.salesPoints.filter(s => s.itemId === it.id).length} Sales-Point(s)</span></div>
       <div class="stack">${field('Größe (optional)', inp(`offer.items.${it.id}.size`, it.size))}${field('Spezifikation (optional)', inp(`offer.items.${it.id}.spec`, it.spec))}</div>
       ${field('Beschreibung', ta(`offer.items.${it.id}.description`, it.description, 'style="min-height:96px"'))}
@@ -644,7 +748,7 @@ function vScene(p, s) {
   <div class="scene-grid">
     <div class="card stack">
       ${field('Bezeichnung der Szene', inp(b('name'), s.name, 'placeholder="Name of scene"'))}
-      <div class="media">${s.media?.src ? mediaTag(s.media) : (s.mediaUrl ? (/\.(mp4|webm|mov)(\?|$)/i.test(s.mediaUrl) ? `<video src="${esc(s.mediaUrl)}" controls muted playsinline></video>` : /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl) ? `<img src="${esc(s.mediaUrl)}" alt="">` : `<a href="${esc(s.mediaUrl)}" target="_blank" rel="noopener">Clip öffnen ↗</a>`) : '<div>Bild oder Clip<br><span class="small faint">Scribble, Foto oder kurzes Video</span></div>')}
+      <div class="media">${msrc(s.media) ? mediaTag(s.media) : (s.mediaUrl ? (/\.(mp4|webm|mov)(\?|$)/i.test(s.mediaUrl) ? `<video src="${esc(s.mediaUrl)}" controls muted playsinline></video>` : /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl) ? `<img src="${esc(s.mediaUrl)}" alt="">` : `<a href="${esc(s.mediaUrl)}" target="_blank" rel="noopener">Clip öffnen ↗</a>`) : '<div>Bild oder Clip<br><span class="small faint">Scribble, Foto oder kurzes Video</span></div>')}
         <div class="ov"><button class="btn sm" data-action="upload" data-mode="set" data-path="${b('media')}" data-accept="image/*,video/*">${s.media ? 'Ersetzen' : 'Hochladen'}</button>${s.media ? `<button class="btn sm danger" data-action="clearMedia" data-id="${s.id}">Entfernen</button>` : ''}</div></div>
       ${field('oder Link zu Clip / Bild', inp(b('mediaUrl'), s.mediaUrl, 'placeholder="https://…" data-rerender'))}
     </div>
@@ -782,6 +886,7 @@ function vAnalysis(p) {
 
 /* ---------- Export ---------- */
 const LAYOUTS = [
+  ['dispo', 'Dispo', 'Termine, Location, Team mit Einsatztagen und Tagesablauf – zum Verteilen an Crew und Externe.'],
   ['storyboard', 'Storyboard komplett', 'Alle Szenen mit Bild, Beschreibung, Text/VO, Produkten, Sales-Points, Rezept und Kommentaren.'],
   ['kitchen', 'Kitchen-Crew', 'Rezept-Szenen mit Zutaten, benötigten Produkten und Timecode – plus Einkaufsliste.'],
   ['stage', 'Stage-Crew', 'Ablaufplan: Timecode, Szene, Kategorie, Produkte/Requisiten, Set-Spezifikationen.'],
@@ -796,8 +901,9 @@ function exportHTML(p, layout, withImg) {
   const head = `<h1>${esc(p.title)}</h1><div class="prmeta">${esc(L[1])} · Showdauer ${fmtDur(p.duration)} (Szenen ${fmtDur(totalDur(p))}) · Studio: ${esc(p.studio || '–')} · Dreh: ${fmtDay(p.shootingDate)} · Stand ${fmtDate(Date.now())} · ${esc(me()?.name || '')}</div>`;
   const items = s => s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', ');
   const sps = s => s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean);
-  const img = s => withImg && s.media?.src && s.media.type !== 'video' ? `<img src="${esc(s.media.src)}" alt="">` : '';
+  const img = s => withImg && msrc(s.media) && s.media.type === 'image' ? `<img src="${esc(msrc(s.media))}" alt="">` : '';
   let body = '';
+  if (layout === 'dispo') return `<div class="pr">${dispoHTML(p)}</div>`;
   if (layout === 'storyboard') {
     body = p.segments.map((seg, si) => `<div class="seghead">${si + 1}. ${esc(seg.name)} · ${fmtDur(segDur(p, seg.id))}</div>` + p.scenes.filter(s => s.segmentId === seg.id).map(s => { const im = img(s);
       return `<div class="sc ${im ? '' : 'noimg'}">${im ? `<div>${im}</div>` : ''}<div><div class="h">${meta[s.id].no} ${esc(s.name)} <span style="font-weight:400;color:#666">· ${fmtDur(meta[s.id].start)} · ${fmtDur(s.duration)} · ${esc(s.categories.join(', '))}</span></div>
@@ -852,7 +958,151 @@ function vExport(p) {
   </div>`;
 }
 
-const VIEWS = { projects: vProjects, details: vDetails, set: vSet, offer: vOffer, sp: vSP, storyboard: vStoryboard, anim: vAnim, broll: vBroll, post: vPost, notes: vNotes, analysis: vAnalysis, export: vExport };
+/* ---------- Dispo ---------- */
+const dayShort = d => d.date ? new Date(d.date + 'T00:00').toLocaleDateString('de-DE', { weekday: 'short' }).replace('.', '') : (d.label || '?');
+const dayLong = d => d.date ? new Date(d.date + 'T00:00').toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: '2-digit', year: 'numeric' }) : (d.label || 'ohne Datum');
+const sortedDays = D => [...D.days].sort((a, b) => (a.date || '9').localeCompare(b.date || '9'));
+function teamDays(D, m) { const ds = sortedDays(D); if (!ds.length || !m.dayIds.length) return '–'; if (ds.every(d => m.dayIds.includes(d.id))) return 'alle'; return ds.filter(d => m.dayIds.includes(d.id)).map(dayShort).join(' & '); }
+function vDispo(p) {
+  const D = p.dispo, days = sortedDays(D), meta = sceneMeta(p);
+  const sceneOpts = [['', '— keine Szene —'], ...ordered(p).map(s => [s.id, `${meta[s.id].no} ${s.name} (${fmtDur(s.duration)})`])];
+  const teamRows = g => D.team.filter(m => m.group === g).map(m => `<tr>
+    <td>${inp(`dispo.team.${m.id}.name`, m.name, 'placeholder="Name" aria-label="Name"')}</td>
+    <td>${inp(`dispo.team.${m.id}.position`, m.position, 'placeholder="Position" aria-label="Position"')}</td>
+    <td><div class="row" style="gap:4px;flex-wrap:nowrap">${days.map(d => `<label class="chip daychip ${m.dayIds.includes(d.id) ? 'on' : ''}" title="${esc(dayLong(d))} · ${esc(d.label)}"><input type="checkbox" data-action="toggle" data-list="dispo.team.${m.id}.dayIds" data-val="${d.id}" ${m.dayIds.includes(d.id) ? 'checked' : ''}>${esc(dayShort(d))}</label>`).join('') || '<span class="faint small">erst Tage anlegen</span>'}${days.length > 1 ? `<button class="btn sm ghost" data-action="allDays" data-id="${m.id}" title="alle / keine Tage">alle</button>` : ''}</div></td>
+    <td>${inp(`dispo.team.${m.id}.contact`, m.contact, 'placeholder="Telefon / E-Mail" aria-label="Kontakt"')}</td>
+    <td>${sel(`dispo.team.${m.id}.group`, m.group, [['intern', 'Intern'], ['extern', 'Extern']], 'aria-label="Gruppe"')}</td>
+    <td>${del('remove', { list: 'dispo.team', id: m.id })}</td></tr>`).join('');
+  const dayCard = d => { const people = D.team.filter(m => m.dayIds.includes(d.id) && m.name); const base = `dispo.days.${d.id}`;
+    return `<div class="card" style="margin-top:16px">
+      <div class="dayhead">${field('Datum', inp(`${base}.date`, d.date, 'type="date" data-rerender'))}${field('Bezeichnung', inp(`${base}.label`, d.label, 'placeholder="z. B. Drehtag 1" data-rerender'))}${field('Thema des Tages', inp(`${base}.title`, d.title, 'placeholder="z. B. Aufbau und Vorbereitung + Probe für Kamera"'))}<div class="row" style="gap:2px"><button class="btn sm ghost" data-action="sortDay" data-id="${d.id}" title="Ablauf nach Uhrzeit sortieren">Sortieren</button>${del('delDay', { id: d.id }, 'Tag löschen')}</div></div>
+      <h2 style="margin:16px 0 0">Ablauf ${esc(dayLong(d))} <span class="faint" style="font-weight:400">→ ${esc(d.label || '')}</span></h2>
+      <div class="people">${people.length ? '(' + people.map(m => esc(m.name)).join(', ') + ')' : 'Noch niemand für diesen Tag eingeteilt – im Team die Tage anklicken.'}</div>
+      <div class="entry small muted" style="padding-top:0"><span>Uhrzeit</span><span>To Do</span><span class="note">Bemerkung</span><span></span></div>
+      ${d.entries.map(e => { const sc = e.sceneId && p.scenes.find(x => x.id === e.sceneId); const eb = `${base}.entries.${e.id}`; return `<div class="entry">
+        ${inp(`${eb}.time`, e.time, 'placeholder="09:00" aria-label="Uhrzeit"')}
+        <div>${ta(`${eb}.todo`, e.todo, 'rows="2" placeholder="Was passiert?" aria-label="To Do"')}<div class="row scn" style="gap:6px">${sel(`${eb}.sceneId`, e.sceneId, sceneOpts, 'aria-label="Szene verknüpfen" style="width:auto;max-width:100%;padding:4px 8px;font-size:12.5px"')}${sc ? `<a href="#" data-action="openScene" data-id="${sc.id}">zur Szene ${meta[sc.id]?.no} ↗</a>` : ''}</div></div>
+        <div class="note">${inp(`${eb}.note`, e.note, 'placeholder="(1 h)" aria-label="Bemerkung"')}</div>
+        ${del('remove', { list: `${base}.entries`, kind: 'entries', id: e.id, quiet: 1 })}</div>`; }).join('')}
+      <div class="row" style="margin-top:10px"><button class="btn sm" data-action="add" data-list="${base}.entries" data-kind="entries">+ Ablauf-Eintrag</button></div>
+      <div class="grid g2" style="margin-top:16px">
+        ${field('Hinweise (Fahrgemeinschaften, Abholung, Catering …)', ta(`${base}.notes`, d.notes, 'style="min-height:120px"'))}
+        <div class="field"><span>Checkliste / Vorbereitung</span>${d.checklist.map(c => `<div class="chk ${c.done ? 'done' : ''}"><input type="checkbox" data-bind="${base}.checklist.${c.id}.done" ${c.done ? 'checked' : ''} aria-label="erledigt">${inp(`${base}.checklist.${c.id}.text`, c.text, 'placeholder="Aufgabe"')}${del('remove', { list: `${base}.checklist`, kind: 'checklist', id: c.id, quiet: 1 })}</div>`).join('')}<div><button class="btn sm" data-action="add" data-list="${base}.checklist" data-kind="checklist">+ Punkt</button></div></div>
+      </div></div>`; };
+  return `<div class="pagehead"><div><h1>Dispo</h1><div class="sub">Disposition für den Dreh: Termine, Location, Team und Tagesablauf</div></div>
+    <div class="actions"><button class="btn" data-action="add" data-list="dispo.days" data-kind="dispo.days">+ Tag</button>${EMBED ? '<button class="btn pri" data-action="dispoPreview">Druckvorschau</button>' : '<button class="btn pri" data-action="printDispo">Dispo drucken / PDF</button>'}</div></div>
+  <div class="grid g2">
+    <div class="card stack"><h2>Allgemein</h2>
+      ${field('Titel', inp('dispo.title', D.title, 'placeholder="Disposition Infomercial"'))}
+      <div class="small muted">Produkt: <b style="font-weight:500;color:var(--text)">${esc(p.title)}</b> (${Math.round(p.duration / 60)} Min.)</div>
+      ${field('Produktion / Firma (Briefkopf)', inp('dispo.company', D.company, 'placeholder="z. B. Studio / Produktionsfirma"'))}
+    </div>
+    <div class="card stack"><h2>Location</h2>
+      ${field('Name', inp('dispo.location.name', D.location.name, 'placeholder="z. B. Eventlocation"'))}
+      ${field('Adresse', ta('dispo.location.address', D.location.address, 'style="min-height:64px" placeholder="Straße\nPLZ Ort"'))}
+      ${field('Karten-Link', inp('dispo.location.link', D.location.link, 'placeholder="https://maps…" data-rerender'))}${D.location.link ? `<a class="small" href="${esc(D.location.link)}" target="_blank" rel="noopener">Karte öffnen ↗</a>` : ''}
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Termine</h2>
+    ${days.length ? `<div class="tbl-wrap"><table><tbody>${days.map(d => `<tr><td style="width:60px"><b style="font-weight:500">${esc(dayShort(d)).toUpperCase()}</b></td><td style="width:130px">${d.date ? new Date(d.date + 'T00:00').toLocaleDateString('de-DE') : '–'}</td><td>${esc(d.label)}</td><td class="muted">${esc(d.title)}</td><td class="num small faint">${d.entries.length} Einträge · ${D.team.filter(m => m.dayIds.includes(d.id)).length} Personen</td></tr>`).join('')}</tbody></table></div>` : '<div class="empty small">Noch keine Tage. Lege Aufbautag und Drehtage an.</div>'}
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Team</h2>
+    <div class="tbl-wrap"><table class="teamtbl"><thead><tr><th style="min-width:130px">Name</th><th style="min-width:180px">Position</th><th>Tage</th><th style="min-width:150px">Kontakt</th><th style="width:110px">Gruppe</th><th></th></tr></thead><tbody>
+      <tr class="grouprow"><td colspan="6">${esc(D.company || 'Intern')}</td></tr>${teamRows('intern')}
+      <tr><td colspan="6"><button class="btn sm" data-action="add" data-list="dispo.team" data-kind="dispo.team" data-group="intern">+ Person intern</button></td></tr>
+      <tr class="grouprow"><td colspan="6">Extern</td></tr>${teamRows('extern')}
+      <tr><td colspan="6"><button class="btn sm" data-action="add" data-list="dispo.team" data-kind="dispo.team" data-group="extern">+ Person extern</button></td></tr>
+    </tbody></table></div>
+  </div>
+  ${days.map(dayCard).join('')}
+  <div class="card" style="margin-top:16px"><h2>Anfahrt &amp; Parken</h2>
+    <div class="grid g2">${field('Hinweise', ta('dispo.parking', D.parking, 'style="min-height:120px" placeholder="Parkmöglichkeiten, Ausladen, Zufahrt …"'))}
+    <div class="media" style="aspect-ratio:16/10">${D.parkingImage ? mediaTag(D.parkingImage) : '<div>Lageplan / Screenshot</div>'}<div class="ov"><button class="btn sm" data-action="upload" data-mode="set" data-path="dispo.parkingImage" data-accept="image/*">${D.parkingImage ? 'Ersetzen' : 'Hochladen'}</button></div></div></div>
+  </div>`;
+}
+function dispoHTML(p) {
+  const D = p.dispo, days = sortedDays(D), meta = sceneMeta(p);
+  const team = g => { const l = D.team.filter(m => m.group === g && (m.name || m.position)); return l.length ? `<tr class="grp"><td colspan="4">${esc(g === 'intern' ? (D.company || 'Intern').toUpperCase() : 'EXTERN')}</td></tr>` + l.map(m => `<tr><td>${esc(m.name)}</td><td>${esc(m.position)}</td><td style="text-align:center">${esc(teamDays(D, m))}</td><td>${esc(m.contact)}</td></tr>`).join('') : ''; };
+  const [t1, ...t2] = (D.title || 'Disposition').split(' ');
+  return `<div class="dispo-h"><div><h1>${esc(t1.toUpperCase())} <span>${esc(t2.join(' ').toUpperCase())}</span></h1>
+    <div class="big"><b>PRODUKT:</b> ${esc(p.title.toUpperCase())} (${Math.round(p.duration / 60)} Min.)</div>
+    <div class="big"><b>TERMINE</b></div><table class="termine"><tbody>${days.map(d => `<tr><td>${esc(dayShort(d).toUpperCase())}</td><td>${d.date ? new Date(d.date + 'T00:00').toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' }) : ''}</td><td>${esc(d.label)}</td></tr>`).join('')}</tbody></table></div>
+    ${D.company ? `<div style="font-size:16pt;font-weight:300;letter-spacing:.1em;text-align:right">${esc(D.company.toUpperCase())}</div>` : ''}</div>
+  <hr><div><b>LOCATION</b><div class="pre" style="font-size:10pt">${esc([D.location.name, D.location.address].filter(Boolean).join('\n') || '–')}</div>${D.location.link ? `<div style="font-size:9pt">${esc(D.location.link)}</div>` : ''}</div><hr>
+  <div class="big"><b>TEAM</b></div><table><thead><tr><th>NAME</th><th>POSITION</th><th style="text-align:center">TAGE</th><th>KONTAKT</th></tr></thead><tbody>${team('intern')}${team('extern')}</tbody></table>
+  ${days.map(d => { const people = D.team.filter(m => m.dayIds.includes(d.id) && m.name).map(m => m.name); return `<div class="dayblock"><div><span class="dayt">ABLAUF ${esc(dayLong(d))}</span> <b>→ ${esc(d.title || d.label)}</b></div>
+    ${people.length ? `<div class="gray" style="margin:4pt 0 6pt">(${esc(people.join(', '))})</div>` : ''}
+    <table class="ablauf"><thead><tr><th style="width:80pt">UHRZEIT</th><th>TO DO</th><th style="width:110pt">BEMERKUNG</th></tr></thead><tbody>${d.entries.map(e => { const sc = e.sceneId && meta[e.sceneId]; return `<tr><td><b>${esc(e.time)}</b></td><td class="pre">${esc(e.todo)}${sc ? ` <span style="color:#2d5aa8">– Szene ${sc.no}</span>` : ''}</td><td class="gray">${esc(e.note)}</td></tr>`; }).join('') || '<tr><td colspan="3">–</td></tr>'}</tbody></table>
+    ${d.notes ? `<div class="pre" style="margin-top:6pt;font-style:italic">${esc(d.notes)}</div>` : ''}
+    ${d.checklist.length ? `<div style="margin-top:6pt"><b>Vorbereitung:</b><ul style="margin:2pt 0;padding-left:6pt;list-style:none">${d.checklist.map(c => `<li>${c.done ? '☑' : '☐'} ${esc(c.text)}</li>`).join('')}</ul></div>` : ''}</div>`; }).join('')}
+  ${D.parking || D.parkingImage ? `<div class="dayblock"><b><u>Parken:</u></b><div class="pre">${esc(D.parking)}</div>${msrc(D.parkingImage) ? `<img src="${esc(msrc(D.parkingImage))}" style="max-width:260pt;margin-top:6pt" alt="">` : ''}</div>` : ''}`;
+}
+
+/* ---------- Moodboard ---------- */
+const hostOf = u => { try { return new URL(u).hostname.replace(/^www\./, ''); } catch (e) { return u; } };
+function classifyUrl(u) {
+  const x = u.toLowerCase().split(/[?#]/)[0];
+  if (/\.(png|jpe?g|gif|webp|avif|svg)$/.test(x)) return { kind: 'image' };
+  if (/\.(mp4|webm|mov|m4v)$/.test(x)) return { kind: 'video' };
+  if (/\.(mp3|wav|m4a|aac|ogg|oga|flac)$/.test(x)) return { kind: 'audio' };
+  const yt = u.match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/)|youtu\.be\/)([\w-]{11})/);
+  if (yt) return { kind: 'video', provider: 'YouTube', autoThumb: `https://img.youtube.com/vi/${yt[1]}/hqdefault.jpg` };
+  if (/vimeo\.com\/\d+/.test(u)) return { kind: 'video', provider: 'Vimeo' };
+  if (/tiktok\.com/.test(u)) return { kind: 'video', provider: 'TikTok' };
+  if (/open\.spotify\.com|soundcloud\.com|music\.apple\.com|deezer\.com/.test(u)) return { kind: 'audio', provider: hostOf(u) };
+  return { kind: 'link', provider: hostOf(u) };
+}
+const KIND = { image: ['Bild', '◻'], video: ['Video', '▶'], audio: ['Audio', '♪'], link: ['Link', '↗'] };
+function addMoodLink(raw) {
+  let u = String(raw || '').trim(); if (!u) return false;
+  if (!/^https?:\/\//i.test(u)) u = 'https://' + u;
+  try { new URL(u); } catch (e) { toast('Das ist kein gültiger Link.'); return false; }
+  const c = classifyUrl(u);
+  const title = c.provider && c.provider !== hostOf(u) ? c.provider : (decodeURIComponent(new URL(u).pathname.split('/').filter(Boolean).pop() || hostOf(u)).replace(/[-_]+/g, ' ').replace(/\.[a-z0-9]+$/i, '').slice(0, 60));
+  P().moodboard.unshift({ id: uid(), source: 'link', url: u, title, note: '', tag: '', ts: Date.now(), by: S.currentUser, ...c });
+  commit(`Moodboard: ${KIND[c.kind][0]} verlinkt`); return true;
+}
+async function addMoodFiles(files) {
+  let n = 0;
+  for (const f of files) { const m = await fileToMedia(f); if (!m) continue; P().moodboard.unshift({ id: uid(), kind: m.type, source: 'upload', file: m, title: f.name.replace(/\.[^.]+$/, ''), note: '', tag: '', ts: Date.now(), by: S.currentUser }); n++; }
+  if (!n) return toast('Keine passenden Dateien – erlaubt sind Bilder, Videos und Audio.');
+  commit(`Moodboard: ${n} Datei(en) hochgeladen`); toast(n === 1 ? 'Datei hochgeladen.' : n + ' Dateien hochgeladen.');
+}
+function moodPreview(it) {
+  const up = it.source === 'upload', src = up ? msrc(it.file) : it.url;
+  const thumb = it.thumb ? msrc(it.thumb) : (it.autoThumb || '');
+  const [, glyph] = KIND[it.kind];
+  const card = () => `<a class="lcard" href="${esc(it.url)}" target="_blank" rel="noopener">${thumb ? `<img data-fallback="${glyph}" src="${esc(thumb)}" alt="" loading="lazy">${it.kind !== 'link' ? `<span class="play">${glyph}</span>` : ''}` : `<div class="ph"><span class="g">${glyph}</span><span>${esc(it.provider || hostOf(it.url))}</span></div>`}</a>`;
+  if (it.kind === 'image') return up ? `<img src="${esc(src)}" alt="" loading="lazy">` : `<a class="lcard" href="${esc(it.url)}" target="_blank" rel="noopener"><img data-fallback="◻" src="${esc(src)}" alt="" loading="lazy"></a>`;
+  if (it.kind === 'video') return up || /\.(mp4|webm|mov|m4v)(\?|#|$)/i.test(it.url) ? `<video src="${esc(src)}" controls playsinline preload="metadata" ${thumb ? `poster="${esc(thumb)}"` : ''}></video>` : card();
+  if (it.kind === 'audio') return up || /\.(mp3|wav|m4a|aac|ogg|oga|flac)(\?|#|$)/i.test(it.url) ? `<div class="aud">${thumb ? `<img data-fallback="♪" src="${esc(thumb)}" alt="">` : '<div class="ph" style="aspect-ratio:3/1"><span class="g">♪</span></div>'}<audio src="${esc(src)}" controls preload="metadata"></audio></div>` : card();
+  return card();
+}
+function vMood(p) {
+  const kind = ui.moodKind || 'all', tag = ui.moodTag || '';
+  const tags = [...new Set(p.moodboard.map(x => x.tag).filter(Boolean))].sort();
+  const list = p.moodboard.filter(x => (kind === 'all' || x.kind === kind) && (!tag || x.tag === tag));
+  const cnt = k => p.moodboard.filter(x => k === 'all' || x.kind === k).length;
+  return `<div class="pagehead"><div><h1>Moodboard</h1><div class="sub">Bilder, Videos, Audio und Links sammeln – hochladen oder verlinken, mit Vorschau</div></div>
+    <div class="actions"><button class="btn pri" data-action="moodUpload">+ Dateien hochladen</button></div></div>
+  <div class="moodbar">
+    <div class="url"><input id="moodUrl" placeholder="Link einfügen: Bild, YouTube, Vimeo, MP3, Spotify, Website …" aria-label="Link einfügen"><button class="btn" data-action="addMoodLink">Verlinken</button></div>
+    <div class="filters">${[['all', 'Alle'], ['image', 'Bilder'], ['video', 'Videos'], ['audio', 'Audio'], ['link', 'Links']].map(([k, l]) => `<button class="${kind === k ? 'on' : ''}" data-action="moodFilter" data-v="${k}">${l} ${cnt(k)}</button>`).join('')}</div>
+    ${tags.length ? `<select data-action-change="moodTag" style="width:auto" aria-label="Gruppe filtern"><option value="">Alle Gruppen</option>${tags.map(t => `<option ${t === tag ? 'selected' : ''}>${esc(t)}</option>`).join('')}</select>` : ''}
+  </div>
+  <div class="dropzone">Dateien hierher ziehen oder einfügen (⌘/Strg + V) – Bilder, Videos, Audio${idb ? '' : ' (max. 3 MB)'} · Links werden automatisch erkannt${EMBED ? '<br><span class="small faint">In der Online-Vorschau werden externe Vorschaubilder blockiert – bei Links ein eigenes Vorschaubild hochladen.</span>' : ''}</div>
+  ${list.length ? `<div class="mood">${list.map(it => { const b = `moodboard.${it.id}`, u = userById(it.by); return `<div class="mitem">
+    <div class="mprev">${moodPreview(it)}<span class="kind">${KIND[it.kind][0]}${it.provider && it.source === 'link' && it.kind !== 'link' ? ' · ' + esc(it.provider) : ''}</span></div>
+    <div class="mbody">
+      ${inp(`${b}.title`, it.title, 'placeholder="Titel" aria-label="Titel"')}
+      ${ta(`${b}.note`, it.note, 'placeholder="Notiz, Idee, wofür …" aria-label="Notiz"')}
+      ${inp(`${b}.tag`, it.tag, `placeholder="Gruppe (z. B. Set, Licht, Musik)" aria-label="Gruppe" list="moodTags" data-rerender`)}
+      <div class="src">${it.source === 'link' ? `<a href="${esc(it.url)}" target="_blank" rel="noopener">${esc(hostOf(it.url))} ↗</a>` : 'Hochgeladen'}${u ? ' · ' + esc(u.name) : ''} · ${new Date(it.ts || Date.now()).toLocaleDateString('de-DE')}</div>
+      <div class="row" style="justify-content:space-between;gap:4px">${it.source === 'link' && it.kind !== 'image' ? `<span class="row" style="gap:4px"><button class="btn sm" data-action="upload" data-mode="set" data-path="${b}.thumb" data-accept="image/*">${it.thumb ? 'Vorschaubild ändern' : '+ Vorschaubild'}</button>${it.thumb ? `<button class="btn sm ghost" data-action="clearThumb" data-id="${it.id}">×</button>` : ''}</span>` : '<span></span>'}${del('remove', { list: 'moodboard', id: it.id })}</div>
+    </div></div>`; }).join('')}</div><datalist id="moodTags">${tags.map(t => `<option value="${esc(t)}">`).join('')}</datalist>` : `<div class="empty">${p.moodboard.length ? 'Keine Elemente für diesen Filter.' : 'Noch leer. Lade Bilder, Videos oder Audio hoch oder füge einen Link ein.'}</div>`}`;
+}
+
+const VIEWS = { dispo: vDispo, mood: vMood, projects: vProjects, details: vDetails, set: vSet, offer: vOffer, sp: vSP, storyboard: vStoryboard, anim: vAnim, broll: vBroll, post: vPost, notes: vNotes, analysis: vAnalysis, export: vExport };
 
 /* ============================================================
    ACTIONS
@@ -880,6 +1130,10 @@ function doPrint(html) { $('#print').innerHTML = html; setTimeout(() => window.p
 function commit(msg, key) { log(msg, key); save(); render(); }
 
 const FACTORY = {
+  'dispo.team': d => ({ id: uid(), name: '', position: '', group: d.group || 'intern', dayIds: P().dispo.days.map(x => x.id), contact: '' }),
+  'dispo.days': () => { const ds = P().dispo.days; const last = [...ds].sort((a, b) => (a.date || '').localeCompare(b.date || '')).pop(); let date = ''; if (last?.date) { const t = new Date(last.date + 'T12:00'); t.setDate(t.getDate() + 1); date = t.toISOString().slice(0, 10); } else date = P().shootingDate || ''; return { id: uid(), date, label: 'Drehtag ' + (ds.filter(x => /dreh/i.test(x.label)).length + 1), title: '', notes: '', checklist: [], entries: [] }; },
+  entries: () => ({ id: uid(), time: '', todo: '', note: '', sceneId: '' }),
+  checklist: () => ({ id: uid(), text: '', done: false }),
   hosts: () => ({ id: uid(), name: '', role: '', contact: '' }),
   'setDesign.colors': () => ({ id: uid(), name: 'Neue Farbe', hex: '#888888' }),
   'offer.items': () => ({ id: uid(), name: 'Neues Produkt', size: '', spec: '', description: '', image: null }),
@@ -889,7 +1143,7 @@ const FACTORY = {
   post: () => ({ id: uid(), text: '', sceneId: '', priority: 'mittel', done: false }),
   notes: () => ({ id: uid(), title: 'Neue Notiz', link: '', text: '', image: null })
 };
-const LISTNAME = { hosts: 'Host', 'setDesign.colors': 'Farbe', 'setDesign.images': 'Set-Bild', 'offer.items': 'Produkt', salesPoints: 'Sales-Point', animations: 'Animation', brolls: 'B-Roll', post: 'Post-Shooting-Eintrag', notes: 'Notiz' };
+const LISTNAME = { 'dispo.team': 'Team-Mitglied', 'dispo.days': 'Tag', entries: 'Ablauf-Eintrag', checklist: 'Checklisten-Punkt', moodboard: 'Moodboard-Element', hosts: 'Host', 'setDesign.colors': 'Farbe', 'setDesign.images': 'Set-Bild', 'offer.items': 'Produkt', salesPoints: 'Sales-Point', animations: 'Animation', brolls: 'B-Roll', post: 'Post-Shooting-Eintrag', notes: 'Notiz' };
 
 const A = {
   nav: async d => { ui.view = d.v; ui.sceneId = null; S.lastView = d.v; save(); render(); $('main').scrollTop = 0; },
@@ -900,8 +1154,17 @@ const A = {
   openProject: async (d, el, e) => { if (e.target.closest('button')) return; S.activeProjectId = d.id; ui.view = 'storyboard'; ui.sceneId = null; save(); render(); },
   dupProject: async d => { const src = S.projects.find(p => p.id === d.id); const c = clone(src); c.id = uid(); c.title += ' (Kopie)'; c.history = []; c.created = Date.now(); S.projects.unshift(c); S.activeProjectId = c.id; log('Projekt dupliziert aus „' + src.title + '“'); save(); render(); },
   delProject: async d => { const p = S.projects.find(x => x.id === d.id); if (!await ask(`Projekt „${p.title}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden.`)) return; S.projects = S.projects.filter(x => x.id !== d.id); if (S.activeProjectId === d.id) S.activeProjectId = S.projects[0]?.id || null; save(); render(); },
-  add: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const o = FACTORY[d.list](d); arr.push(o); commit(`${LISTNAME[d.list]} hinzugefügt`); setTimeout(() => { const el = document.querySelector(`[data-bind^="${d.list}.${o.id}."]`); el?.focus(); el?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30); },
-  remove: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.findIndex(x => x.id === d.id); if (i < 0) return; const nm = arr[i].name || arr[i].title || arr[i].text || arr[i].caption || ''; if (!await ask(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} löschen?`)) return; arr.splice(i, 1); commit(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} gelöscht`); },
+  add: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const o = FACTORY[d.kind || d.list](d); arr.push(o); commit(`${LISTNAME[d.kind || d.list]} hinzugefügt`); setTimeout(() => { const el = document.querySelector(`[data-bind^="${d.list}.${o.id}."]`); el?.focus(); el?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30); },
+  remove: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.findIndex(x => x.id === d.id); if (i < 0) return; const nm = arr[i].name || arr[i].title || arr[i].text || arr[i].caption || ''; const ln = LISTNAME[d.kind || d.list] || 'Eintrag'; if (!d.quiet && !await ask(`${ln}${nm ? ' „' + nm + '“' : ''} löschen?`)) return; arr.splice(i, 1); commit(`${ln}${nm ? ' „' + nm + '“' : ''} gelöscht`); },
+  delDay: async d => { const D = P().dispo; const dy = D.days.find(x => x.id === d.id); if (!await ask(`Tag „${dy.label || dayLong(dy)}“ mit ${dy.entries.length} Ablauf-Einträgen löschen?`)) return; D.days = D.days.filter(x => x.id !== d.id); D.team.forEach(m => m.dayIds = m.dayIds.filter(x => x !== d.id)); commit(`Dispo: Tag „${dy.label}“ gelöscht`); },
+  sortDay: async d => { const dy = P().dispo.days.find(x => x.id === d.id); const key = t => { const m = String(t || '').match(/(\d{1,2})[:.](\d{2})/); return m ? +m[1] * 60 + +m[2] - (/vor/i.test(t) ? .5 : 0) : 9999; }; dy.entries.sort((a, b) => key(a.time) - key(b.time)); commit(`Dispo „${dy.label}“: Ablauf sortiert`); },
+  allDays: async d => { const D = P().dispo; const m = D.team.find(x => x.id === d.id); m.dayIds = m.dayIds.length === D.days.length ? [] : D.days.map(x => x.id); commit('Dispo: Team geändert', 'dispo.team'); },
+  dispoPreview: async () => { ui.exportLayout = 'dispo'; A.nav({ v: 'export' }); },
+  printDispo: async () => doPrint(exportHTML(P(), 'dispo', true)),
+  moodFilter: async d => { ui.moodKind = d.v; render(); },
+  moodUpload: async () => fileInput('image/*,video/*,audio/*', true, addMoodFiles),
+  addMoodLink: async () => { const el = $('#moodUrl'); const ok = addMoodLink(el.value); if (ok) el.value = ''; },
+  clearThumb: async d => { const it = P().moodboard.find(x => x.id === d.id); it.thumb = null; commit(`Moodboard „${it.title}“: Vorschaubild entfernt`); },
   toggle: async (d, el) => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.indexOf(d.val); i >= 0 ? arr.splice(i, 1) : arr.push(d.val); if (d.list === 'userIds') return commit('Benutzerzuordnung geändert', d.list); commit(describe(d.list.replace(/\.[^.]+$/, '') + '.' + ({ itemIds: 'Produkte', salesPointIds: 'Sales-Points', categories: 'Kategorien', sceneIds: 'Szenen', userIds: 'Benutzer' }[d.list.split('.').pop()] || 'Liste')), d.list); },
   toggleAnim: async d => { const a = P().animations.find(x => x.id === d.anim); const i = a.sceneIds.indexOf(d.scene); i >= 0 ? a.sceneIds.splice(i, 1) : a.sceneIds.push(d.scene); commit(`Animation „${a.name}“ verknüpft`); },
   delCat: async d => { const p = P(); if (!await ask(`Kategorie „${d.v}“ entfernen? Sie wird auch aus allen Szenen entfernt.`)) return; p[d.key] = p[d.key].filter(c => c !== d.v); p.scenes.forEach(s => { s.categories = s.categories.filter(c => c !== d.v); if (s.recipeCategory === d.v && d.key === 'recipeCategories') s.recipeCategory = ''; }); commit(`Kategorie „${d.v}“ entfernt`); },
@@ -915,6 +1178,7 @@ const A = {
   closeScene: async () => { ui.sceneId = null; render(); },
   dupScene: async d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); const c = clone(s); c.id = uid(); c.name += ' (Kopie)'; c.comments = []; p.scenes.splice(p.scenes.indexOf(s) + 1, 0, c); log(`Szene „${s.name}“ dupliziert`); save(); ui.sceneId = c.id; render(); },
   delScene: async d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); if (!await ask(`Szene „${s.name}“ löschen?`)) return; p.scenes = p.scenes.filter(x => x.id !== d.id); p.animations.forEach(a => a.sceneIds = a.sceneIds.filter(x => x !== d.id)); p.brolls.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); p.post.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); ui.sceneId = null; commit(`Szene „${s.name}“ gelöscht`); },
+  openMood: async d => { const it = P().moodboard.find(x => x.id === d.id); if (it?.url) window.open(it.url, '_blank', 'noopener'); },
   clearMedia: async d => { const s = P().scenes.find(x => x.id === d.id); s.media = null; commit(`Szene „${s.name}“: Bild entfernt`); },
   addComment: async d => { const t = $('#commentDraft').value.trim(); if (!t) return; const s = P().scenes.find(x => x.id === d.id); s.comments.push({ id: uid(), user: S.currentUser, ts: Date.now(), text: t }); commit(`Kommentar zu Szene „${s.name}“`, 'c' + uid()); },
   delComment: async d => { const s = P().scenes.find(x => x.id === d.scene); s.comments = s.comments.filter(c => c.id !== d.id); commit(`Kommentar in Szene „${s.name}“ gelöscht`); },
@@ -926,14 +1190,14 @@ const A = {
     const rows = [['Nr', 'Start', 'Dauer', 'Segment', 'Szene', 'Kategorien', 'Produkte', 'Sales-Points', 'Rezept', 'Rezeptkategorie', 'Zutaten', 'Beschreibung', 'Text/VO']];
     ordered(p).forEach(s => rows.push([meta[s.id].no, fmtDur(meta[s.id].start), fmtDur(s.duration), meta[s.id].seg.name, s.name, s.categories.join(', '), s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', '), s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean).join(' | '), s.recipeOn ? s.recipe : '', s.recipeOn ? s.recipeCategory : '', s.recipeOn ? s.ingredients : '', s.description, s.textVO]));
     download(slug(p.title) + '-szenen.csv', '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv;charset=utf-8'); },
-  exportJSON: async () => { const p = P(); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
-  backupAll: async () => download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...S }, null, 2), 'application/json'),
+  exportJSON: async () => { const p = await inlineMedia(P()); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
+  backupAll: async () => { const d = await inlineMedia(S); download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...d }, null, 2), 'application/json'); },
   importJSON: async () => fileInput('.json,application/json', false, files => { const f = files[0]; return f.text().then(async t => {
     let d; try { d = JSON.parse(t); } catch (e) { return toast('Datei ist kein gültiges JSON.'); }
-    if (d.format === 'pitchmeister-backup' && Array.isArray(d.projects)) { if (!await ask('Komplett-Backup einspielen? Alle aktuellen Daten in diesem Browser werden ersetzt.', 'Einspielen')) return; const cu = S.currentUser; S = migrate(d); delete S.format; delete S.version; if (S.users.some(u => u.id === cu)) S.currentUser = cu; else S.currentUser = null; save(true); render(); return toast('Backup eingespielt.'); }
+    if (d.format === 'pitchmeister-backup' && Array.isArray(d.projects)) { if (!await ask('Komplett-Backup einspielen? Alle aktuellen Daten in diesem Browser werden ersetzt.', 'Einspielen')) return; const cu = S.currentUser; await externalizeMedia(d); S = migrate(d); delete S.format; delete S.version; if (S.users.some(u => u.id === cu)) S.currentUser = cu; else S.currentUser = null; save(true); render(); return toast('Backup eingespielt.'); }
     const proj = d.project || (d.scenes ? d : null); if (!proj) return toast('Unbekanntes Format.');
     (d.users || []).forEach(u => { if (!S.users.some(x => x.id === u.id)) S.users.push(u); });
-    proj.id = uid(); migrate({ projects: [proj] }); S.projects.unshift(proj); S.activeProjectId = proj.id; log('Projekt importiert'); save(); render(); toast(`Projekt „${proj.title}“ importiert.`); }); })
+    proj.id = uid(); await externalizeMedia(proj); migrate({ projects: [proj] }); S.projects.unshift(proj); S.activeProjectId = proj.id; log('Projekt importiert'); save(); render(); toast(`Projekt „${proj.title}“ importiert.`); }); })
 };
 
 /* uploads (images are downscaled to keep storage small) */
@@ -950,21 +1214,29 @@ function pickFiles(d) {
     const p = P(); let n = 0;
     for (const f of files) {
       let m;
-      if (f.type.startsWith('image/')) m = { type: 'image', src: await downscale(f, 1280) };
-      else if (f.type.startsWith('video/')) { if (f.size > 4 * 1024 * 1024) { toast('Video ist größer als 4 MB – bitte als Link zum Clip eintragen.'); continue; } m = { type: 'video', src: await readURL(f) }; }
-      else continue;
+      m = await fileToMedia(f); if (!m) continue;
       if (d.mode === 'push') { resolve(p, d.path.split('.')).push({ id: uid(), caption: f.name.replace(/\.[^.]+$/, ''), ...m }); }
       else setPath(p, d.path, m);
       n++;
     }
-    if (!n) return toast('Dateityp wird nicht unterstützt – bitte Bild (JPG, PNG, WebP) oder Video wählen.');
-    commit(describe(d.path.replace(/\.(media|image|preview|images)$/, '') + '.' + (d.mode === 'push' ? 'images' : 'Bild')), d.path);
+    if (!n) return toast('Dateityp wird nicht unterstützt – bitte Bild (JPG, PNG, WebP), Video oder Audio wählen.');
+    commit(describe(d.path.replace(/\.(media|image|preview|images|thumb|parkingImage)$/, '') + '.' + (d.mode === 'push' ? 'images' : 'Bild')), d.path);
     toast(n === 1 ? 'Datei hochgeladen.' : n + ' Dateien hochgeladen.');
   });
 }
+const MAX_AV = () => idb ? 200 : 3; // MB
+async function fileToMedia(f) {
+  const t = f.type || '';
+  if (t.startsWith('image/')) { const b = await downscale(f, 1600); return { type: 'image', ...await putBlob(b) }; }
+  if (t.startsWith('video/') || t.startsWith('audio/')) {
+    if (f.size > MAX_AV() * 1024 * 1024) { toast(`„${f.name}“ ist größer als ${MAX_AV()} MB – bitte als Link eintragen.`); return null; }
+    return { type: t.startsWith('video/') ? 'video' : 'audio', ...await putBlob(f) };
+  }
+  return null;
+}
 const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
 function downscale(f, max) {
-  return new Promise((res, rej) => { const img = new Image(); const url = URL.createObjectURL(f); img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', .82)); }; img.onerror = () => { URL.revokeObjectURL(url); if (f.size > 2.5 * 1024 * 1024) return rej(new Error('Bildformat nicht lesbar (z. B. HEIC) – bitte als JPG/PNG exportieren.')); readURL(f).then(res, rej); }; img.src = url; });
+  return new Promise((res, rej) => { const img = new Image(); const url = URL.createObjectURL(f); img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); if (k === 1 && f.size < 400 * 1024 && /png|gif|webp|svg/.test(f.type)) return res(f); c.toBlob(b => b ? res(b) : rej(new Error('Bild konnte nicht verarbeitet werden.')), 'image/jpeg', .85); }; img.onerror = () => { URL.revokeObjectURL(url); rej(new Error('Bildformat nicht lesbar (z. B. HEIC) – bitte als JPG oder PNG exportieren.')); }; img.src = url; });
 }
 
 /* ---------- events ---------- */
@@ -989,19 +1261,23 @@ function applyBind(el, isChange) {
 document.addEventListener('input', e => { const el = e.target.closest('[data-bind]'); if (el && el.type !== 'checkbox' && el.tagName !== 'SELECT') applyBind(el, false); });
 document.addEventListener('change', e => {
   const el = e.target;
-  if (el.matches('[data-bind]')) { applyBind(el, true); if (el.dataset.rerender !== undefined || el.type === 'checkbox' || el.tagName === 'SELECT') render(); return; }
+  if (el.matches('[data-bind]')) { applyBind(el, true);
+    const mm = el.dataset.bind.match(/^dispo\.days\.(\w+)\.entries\.(\w+)\.sceneId$/);
+    if (mm && el.value) { const p = P(), e = p.dispo.days.find(x => x.id === mm[1])?.entries.find(x => x.id === mm[2]), s = p.scenes.find(x => x.id === el.value), no = sceneMeta(p)[el.value]?.no; if (e && s) { if (!e.todo.trim()) e.todo = `Szene ${no} („${s.name}“)`; if (!e.note.trim()) e.note = `(${fmtDur(s.duration)})`; save(); } } if (el.dataset.rerender !== undefined || el.type === 'checkbox' || el.tagName === 'SELECT') render(); return; }
   if (el.type === 'checkbox' && el.dataset.action) { A[el.dataset.action](el.dataset, el, e); return; }
   if (el.id === 'projSel') { S.activeProjectId = el.value; ui.sceneId = null; if (ui.view === 'projects') ui.view = 'storyboard'; save(); render(); return; }
   const ac = el.dataset.actionChange;
   if (ac === 'segFilter') { ui.segFilter = el.value; render(); }
   if (ac === 'layout') { ui.exportLayout = el.value; render(); }
   if (ac === 'exportImages') { ui.exportImages = el.checked; render(); }
+  if (ac === 'moodTag') { ui.moodTag = el.value; render(); }
 });
 document.addEventListener('keydown', e => {
   const el = e.target;
   if (el.dataset?.addcat && e.key === 'Enter') { e.preventDefault(); const v = el.value.trim().toUpperCase(); const p = P(); if (v && !p[el.dataset.addcat].includes(v)) { p[el.dataset.addcat].push(v); commit(`Kategorie „${v}“ hinzugefügt`); setTimeout(() => $(`[data-addcat="${el.dataset.addcat}"]`)?.focus(), 20); } }
   if (el.id === 'commentDraft' && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { $('[data-action="addComment"]').click(); }
   if (e.key === 'Enter' && el.dataset?.type === 'dur') el.blur();
+  if (e.key === 'Enter' && el.id === 'moodUrl') { e.preventDefault(); A.addMoodLink(); }
 });
 document.addEventListener('submit', e => {
   if (e.target.id !== 'loginForm') return; e.preventDefault();
@@ -1025,10 +1301,28 @@ document.addEventListener('drop', e => {
   else { const l = p.scenes.filter(x => x.segmentId === s.segmentId); p.scenes.splice(l.length ? p.scenes.indexOf(l[l.length - 1]) + 1 : p.scenes.length, 0, s); }
   dragId = null; commit(`Szene „${s.name}“ verschoben`);
 });
-window.addEventListener('storage', e => { if (e.key === KEY) { const d = load(); if (d) { const cu = S.currentUser; S = d; S.currentUser = cu; render(); } } });
+/* Moodboard: Dateien/Links per Drag & Drop oder Einfügen */
+const fileDrag = e => ui.view === 'mood' && !dragId && [...(e.dataTransfer?.types || [])].some(t => t === 'Files' || t === 'text/uri-list');
+document.addEventListener('dragover', e => { if (fileDrag(e)) { e.preventDefault(); document.body.classList.add('filedrag'); } });
+document.addEventListener('dragleave', e => { if (!e.relatedTarget) document.body.classList.remove('filedrag'); });
+document.addEventListener('drop', e => {
+  if (!fileDrag(e)) return; e.preventDefault(); document.body.classList.remove('filedrag');
+  const files = [...e.dataTransfer.files]; if (files.length) return addMoodFiles(files).catch(err => toast(err.message));
+  const u = e.dataTransfer.getData('text/uri-list') || e.dataTransfer.getData('text/plain'); if (u) addMoodLink(u.split('\n')[0]);
+});
+document.addEventListener('paste', e => {
+  if (ui.view !== 'mood') return; const t = e.target;
+  const files = [...(e.clipboardData?.files || [])];
+  if (files.length) { e.preventDefault(); return addMoodFiles(files).catch(err => toast(err.message)); }
+  if (t.matches?.('input,textarea')) return;
+  const txt = (e.clipboardData?.getData('text') || '').trim(); if (/^(https?:\/\/|www\.)\S+$/i.test(txt)) { e.preventDefault(); addMoodLink(txt); }
+});
+window.addEventListener('storage', e => { if (e.key === KEY) { const d = load(); if (d) { const cu = S.currentUser; S = d; S.currentUser = cu; loadMedia(false).then(render); } } });
+document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && t.hasAttribute('data-fallback')) { const ph = document.createElement('div'); ph.className = 'ph'; ph.innerHTML = `<span class="g">${esc(t.dataset.fallback || '◻')}</span><span>Vorschau nicht verfügbar</span>`; t.replaceWith(ph); } }, true);
 
 try { const th = localStorage.getItem(KEY + '.theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
 render();
+loadMedia(true).then(render);
 </script>
 </body>
 </html>
