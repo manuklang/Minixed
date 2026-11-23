@@ -183,6 +183,10 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .history{max-height:360px;overflow:auto}
 .history td{font-size:13px}
 .done td{color:var(--faint);text-decoration:line-through}
+.modal{position:fixed;inset:0;background:rgba(10,15,25,.45);display:grid;place-items:center;z-index:60;padding:16px}
+.mbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px;width:min(440px,100%);box-shadow:var(--shadow)}
+.mbox p{margin:0 0 16px}
+.mbox textarea{min-height:240px;font:12px/1.4 ui-monospace,Menlo,monospace;margin-bottom:12px}
 .toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;z-index:50;box-shadow:var(--shadow);font-size:14px;max-width:90vw}
 /* login */
 .login{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(160deg,var(--bg),var(--bg2));z-index:40;padding:16px}
@@ -253,6 +257,7 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
    Lokale Web-App: Daten im Browser (localStorage), JSON-Backup.
    ============================================================ */
 const KEY = 'pitchmeister.v1';
+const EMBED = !!window.PM_EMBED; // im claude.ai-Artifact: kein Druck, keine Downloads
 const DEFAULT_CATS = ['LIVE','B-ROLL','FEATURE SEGMENT','DEMO','TESTIMONIAL','ANIMATION','OFFER / CTA'];
 const DEFAULT_RCATS = ['VORSPEISE','HAUPTGANG','FISCH','FLEISCH','VEGETARISCH','DESSERT','SNACK'];
 const PALETTE = ['#2d5aa8','#e0a21b','#2f8f5b','#c0392b','#8e44ad','#16a2b8','#d35400','#5d6d7e','#c2185b','#7cb342'];
@@ -462,7 +467,7 @@ function renderLogin() {
       ${field('Rolle', `<select name="role"><option>Regie</option><option>Produktion</option><option>Kitchen-Crew</option><option>Stage-Crew</option><option>Kunde</option><option>Redaktion</option></select>`)}
       <button class="btn pri" style="justify-content:center">Anlegen &amp; anmelden</button>
     </form>
-    <p class="small faint" style="margin-top:16px">Alle Änderungen werden pro Benutzer in der Projekt-History protokolliert. Daten werden lokal in diesem Browser gespeichert – Backup über <i>Export → JSON</i>.</p>
+    <p class="small faint" style="margin-top:16px">Alle Änderungen werden pro Benutzer in der Projekt-History protokolliert. Daten werden lokal in diesem Browser gespeichert. Backup über <i>Export → JSON</i>.</p>
   </div>`;
 }
 
@@ -771,7 +776,7 @@ function analysisHTML(p, segId, print = false) {
 function vAnalysis(p) {
   return `<div class="pagehead"><div><h1>Analyse</h1><div class="sub">Numerisch, prozentual und als Diagramm – pro Segment und Total</div></div>
     <div class="actions"><select data-action-change="segFilter" style="width:auto">${[['all', 'Total – alle Segmente'], ...p.segments.map(s => [s.id, 'Segment: ' + s.name])].map(([v, l]) => `<option value="${v}" ${ui.segFilter === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>
-    <button class="btn pri" data-action="printAnalysis">Drucken / PDF</button></div></div>
+    ${EMBED ? '' : '<button class="btn pri" data-action="printAnalysis">Drucken / PDF</button>'}</div></div>
   ${p.scenes.length ? analysisHTML(p, ui.segFilter) : '<div class="empty">Noch keine Szenen im Storyboard – die Analyse füllt sich automatisch.</div>'}`;
 }
 
@@ -836,12 +841,12 @@ function shoppingTable(p) { const l = shoppingList(p); return l.length ? `<table
 
 function vExport(p) {
   return `<div class="pagehead"><div><h1>Export &amp; Druck</h1><div class="sub">PDF und Druck mit verschiedenen Layouts, Listen als CSV, Projekt-Backup als JSON</div></div>
-    <div class="actions"><button class="btn" data-action="csv">Szenenliste CSV</button><button class="btn" data-action="exportJSON">Projekt JSON</button><button class="btn" data-action="backupAll">Komplett-Backup</button><button class="btn pri" data-action="print">Drucken / PDF</button></div></div>
+    <div class="actions"><button class="btn" data-action="csv">Szenenliste CSV${EMBED ? ' kopieren' : ''}</button><button class="btn" data-action="exportJSON">Projekt JSON${EMBED ? ' kopieren' : ''}</button><button class="btn" data-action="backupAll">Komplett-Backup${EMBED ? ' kopieren' : ''}</button>${EMBED ? '' : '<button class="btn pri" data-action="print">Drucken / PDF</button>'}</div></div>
   <div class="grid" style="grid-template-columns:minmax(0,320px) minmax(0,1fr)" id="exportGrid">
     <div class="stack export-opts">
       ${LAYOUTS.map(([k, l, d]) => `<label class="opt ${ui.exportLayout === k ? 'on' : ''}"><input type="radio" name="layout" data-action-change="layout" value="${k}" ${ui.exportLayout === k ? 'checked' : ''}><span><b style="font-weight:500">${l}</b><br><span class="small muted">${d}</span></span></label>`).join('')}
       <label class="toggle"><input type="checkbox" data-action-change="exportImages" ${ui.exportImages ? 'checked' : ''}> Bilder einbeziehen</label>
-      <p class="small faint">Tipp: Im Druckdialog „Als PDF speichern“ wählen, um ein PDF zu erzeugen.</p>
+      <p class="small faint">${EMBED ? 'Drucken und PDF gehen in der Online-Vorschau nicht. Dafür die App-Datei (index.html) direkt im Browser öffnen.' : 'Tipp: Im Druckdialog „Als PDF speichern“ wählen, um ein PDF zu erzeugen.'}</p>
     </div>
     <div class="card"><h2>Vorschau</h2><div class="preview-print">${exportHTML(p, ui.exportLayout, ui.exportImages)}</div></div>
   </div>`;
@@ -852,8 +857,24 @@ const VIEWS = { projects: vProjects, details: vDetails, set: vSet, offer: vOffer
 /* ============================================================
    ACTIONS
    ============================================================ */
+function ask(msg, yes = 'Löschen') {
+  return new Promise(res => {
+    const w = document.createElement('div'); w.className = 'modal';
+    w.innerHTML = `<div class="mbox" role="dialog" aria-modal="true"><p>${esc(msg)}</p><div class="row" style="justify-content:flex-end"><button class="btn" data-m="0">Abbrechen</button><button class="btn pri" data-m="1">${esc(yes)}</button></div></div>`;
+    const done = v => { w.remove(); document.removeEventListener('keydown', key, true); res(v); };
+    const key = e => { if (e.key === 'Escape') { e.stopPropagation(); done(false); } };
+    w.addEventListener('click', e => { const b = e.target.closest('[data-m]'); if (b) done(b.dataset.m === '1'); else if (e.target === w) done(false); });
+    document.addEventListener('keydown', key, true);
+    document.body.appendChild(w); w.querySelector('[data-m="1"]').focus();
+  });
+}
 function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); }
-function download(name, data, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+function download(name, data, type) {
+  if (EMBED) {
+    const show = () => { const w = document.createElement('div'); w.className = 'modal'; w.innerHTML = `<div class="mbox"><p>${esc(name)} – Inhalt markieren und kopieren:</p><textarea readonly>${esc(data.replace(/^\ufeff/, ''))}</textarea><div class="row" style="justify-content:flex-end"><button class="btn pri">Schließen</button></div></div>`; w.querySelector('button').onclick = () => w.remove(); document.body.appendChild(w); const t = w.querySelector('textarea'); t.focus(); t.select(); };
+    try { navigator.clipboard.writeText(data.replace(/^\ufeff/, '')).then(() => toast(name + ' in die Zwischenablage kopiert.'), show); } catch (e) { show(); }
+    return;
+  } const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
 const slug = s => String(s).toLowerCase().replace(/[äöüß]/g, c => ({ ä: 'ae', ö: 'oe', ü: 'ue', ß: 'ss' }[c])).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'projekt';
 function doPrint(html) { $('#print').innerHTML = html; setTimeout(() => window.print(), 80); }
 function commit(msg, key) { log(msg, key); save(); render(); }
@@ -871,45 +892,45 @@ const FACTORY = {
 const LISTNAME = { hosts: 'Host', 'setDesign.colors': 'Farbe', 'setDesign.images': 'Set-Bild', 'offer.items': 'Produkt', salesPoints: 'Sales-Point', animations: 'Animation', brolls: 'B-Roll', post: 'Post-Shooting-Eintrag', notes: 'Notiz' };
 
 const A = {
-  nav: d => { ui.view = d.v; ui.sceneId = null; S.lastView = d.v; save(); render(); $('main').scrollTop = 0; },
-  theme: () => { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem(KEY + '.theme', r.dataset.theme); } catch (e) {} },
-  login: d => { S.currentUser = d.id; save(true); render(); },
-  logout: () => { if (confirm('Benutzer wechseln / abmelden?')) { S.currentUser = null; save(true); render(); } },
-  addProject: () => { const p = newProject(); S.projects.unshift(p); S.activeProjectId = p.id; log('Projekt angelegt'); save(); ui.view = 'details'; render(); },
-  openProject: (d, el, e) => { if (e.target.closest('button')) return; S.activeProjectId = d.id; ui.view = 'storyboard'; ui.sceneId = null; save(); render(); },
-  dupProject: d => { const src = S.projects.find(p => p.id === d.id); const c = clone(src); c.id = uid(); c.title += ' (Kopie)'; c.history = []; c.created = Date.now(); S.projects.unshift(c); S.activeProjectId = c.id; log('Projekt dupliziert aus „' + src.title + '“'); save(); render(); },
-  delProject: d => { const p = S.projects.find(x => x.id === d.id); if (!confirm(`Projekt „${p.title}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden.`)) return; S.projects = S.projects.filter(x => x.id !== d.id); if (S.activeProjectId === d.id) S.activeProjectId = S.projects[0]?.id || null; save(); render(); },
-  add: d => { const p = P(); const arr = resolve(p, d.list.split('.')); const o = FACTORY[d.list](d); arr.push(o); commit(`${LISTNAME[d.list]} hinzugefügt`); setTimeout(() => { const el = document.querySelector(`[data-bind^="${d.list}.${o.id}."]`); el?.focus(); el?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30); },
-  remove: d => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.findIndex(x => x.id === d.id); if (i < 0) return; const nm = arr[i].name || arr[i].title || arr[i].text || arr[i].caption || ''; if (!confirm(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} löschen?`)) return; arr.splice(i, 1); commit(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} gelöscht`); },
-  toggle: (d, el) => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.indexOf(d.val); i >= 0 ? arr.splice(i, 1) : arr.push(d.val); if (d.list === 'userIds') return commit('Benutzerzuordnung geändert', d.list); commit(describe(d.list.replace(/\.[^.]+$/, '') + '.' + ({ itemIds: 'Produkte', salesPointIds: 'Sales-Points', categories: 'Kategorien', sceneIds: 'Szenen', userIds: 'Benutzer' }[d.list.split('.').pop()] || 'Liste')), d.list); },
-  toggleAnim: d => { const a = P().animations.find(x => x.id === d.anim); const i = a.sceneIds.indexOf(d.scene); i >= 0 ? a.sceneIds.splice(i, 1) : a.sceneIds.push(d.scene); commit(`Animation „${a.name}“ verknüpft`); },
-  delCat: d => { const p = P(); if (!confirm(`Kategorie „${d.v}“ entfernen? Sie wird auch aus allen Szenen entfernt.`)) return; p[d.key] = p[d.key].filter(c => c !== d.v); p.scenes.forEach(s => { s.categories = s.categories.filter(c => c !== d.v); if (s.recipeCategory === d.v && d.key === 'recipeCategories') s.recipeCategory = ''; }); commit(`Kategorie „${d.v}“ entfernt`); },
-  delItem: d => { const p = P(); const it = p.offer.items.find(i => i.id === d.id); if (!confirm(`Produkt „${it.name}“ löschen? Verknüpfungen in Szenen werden entfernt.`)) return; p.offer.items = p.offer.items.filter(i => i.id !== d.id); p.scenes.forEach(s => s.itemIds = s.itemIds.filter(x => x !== d.id)); p.salesPoints.forEach(sp => { if (sp.itemId === d.id) sp.itemId = null; }); commit(`Produkt „${it.name}“ gelöscht`); },
-  delSP: d => { const p = P(); const sp = p.salesPoints.find(i => i.id === d.id); if (!confirm(`Sales-Point „${sp.text}“ löschen?`)) return; p.salesPoints = p.salesPoints.filter(i => i.id !== d.id); p.scenes.forEach(s => s.salesPointIds = s.salesPointIds.filter(x => x !== d.id)); commit(`Sales-Point „${sp.text}“ gelöscht`); },
-  addSegment: () => { const p = P(); const seg = { id: uid(), name: 'Segment ' + (p.segments.length + 1) }; p.segments.push(seg); commit(`Segment „${seg.name}“ angelegt`); },
-  moveSeg: d => { const p = P(); const i = p.segments.findIndex(s => s.id === d.id), j = i + +d.d; if (j < 0 || j >= p.segments.length) return; [p.segments[i], p.segments[j]] = [p.segments[j], p.segments[i]]; commit('Segment-Reihenfolge geändert'); },
-  delSegment: d => { const p = P(); if (p.segments.length < 2) return toast('Mindestens ein Segment wird benötigt.'); const i = p.segments.findIndex(s => s.id === d.id), seg = p.segments[i]; const n = p.scenes.filter(s => s.segmentId === seg.id).length; const target = p.segments[i - 1] || p.segments[i + 1]; if (!confirm(`Segment „${seg.name}“ löschen?${n ? ` Die ${n} Szene(n) werden nach „${target.name}“ verschoben.` : ''}`)) return; p.scenes.forEach(s => { if (s.segmentId === seg.id) s.segmentId = target.id; }); p.segments.splice(i, 1); commit(`Segment „${seg.name}“ gelöscht`); },
-  addScene: d => { const p = P(); const s = newScene(d.seg, 'Szene ' + (p.scenes.filter(x => x.segmentId === d.seg).length + 1)); const segScenes = p.scenes.filter(x => x.segmentId === d.seg); const lastIdx = segScenes.length ? p.scenes.indexOf(segScenes[segScenes.length - 1]) + 1 : p.scenes.length; p.scenes.splice(lastIdx, 0, s); log(`Szene „${s.name}“ angelegt`); save(); ui.sceneId = s.id; ui.sceneTab = 'desc'; render(); $('main').scrollTop = 0; setTimeout(() => { const el = $(`[data-bind="scenes.${s.id}.name"]`); el?.focus(); el?.select(); }, 30); },
-  openScene: (d, el, e) => { if (!d.id) return; e.preventDefault(); ui.view = 'storyboard'; ui.sceneId = d.id; render(); $('main').scrollTop = 0; },
-  closeScene: () => { ui.sceneId = null; render(); },
-  dupScene: d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); const c = clone(s); c.id = uid(); c.name += ' (Kopie)'; c.comments = []; p.scenes.splice(p.scenes.indexOf(s) + 1, 0, c); log(`Szene „${s.name}“ dupliziert`); save(); ui.sceneId = c.id; render(); },
-  delScene: d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); if (!confirm(`Szene „${s.name}“ löschen?`)) return; p.scenes = p.scenes.filter(x => x.id !== d.id); p.animations.forEach(a => a.sceneIds = a.sceneIds.filter(x => x !== d.id)); p.brolls.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); p.post.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); ui.sceneId = null; commit(`Szene „${s.name}“ gelöscht`); },
-  clearMedia: d => { const s = P().scenes.find(x => x.id === d.id); s.media = null; commit(`Szene „${s.name}“: Bild entfernt`); },
-  addComment: d => { const t = $('#commentDraft').value.trim(); if (!t) return; const s = P().scenes.find(x => x.id === d.id); s.comments.push({ id: uid(), user: S.currentUser, ts: Date.now(), text: t }); commit(`Kommentar zu Szene „${s.name}“`, 'c' + uid()); },
-  delComment: d => { const s = P().scenes.find(x => x.id === d.scene); s.comments = s.comments.filter(c => c.id !== d.id); commit(`Kommentar in Szene „${s.name}“ gelöscht`); },
-  tab: d => { ui[d.k] = d.v; render(); },
-  upload: d => pickFiles(d),
-  printAnalysis: () => doPrint(`<div class="pr"><h1>${esc(P().title)}</h1><div class="prmeta">Analyse · ${esc(ui.segFilter === 'all' ? 'Total' : P().segments.find(s => s.id === ui.segFilter)?.name)} · Stand ${fmtDate(Date.now())}</div>${analysisHTML(P(), ui.segFilter, true)}</div>`),
-  print: () => doPrint(exportHTML(P(), ui.exportLayout, ui.exportImages)),
-  csv: () => { const p = P(), meta = sceneMeta(p); const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+  nav: async d => { ui.view = d.v; ui.sceneId = null; S.lastView = d.v; save(); render(); $('main').scrollTop = 0; },
+  theme: async () => { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem(KEY + '.theme', r.dataset.theme); } catch (e) {} },
+  login: async d => { S.currentUser = d.id; save(true); render(); },
+  logout: async () => { if (await ask('Benutzer wechseln / abmelden?', 'Abmelden')) { S.currentUser = null; save(true); render(); } },
+  addProject: async () => { const p = newProject(); S.projects.unshift(p); S.activeProjectId = p.id; log('Projekt angelegt'); save(); ui.view = 'details'; render(); },
+  openProject: async (d, el, e) => { if (e.target.closest('button')) return; S.activeProjectId = d.id; ui.view = 'storyboard'; ui.sceneId = null; save(); render(); },
+  dupProject: async d => { const src = S.projects.find(p => p.id === d.id); const c = clone(src); c.id = uid(); c.title += ' (Kopie)'; c.history = []; c.created = Date.now(); S.projects.unshift(c); S.activeProjectId = c.id; log('Projekt dupliziert aus „' + src.title + '“'); save(); render(); },
+  delProject: async d => { const p = S.projects.find(x => x.id === d.id); if (!await ask(`Projekt „${p.title}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden.`)) return; S.projects = S.projects.filter(x => x.id !== d.id); if (S.activeProjectId === d.id) S.activeProjectId = S.projects[0]?.id || null; save(); render(); },
+  add: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const o = FACTORY[d.list](d); arr.push(o); commit(`${LISTNAME[d.list]} hinzugefügt`); setTimeout(() => { const el = document.querySelector(`[data-bind^="${d.list}.${o.id}."]`); el?.focus(); el?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30); },
+  remove: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.findIndex(x => x.id === d.id); if (i < 0) return; const nm = arr[i].name || arr[i].title || arr[i].text || arr[i].caption || ''; if (!await ask(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} löschen?`)) return; arr.splice(i, 1); commit(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} gelöscht`); },
+  toggle: async (d, el) => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.indexOf(d.val); i >= 0 ? arr.splice(i, 1) : arr.push(d.val); if (d.list === 'userIds') return commit('Benutzerzuordnung geändert', d.list); commit(describe(d.list.replace(/\.[^.]+$/, '') + '.' + ({ itemIds: 'Produkte', salesPointIds: 'Sales-Points', categories: 'Kategorien', sceneIds: 'Szenen', userIds: 'Benutzer' }[d.list.split('.').pop()] || 'Liste')), d.list); },
+  toggleAnim: async d => { const a = P().animations.find(x => x.id === d.anim); const i = a.sceneIds.indexOf(d.scene); i >= 0 ? a.sceneIds.splice(i, 1) : a.sceneIds.push(d.scene); commit(`Animation „${a.name}“ verknüpft`); },
+  delCat: async d => { const p = P(); if (!await ask(`Kategorie „${d.v}“ entfernen? Sie wird auch aus allen Szenen entfernt.`)) return; p[d.key] = p[d.key].filter(c => c !== d.v); p.scenes.forEach(s => { s.categories = s.categories.filter(c => c !== d.v); if (s.recipeCategory === d.v && d.key === 'recipeCategories') s.recipeCategory = ''; }); commit(`Kategorie „${d.v}“ entfernt`); },
+  delItem: async d => { const p = P(); const it = p.offer.items.find(i => i.id === d.id); if (!await ask(`Produkt „${it.name}“ löschen? Verknüpfungen in Szenen werden entfernt.`)) return; p.offer.items = p.offer.items.filter(i => i.id !== d.id); p.scenes.forEach(s => s.itemIds = s.itemIds.filter(x => x !== d.id)); p.salesPoints.forEach(sp => { if (sp.itemId === d.id) sp.itemId = null; }); commit(`Produkt „${it.name}“ gelöscht`); },
+  delSP: async d => { const p = P(); const sp = p.salesPoints.find(i => i.id === d.id); if (!await ask(`Sales-Point „${sp.text}“ löschen?`)) return; p.salesPoints = p.salesPoints.filter(i => i.id !== d.id); p.scenes.forEach(s => s.salesPointIds = s.salesPointIds.filter(x => x !== d.id)); commit(`Sales-Point „${sp.text}“ gelöscht`); },
+  addSegment: async () => { const p = P(); const seg = { id: uid(), name: 'Segment ' + (p.segments.length + 1) }; p.segments.push(seg); commit(`Segment „${seg.name}“ angelegt`); },
+  moveSeg: async d => { const p = P(); const i = p.segments.findIndex(s => s.id === d.id), j = i + +d.d; if (j < 0 || j >= p.segments.length) return; [p.segments[i], p.segments[j]] = [p.segments[j], p.segments[i]]; commit('Segment-Reihenfolge geändert'); },
+  delSegment: async d => { const p = P(); if (p.segments.length < 2) return toast('Mindestens ein Segment wird benötigt.'); const i = p.segments.findIndex(s => s.id === d.id), seg = p.segments[i]; const n = p.scenes.filter(s => s.segmentId === seg.id).length; const target = p.segments[i - 1] || p.segments[i + 1]; if (!await ask(`Segment „${seg.name}“ löschen?${n ? ` Die ${n} Szene(n) werden nach „${target.name}“ verschoben.` : ''}`)) return; p.scenes.forEach(s => { if (s.segmentId === seg.id) s.segmentId = target.id; }); p.segments.splice(i, 1); commit(`Segment „${seg.name}“ gelöscht`); },
+  addScene: async d => { const p = P(); const s = newScene(d.seg, 'Szene ' + (p.scenes.filter(x => x.segmentId === d.seg).length + 1)); const segScenes = p.scenes.filter(x => x.segmentId === d.seg); const lastIdx = segScenes.length ? p.scenes.indexOf(segScenes[segScenes.length - 1]) + 1 : p.scenes.length; p.scenes.splice(lastIdx, 0, s); log(`Szene „${s.name}“ angelegt`); save(); ui.sceneId = s.id; ui.sceneTab = 'desc'; render(); $('main').scrollTop = 0; setTimeout(() => { const el = $(`[data-bind="scenes.${s.id}.name"]`); el?.focus(); el?.select(); }, 30); },
+  openScene: async (d, el, e) => { if (!d.id) return; e.preventDefault(); ui.view = 'storyboard'; ui.sceneId = d.id; render(); $('main').scrollTop = 0; },
+  closeScene: async () => { ui.sceneId = null; render(); },
+  dupScene: async d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); const c = clone(s); c.id = uid(); c.name += ' (Kopie)'; c.comments = []; p.scenes.splice(p.scenes.indexOf(s) + 1, 0, c); log(`Szene „${s.name}“ dupliziert`); save(); ui.sceneId = c.id; render(); },
+  delScene: async d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); if (!await ask(`Szene „${s.name}“ löschen?`)) return; p.scenes = p.scenes.filter(x => x.id !== d.id); p.animations.forEach(a => a.sceneIds = a.sceneIds.filter(x => x !== d.id)); p.brolls.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); p.post.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); ui.sceneId = null; commit(`Szene „${s.name}“ gelöscht`); },
+  clearMedia: async d => { const s = P().scenes.find(x => x.id === d.id); s.media = null; commit(`Szene „${s.name}“: Bild entfernt`); },
+  addComment: async d => { const t = $('#commentDraft').value.trim(); if (!t) return; const s = P().scenes.find(x => x.id === d.id); s.comments.push({ id: uid(), user: S.currentUser, ts: Date.now(), text: t }); commit(`Kommentar zu Szene „${s.name}“`, 'c' + uid()); },
+  delComment: async d => { const s = P().scenes.find(x => x.id === d.scene); s.comments = s.comments.filter(c => c.id !== d.id); commit(`Kommentar in Szene „${s.name}“ gelöscht`); },
+  tab: async d => { ui[d.k] = d.v; render(); },
+  upload: async d => pickFiles(d),
+  printAnalysis: async () => doPrint(`<div class="pr"><h1>${esc(P().title)}</h1><div class="prmeta">Analyse · ${esc(ui.segFilter === 'all' ? 'Total' : P().segments.find(s => s.id === ui.segFilter)?.name)} · Stand ${fmtDate(Date.now())}</div>${analysisHTML(P(), ui.segFilter, true)}</div>`),
+  print: async () => doPrint(exportHTML(P(), ui.exportLayout, ui.exportImages)),
+  csv: async () => { const p = P(), meta = sceneMeta(p); const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
     const rows = [['Nr', 'Start', 'Dauer', 'Segment', 'Szene', 'Kategorien', 'Produkte', 'Sales-Points', 'Rezept', 'Rezeptkategorie', 'Zutaten', 'Beschreibung', 'Text/VO']];
     ordered(p).forEach(s => rows.push([meta[s.id].no, fmtDur(meta[s.id].start), fmtDur(s.duration), meta[s.id].seg.name, s.name, s.categories.join(', '), s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', '), s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean).join(' | '), s.recipeOn ? s.recipe : '', s.recipeOn ? s.recipeCategory : '', s.recipeOn ? s.ingredients : '', s.description, s.textVO]));
     download(slug(p.title) + '-szenen.csv', '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv;charset=utf-8'); },
-  exportJSON: () => { const p = P(); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
-  backupAll: () => download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...S }, null, 2), 'application/json'),
-  importJSON: () => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json'; i.onchange = () => { const f = i.files[0]; if (!f) return; f.text().then(t => {
+  exportJSON: async () => { const p = P(); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
+  backupAll: async () => download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...S }, null, 2), 'application/json'),
+  importJSON: async () => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json'; i.onchange = () => { const f = i.files[0]; if (!f) return; f.text().then(async t => {
     let d; try { d = JSON.parse(t); } catch (e) { return toast('Datei ist kein gültiges JSON.'); }
-    if (d.format === 'pitchmeister-backup' && Array.isArray(d.projects)) { if (!confirm('Komplett-Backup einspielen? Alle aktuellen Daten in diesem Browser werden ersetzt.')) return; const cu = S.currentUser; S = migrate(d); delete S.format; delete S.version; if (S.users.some(u => u.id === cu)) S.currentUser = cu; else S.currentUser = null; save(true); render(); return toast('Backup eingespielt.'); }
+    if (d.format === 'pitchmeister-backup' && Array.isArray(d.projects)) { if (!await ask('Komplett-Backup einspielen? Alle aktuellen Daten in diesem Browser werden ersetzt.', 'Einspielen')) return; const cu = S.currentUser; S = migrate(d); delete S.format; delete S.version; if (S.users.some(u => u.id === cu)) S.currentUser = cu; else S.currentUser = null; save(true); render(); return toast('Backup eingespielt.'); }
     const proj = d.project || (d.scenes ? d : null); if (!proj) return toast('Unbekanntes Format.');
     (d.users || []).forEach(u => { if (!S.users.some(x => x.id === u.id)) S.users.push(u); });
     proj.id = uid(); migrate({ projects: [proj] }); S.projects.unshift(proj); S.activeProjectId = proj.id; log('Projekt importiert'); save(); render(); toast(`Projekt „${proj.title}“ importiert.`); }); }; i.click(); }
