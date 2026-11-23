@@ -578,7 +578,7 @@ function renderLogin() {
 /* ---------- Projects ---------- */
 function vProjects() {
   return `<div class="pagehead"><div><h1>Projekte</h1><div class="sub">${S.projects.length} Projekt(e) · Titel, Showdauer, Studio, Drehtermin, Benutzer</div></div>
-    <div class="actions"><button class="btn" data-action="importJSON">JSON importieren</button><button class="btn pri" data-action="addProject">+ Neues Projekt</button></div></div>
+    <div class="actions"><button class="btn ghost danger" data-action="resetAll" title="Alle lokalen Daten löschen und neu starten">Alles zurücksetzen</button><button class="btn" data-action="loadDemo">Demo-Projekt neu laden</button><button class="btn" data-action="importJSON">JSON importieren</button><button class="btn pri" data-action="addProject">+ Neues Projekt</button></div></div>
   ${S.projects.length ? `<div class="grid gauto">${S.projects.map(p => {
     const t = totalDur(p), over = t > p.duration;
     return `<div class="card pcard ${p.id === S.activeProjectId ? 'active' : ''}" data-action="openProject" data-id="${p.id}">
@@ -1152,6 +1152,16 @@ const A = {
   logout: async () => { if (await ask('Benutzer wechseln / abmelden?', 'Abmelden')) { S.currentUser = null; save(true); render(); } },
   addProject: async () => { const p = newProject(); S.projects.unshift(p); S.activeProjectId = p.id; log('Projekt angelegt'); save(); ui.view = 'details'; render(); },
   openProject: async (d, el, e) => { if (e.target.closest('button')) return; S.activeProjectId = d.id; ui.view = 'storyboard'; ui.sceneId = null; save(); render(); },
+  loadDemo: async () => { const demo = seed().projects[0]; demo.userIds = [S.currentUser]; S.projects.unshift(demo); S.activeProjectId = demo.id; log('Demo-Projekt geladen'); save(); ui.view = 'storyboard'; ui.sceneId = null; render(); toast('Demo-Projekt mit Dispo und Moodboard geladen.'); },
+  resetAll: async () => {
+    if (!await ask(`Wirklich alles zurücksetzen? Alle ${S.projects.length} Projekt(e), Benutzer und hochgeladenen Medien in diesem Browser werden gelöscht. Vorher ggf. unter Export ein Komplett-Backup sichern.`, 'Alles löschen')) return;
+    clearTimeout(saveTimer);
+    try { localStorage.removeItem(KEY); } catch (e) {}
+    try { if (idb) await idbDo('readwrite', st => st.clear()); } catch (e) {}
+    MEDIA.forEach(u => URL.revokeObjectURL(u)); MEDIA.clear();
+    S = seed(); ui = { ...ui, view: 'projects', sceneId: null, segFilter: 'all', moodKind: 'all', moodTag: '' };
+    save(true); render(); toast('Zurückgesetzt – Neustart mit Demo-Projekt.');
+  },
   dupProject: async d => { const src = S.projects.find(p => p.id === d.id); const c = clone(src); c.id = uid(); c.title += ' (Kopie)'; c.history = []; c.created = Date.now(); S.projects.unshift(c); S.activeProjectId = c.id; log('Projekt dupliziert aus „' + src.title + '“'); save(); render(); },
   delProject: async d => { const p = S.projects.find(x => x.id === d.id); if (!await ask(`Projekt „${p.title}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden.`)) return; S.projects = S.projects.filter(x => x.id !== d.id); if (S.activeProjectId === d.id) S.activeProjectId = S.projects[0]?.id || null; save(); render(); },
   add: async d => { const p = P(); const arr = resolve(p, d.list.split('.')); const o = FACTORY[d.kind || d.list](d); arr.push(o); commit(`${LISTNAME[d.kind || d.list]} hinzugefügt`); setTimeout(() => { const el = document.querySelector(`[data-bind^="${d.list}.${o.id}."]`); el?.focus(); el?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30); },
