@@ -196,6 +196,35 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .history{max-height:360px;overflow:auto}
 .history td{font-size:13px}
 .done td{color:var(--faint);text-decoration:line-through}
+.thumb>.sthumb,.thumb>.cthumb,.thumb>img.over{position:absolute;inset:0}
+.scard .thumb .num,.scard .thumb .dur{z-index:3}
+.sthumb{display:grid;place-content:center;justify-items:center;gap:6px;text-align:center;color:#fff;padding:10px;background:radial-gradient(120% 90% at 50% 0%,#2a2a2a,#111)}
+.sthumb .ico{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:rgba(255,255,255,.12)}
+.sthumb .ico svg{width:22px;height:22px}
+.sthumb b{font-size:13px;font-weight:600;letter-spacing:.01em}
+.sthumb small{font-size:11px;opacity:.7;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sthumb.k-youtube{background:radial-gradient(120% 90% at 50% 0%,#3a0d0d,#0f0f0f)}
+.sthumb.k-youtube .ico{background:#ff0033;width:56px;height:40px;border-radius:11px}
+.sthumb.k-vimeo{background:radial-gradient(120% 90% at 50% 0%,#0b3442,#0c1418)}
+.sthumb.k-vimeo .ico{background:#1ab7ea}
+.sthumb.k-video{background:radial-gradient(120% 90% at 50% 0%,#14233d,#0b0f17)}
+.sthumb.k-video .ico{background:#0065fc}
+.sthumb.k-file .ico{background:#5b5b66}
+.sthumb.k-link .ico{background:#3a3a44}
+.playbadge{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:50%;background:rgba(0,0,0,.55);border:1px solid rgba(255,255,255,.35);display:grid;place-items:center;z-index:2;pointer-events:none}
+.playbadge svg{width:16px;height:16px;margin-left:2px}
+.cthumb{display:flex;align-items:flex-end;padding:10px 12px;color:#fff;text-align:left;overflow:hidden;background:linear-gradient(135deg,color-mix(in srgb,var(--c) 78%,#000) 0%,color-mix(in srgb,var(--c) 30%,#0a0a0a) 100%)}
+.cthumb>img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.32}
+.cthumb::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,transparent 30%,rgba(0,0,0,.55))}
+.cthumb .ct-in{position:relative;z-index:1;display:flex;flex-direction:column;gap:2px;min-width:0;width:100%}
+.cthumb .ct-tag{font-size:9.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;opacity:.85}
+.cthumb b{font-size:14px;font-weight:600;line-height:1.2;letter-spacing:-.01em}
+.cthumb small{font-size:11px;line-height:1.3;opacity:.8;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.cthumb .ct-r{position:absolute;right:10px;bottom:10px;z-index:1;font-size:15px}
+.media>.sthumb,.media>.cthumb,.media>img.over{position:absolute;inset:0}
+.media .ovl{position:absolute;left:8px;bottom:8px;z-index:3;display:flex;gap:6px}
+.media .ov{z-index:4}
+.cthumb{isolation:isolate}
 .shots{margin-top:14px;padding:12px 14px;border:1px dashed color-mix(in srgb,var(--brand2) 50%,transparent);border-radius:var(--radius);background:var(--brandSoft)}
 .shots ul{margin:8px 0 0;padding-left:18px}.shots li{margin:2px 0;font-size:13.5px}
 .blk{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;color:#fff;white-space:nowrap;letter-spacing:.01em}
@@ -616,6 +645,8 @@ function seed() {
   p.personas = [pa, pb, pc];
   ['hook', 'problem', 'testimonial', 'demo', 'benefits', 'demo', 'demo', 'demo', 'benefits', 'benefits', 'offer', 'cta'].forEach((k, i) => { if (p.scenes[i]) p.scenes[i].block = k; });
   const H = (type, text, persona = '') => ({ id: uid(), type, text, personaId: persona });
+  p.scenes[8].mediaUrl = 'https://www.youtube.com/watch?v=aqz-KE-bpKQ';
+  p.scenes[4].mediaUrl = 'https://vimeo.com/76979871';
   p.scenes[0].hooks = [H('Problem / Schmerzpunkt', 'Schon wieder Tränen beim Zwiebelschneiden?', pa.id), H('Frage', 'Wie lange brauchen Sie für eine Zwiebel? Wir brauchen 3 Sekunden.', pa.id), H('Neuheit', 'Das neue Fusion-Set: 5 Schneidarten, ein Handgriff.', pb.id)];
   const C = (format, length, ratio, persona = '', status = 'plan', note = '') => ({ id: uid(), format, length, ratio, status, personaId: persona, note });
   p.scenes[0].cutdowns = [C('Text / Headline', '6 s', '9:16', pa.id, 'plan', 'Hook-Test mit 3 Varianten')];
@@ -691,13 +722,40 @@ const del = (action, data, title = 'Löschen') => `<button class="icon-btn" data
 function mediaTag(m, cls = '') {
   const src = msrc(m); if (!src) return '';
   if (m.type === 'audio') return `<audio class="${cls}" src="${esc(src)}" controls preload="metadata"></audio>`;
-  return m.type === 'video' ? `<video class="${cls}" src="${esc(src)}" muted playsinline controls preload="metadata"></video>` : `<img class="${cls}" src="${esc(src)}" alt="">`;
+  return m.type === 'video' ? `<video class="${cls}" src="${esc(src)}" ${msrc(m.poster) ? `poster="${esc(msrc(m.poster))}"` : ''} muted playsinline controls preload="metadata"></video>` : `<img class="${cls}" src="${esc(src)}" alt="">`;
 }
+const ytId = u => (String(u || '').match(/(?:youtube\.com\/(?:watch\?(?:.*&)?v=|shorts\/|embed\/|live\/)|youtu\.be\/)([\w-]{11})/) || [])[1] || null;
+function linkKind(u) {
+  if (!u) return null; const x = String(u).toLowerCase().split(/[?#]/)[0];
+  if (ytId(u)) return 'youtube'; if (/vimeo\.com/.test(x)) return 'vimeo';
+  if (/\.(mp4|webm|mov|m4v)$/.test(x)) return 'video'; if (/\.(png|jpe?g|gif|webp|avif)$/.test(x)) return 'image';
+  if (/dropbox\.com|drive\.google|wetransfer|frame\.io|we\.tl|box\.com|onedrive|sharepoint/.test(x)) return 'file';
+  return 'link';
+}
+const PLAYSVG = '<svg viewBox="0 0 24 24" fill="#fff"><path d="M8 5.5v13l10.5-6.5z"/></svg>';
+const TICONS = { youtube: PLAYSVG, vimeo: PLAYSVG, video: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M7 5v14M17 5v14M3 9h4M3 15h4M17 9h4M17 15h4"/></svg>',
+  file: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 14l3 3 3-3M12 10v7"/></svg>',
+  link: '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1"/></svg>' };
+const TLABEL = { youtube: 'YouTube', vimeo: 'Vimeo', video: 'Video-Link', file: 'Datei-Link', link: 'Link' };
+const stdThumb = (kind, sub = '') => `<div class="sthumb k-${kind}"><span class="ico">${TICONS[kind] || TICONS.link}</span><b>${TLABEL[kind] || 'Link'}</b>${sub ? `<small>${esc(sub)}</small>` : ''}</div>`;
+const playBadge = () => `<span class="playbadge">${PLAYSVG}</span>`;
+function contentThumb(s) {
+  const p = P(), bl = blockOf(s.block), col = bl ? bl[2] : '#3b3b46';
+  const it = s.itemIds.map(id => p?.offer.items.find(i => i.id === id)).find(i => i && msrc(i.image));
+  const txt = String(s.textVO || s.description || '').replace(/\s+/g, ' ').trim().slice(0, 110);
+  return `<div class="cthumb" style="--c:${col}">${it ? `<img src="${esc(msrc(it.image))}" alt="">` : ''}<div class="ct-in"><span class="ct-tag">${esc(bl ? bl[1] : (s.categories[0] || 'Szene'))}</span><b>${esc(s.name)}</b>${txt ? `<small>${esc(txt)}</small>` : ''}</div>${s.recipeOn ? '<span class="ct-r">🍳</span>' : ''}</div>`;
+}
+/* Thumbnail-Reihenfolge: eigenes Thumbnail → Bild → Video-Standbild → Link-Vorschau → generiert aus dem Szeneninhalt */
 function sceneThumb(s) {
+  const own = msrc(s.thumb); if (own) return `<img src="${esc(own)}" alt="">${s.media?.type === 'video' || ['youtube', 'vimeo', 'video'].includes(linkKind(s.mediaUrl)) ? playBadge() : ''}`;
   const ms = msrc(s.media);
-  if (ms) return s.media.type === 'video' ? `<video src="${esc(ms)}" muted preload="metadata"></video>` : `<img src="${esc(ms)}" alt="">`;
-  if (s.mediaUrl && /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl)) return `<img src="${esc(s.mediaUrl)}" alt="">`;
-  return 'Kein Bild';
+  if (ms && s.media.type === 'image') return `<img src="${esc(ms)}" alt="">`;
+  if (ms && s.media.type === 'video') { const ps = msrc(s.media.poster); return (ps ? `<img src="${esc(ps)}" alt="">` : stdThumb('video', 'Standbild wird erzeugt …')) + playBadge(); }
+  const k = linkKind(s.mediaUrl), host = s.mediaUrl ? hostOf(s.mediaUrl) : '';
+  if (k === 'image') return `${stdThumb('link', host)}<img class="over" data-hideerr src="${esc(s.mediaUrl)}" alt="">`;
+  if (k === 'youtube') return `${stdThumb('youtube', 'youtu.be/' + ytId(s.mediaUrl))}<img class="over" data-hideerr src="https://img.youtube.com/vi/${ytId(s.mediaUrl)}/hqdefault.jpg" alt="" loading="lazy">${playBadge()}`;
+  if (k) return stdThumb(k, host);
+  return contentThumb(s);
 }
 
 /* ============================================================
@@ -727,6 +785,7 @@ function render() {
   <main id="main"><div class="eyebrow">${esc((NAV.find(([, it]) => it.some(([k]) => k === ui.view)) || ['Projekt'])[0])}</div>${VIEWS[ui.view](p)}</main>`;
   if (fb) { const el = app.querySelector(`[data-bind="${CSS.escape(fb)}"]`); if (el) { el.focus(); try { if (fs != null) el.setSelectionRange(fs, fs); } catch (e) {} } }
   $('main').scrollTop = scroll;
+  setTimeout(ensurePosters, 0);
   const on = $('nav.side button.on'); if (on && innerWidth <= 860) { const n = on.parentElement; n.scrollLeft = on.offsetLeft - (n.clientWidth - on.offsetWidth) / 2; }
 }
 
@@ -958,8 +1017,11 @@ function vScene(p, s) {
   <div class="scene-grid">
     <div class="card stack">
       ${field('Bezeichnung der Szene', inp(b('name'), s.name, 'placeholder="Name of scene"'))}
-      <div class="media">${msrc(s.media) ? mediaTag(s.media) : (s.mediaUrl ? (/\.(mp4|webm|mov)(\?|$)/i.test(s.mediaUrl) ? `<video src="${esc(s.mediaUrl)}" controls muted playsinline></video>` : /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl) ? `<img src="${esc(s.mediaUrl)}" alt="">` : `<a href="${esc(s.mediaUrl)}" target="_blank" rel="noopener">Clip öffnen ↗</a>`) : '<div>Bild oder Clip<br><span class="small faint">Scribble, Foto oder kurzes Video</span></div>')}
-        <div class="ov"><button class="btn sm" data-action="upload" data-mode="set" data-path="${b('media')}" data-accept="image/*,video/*">${s.media ? 'Ersetzen' : 'Hochladen'}</button>${s.media ? `<button class="btn sm danger" data-action="clearMedia" data-id="${s.id}">Entfernen</button>` : ''}</div></div>
+      <div class="media" style="aspect-ratio:16/9">${msrc(s.media) ? mediaTag(s.media) : (linkKind(s.mediaUrl) === 'video' ? `<video src="${esc(s.mediaUrl)}" controls muted playsinline ${msrc(s.thumb) ? `poster="${esc(msrc(s.thumb))}"` : ''}></video>` : sceneThumb(s))}
+        ${s.mediaUrl && !msrc(s.media) && linkKind(s.mediaUrl) !== 'video' ? `<div class="ovl"><a class="btn sm" href="${esc(s.mediaUrl)}" target="_blank" rel="noopener">${TLABEL[linkKind(s.mediaUrl)] || 'Link'} öffnen ↗</a></div>` : ''}
+        <div class="ov">${s.media?.type === 'video' ? `<button class="btn sm" data-action="posterNow" data-id="${s.id}" title="Aktuelles Videobild als Thumbnail verwenden">Bild als Thumbnail</button>` : ''}<button class="btn sm" data-action="upload" data-mode="set" data-path="${b('media')}" data-accept="image/*,video/*">${s.media ? 'Ersetzen' : 'Hochladen'}</button>${s.media ? `<button class="btn sm danger" data-action="clearMedia" data-id="${s.id}">Entfernen</button>` : ''}</div></div>
+      <div class="row small" style="gap:8px;justify-content:space-between"><span class="muted">${msrc(s.thumb) ? 'Eigenes Thumbnail aktiv' : msrc(s.media) ? (s.media.type === 'video' ? (msrc(s.media.poster) ? 'Thumbnail: Standbild aus dem Video' : 'Thumbnail wird aus dem Video erzeugt …') : 'Thumbnail: hochgeladenes Bild') : s.mediaUrl ? 'Thumbnail: ' + (linkKind(s.mediaUrl) === 'youtube' ? 'YouTube-Vorschau' : 'Standard-Thumbnail') : 'Thumbnail: automatisch aus dem Szeneninhalt'}</span>
+        <span class="row" style="gap:4px"><button class="btn sm" data-action="upload" data-mode="set" data-path="${b('thumb')}" data-accept="image/*">${msrc(s.thumb) ? 'Thumbnail ändern' : 'Eigenes Thumbnail'}</button>${msrc(s.thumb) ? `<button class="btn sm ghost" data-action="clearSceneThumb" data-id="${s.id}" title="Eigenes Thumbnail entfernen">×</button>` : ''}</span></div>
       ${field('oder Link zu Clip / Bild', inp(b('mediaUrl'), s.mediaUrl, 'placeholder="https://…" data-rerender'))}
     </div>
     <div class="card stack">
@@ -1144,7 +1206,7 @@ function exportHTML(p, layout, withImg) {
   const head = `<h1>${esc(p.title)}</h1><div class="prmeta">${esc(L[1])} · Showdauer ${fmtDur(p.duration)} (Szenen ${fmtDur(totalDur(p))}) · Studio: ${esc(p.studio || '–')} · Dreh: ${fmtDay(p.shootingDate)} · Stand ${fmtDate(Date.now())} · ${esc(me()?.name || '')}</div>`;
   const items = s => s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', ');
   const sps = s => s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean);
-  const img = s => withImg && msrc(s.media) && s.media.type === 'image' ? `<img src="${esc(msrc(s.media))}" alt="">` : '';
+  const img = s => { if (!withImg) return ''; const u = msrc(s.thumb) || (s.media?.type === 'image' ? msrc(s.media) : msrc(s.media?.poster)); return u ? `<img src="${esc(u)}" alt="">` : ''; };
   let body = '';
   if (layout === 'dispo') return `<div class="pr">${dispoHTML(p)}</div>`;
   if (layout === 'storyboard') {
@@ -1476,7 +1538,7 @@ async function addMoodFiles(files) {
 }
 function moodPreview(it) {
   const up = it.source === 'upload', src = up ? msrc(it.file) : it.url;
-  const thumb = it.thumb ? msrc(it.thumb) : (it.autoThumb || '');
+  const thumb = it.thumb ? msrc(it.thumb) : (msrc(it.file?.poster) || it.autoThumb || '');
   const [, glyph] = KIND[it.kind];
   const card = () => `<a class="lcard" href="${esc(it.url)}" target="_blank" rel="noopener">${thumb ? `<img data-fallback="${glyph}" src="${esc(thumb)}" alt="" loading="lazy">${it.kind !== 'link' ? `<span class="play">${glyph}</span>` : ''}` : `<div class="ph"><span class="g">${glyph}</span><span>${esc(it.provider || hostOf(it.url))}</span></div>`}</a>`;
   if (it.kind === 'image') return up ? `<img src="${esc(src)}" alt="" loading="lazy">` : `<a class="lcard" href="${esc(it.url)}" target="_blank" rel="noopener"><img data-fallback="◻" src="${esc(src)}" alt="" loading="lazy"></a>`;
@@ -1615,7 +1677,10 @@ const A = {
   dupScene: async d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); const c = clone(s); c.id = uid(); c.name += ' (Kopie)'; c.comments = []; p.scenes.splice(p.scenes.indexOf(s) + 1, 0, c); log(`Szene „${s.name}“ dupliziert`); save(); ui.sceneId = c.id; render(); },
   delScene: async d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); if (!await ask(`Szene „${s.name}“ löschen?`)) return; p.scenes = p.scenes.filter(x => x.id !== d.id); p.animations.forEach(a => a.sceneIds = a.sceneIds.filter(x => x !== d.id)); p.brolls.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); p.post.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); ui.sceneId = null; commit(`Szene „${s.name}“ gelöscht`); },
   openMood: async d => { const it = P().moodboard.find(x => x.id === d.id); if (it?.url) window.open(it.url, '_blank', 'noopener'); },
-  clearMedia: async d => { const s = P().scenes.find(x => x.id === d.id); s.media = null; commit(`Szene „${s.name}“: Bild entfernt`); },
+  posterNow: async d => { const s = P().scenes.find(x => x.id === d.id); const v = $('#main .media video'); if (!v || v.readyState < 2) return toast('Video lädt noch – kurz warten und erneut versuchen.');
+    try { s.media.poster = { type: 'image', ...await putBlob(await frameToBlob(v)) }; s.thumb = null; commit(`Szene „${s.name}“: Thumbnail aus Video gesetzt`); toast('Thumbnail aus aktuellem Videobild gesetzt.'); } catch (e) { toast('Standbild nicht möglich: ' + e.message); } },
+  clearSceneThumb: async d => { const s = P().scenes.find(x => x.id === d.id); s.thumb = null; commit(`Szene „${s.name}“: eigenes Thumbnail entfernt`); },
+  clearMedia: async d => { const s = P().scenes.find(x => x.id === d.id); s.media = null; commit(`Szene „${s.name}“: Medium entfernt`); },
   addComment: async d => { const t = $('#commentDraft').value.trim(); if (!t) return; const s = P().scenes.find(x => x.id === d.id); s.comments.push({ id: uid(), user: S.currentUser, ts: Date.now(), text: t }); commit(`Kommentar zu Szene „${s.name}“`, 'c' + uid()); },
   delComment: async d => { const s = P().scenes.find(x => x.id === d.scene); s.comments = s.comments.filter(c => c.id !== d.id); commit(`Kommentar in Szene „${s.name}“ gelöscht`); },
   tab: async d => { ui[d.k] = d.v; render(); },
@@ -1666,9 +1731,30 @@ async function fileToMedia(f) {
   if (t.startsWith('image/')) { const b = await downscale(f, 1600); return { type: 'image', ...await putBlob(b) }; }
   if (t.startsWith('video/') || t.startsWith('audio/')) {
     if (f.size > MAX_AV() * 1024 * 1024) { toast(`„${f.name}“ ist größer als ${MAX_AV()} MB – bitte als Link eintragen.`); return null; }
-    return { type: t.startsWith('video/') ? 'video' : 'audio', ...await putBlob(f) };
+    const m = { type: t.startsWith('video/') ? 'video' : 'audio', ...await putBlob(f) };
+    if (m.type === 'video') { const url = URL.createObjectURL(f); try { m.poster = { type: 'image', ...await putBlob(await captureFrame(url)) }; } catch (e) {} URL.revokeObjectURL(url); }
+    return m;
   }
   return null;
+}
+function frameToBlob(v) { return new Promise((res, rej) => { try { const w = Math.min(960, v.videoWidth || 960), h = Math.round((v.videoHeight || 540) * w / (v.videoWidth || 960)); const c = document.createElement('canvas'); c.width = w; c.height = h; c.getContext('2d').drawImage(v, 0, 0, w, h); c.toBlob(b => b ? res(b) : rej(new Error('Standbild nicht möglich')), 'image/jpeg', .84); } catch (e) { rej(e); } }); }
+function captureFrame(src, at = null) {
+  return new Promise((res, rej) => {
+    const v = document.createElement('video'); v.muted = true; v.playsInline = true; v.preload = 'auto';
+    const done = (fn, x) => { clearTimeout(to); v.removeAttribute('src'); v.load(); fn(x); };
+    const to = setTimeout(() => done(rej, new Error('Zeitüberschreitung')), 15000);
+    v.onloadedmetadata = () => { const d = isFinite(v.duration) ? v.duration : 2; v.currentTime = at != null ? at : Math.min(Math.max(d * 0.15, 0.3), 3); };
+    v.onseeked = () => frameToBlob(v).then(b => done(res, b), e => done(rej, e));
+    v.onerror = () => done(rej, new Error('Video nicht lesbar'));
+    v.src = src;
+  });
+}
+const posterTried = new Set();
+function ensurePosters() {
+  const p = P(); if (!p) return;
+  const jobs = [...p.scenes.map(s => s.media), ...p.moodboard.map(x => x.file), ...p.animations.map(a => a.preview)].filter(m => m && m.type === 'video' && !m.poster && msrc(m));
+  jobs.forEach(m => { const key = m.ref || m.src.slice(0, 64); if (posterTried.has(key)) return; posterTried.add(key);
+    captureFrame(msrc(m)).then(putBlob).then(r => { m.poster = { type: 'image', ...r }; save(); if (['storyboard', 'mood', 'anim'].includes(ui.view)) render(); }).catch(() => {}); });
 }
 const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
 function downscale(f, max) {
@@ -1754,7 +1840,7 @@ document.addEventListener('paste', e => {
   const txt = (e.clipboardData?.getData('text') || '').trim(); if (/^(https?:\/\/|www\.)\S+$/i.test(txt)) { e.preventDefault(); addMoodLink(txt); }
 });
 window.addEventListener('storage', e => { if (e.key === KEY) { const d = load(); if (d) { const cu = S.currentUser; S = d; S.currentUser = cu; loadMedia(false).then(render); } } });
-document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && t.hasAttribute('data-fallback')) { const ph = document.createElement('div'); ph.className = 'ph'; ph.innerHTML = `<span class="g">${esc(t.dataset.fallback || '◻')}</span><span>Vorschau nicht verfügbar</span>`; t.replaceWith(ph); } }, true);
+document.addEventListener('error', e => { const t = e.target; if (t.tagName === 'IMG' && t.hasAttribute('data-hideerr')) { t.remove(); return; } if (t.tagName === 'IMG' && t.hasAttribute('data-fallback')) { const ph = document.createElement('div'); ph.className = 'ph'; ph.innerHTML = `<span class="g">${esc(t.dataset.fallback || '◻')}</span><span>Vorschau nicht verfügbar</span>`; t.replaceWith(ph); } }, true);
 
 try { const th = localStorage.getItem(KEY + '.theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
 render();
