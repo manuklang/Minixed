@@ -72,3 +72,8 @@ If you find bugs, if you have suggestions, if you modified the script adding
 features or improvements, feel free to contribute by opening 
 [**Issues**](https://github.com/lorenzos/Minixed/issues) or 
 [**Pull Requests**](https://github.com/lorenzos/Minixed/pulls).
+
+Blueprint · Produktionsvorbereitung
+-----------------------------------
+
+Im Ordner [`blueprint/`](blueprint/README.md) liegt das Web-Tool für Produktions-Blueprints (Genius Master-Template): gemeinsam befüllen mit Namens-Markierung, Medien hochladen, Freigabe mit PDF-Erzeugung und Sperre.

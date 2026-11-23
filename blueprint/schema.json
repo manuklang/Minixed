@@ -1,0 +1,85 @@
+{
+	"fields": {
+		"titel":            { "type": "text",      "label": "Projekttitel", "placeholder": "z. B. IMCosmetics Platinum Lift", "required": true },
+		"autor":            { "type": "text",      "label": "Autor", "placeholder": "Kürzel / Name" },
+		"artikel":          { "type": "text",      "label": "Artikel", "placeholder": "z. B. IMC Platinum Lift Creme + Serum", "required": true },
+		"artnr":            { "type": "text",      "label": "Art.-Nr.", "placeholder": "Artikelnummer" },
+
+		"produktbild":      { "type": "media",     "label": "Produktbild", "accept": "image/*,video/*", "compact": true },
+		"artikelinfo":      { "type": "richtext",  "label": "Artikel Info", "required": true,
+		                      "placeholder": "Produktbeschreibung, Inhaltsstoffe & Wirkstoffe, USPs …" },
+		"shows":            { "type": "richtext",  "label": "Drehplan / Shows",
+		                      "placeholder": "Wir drehen: … Shows (z. B. 15, 5, 2 Min) – welche Show mit welchem Angebot?" },
+
+		"angebote":         { "type": "offers",    "label": "Orderscreen-Grafik", "itemLabel": "Angebotsset & Preis" },
+
+		"keyquestion":      { "type": "richtext",  "label": "Key Question", "required": true,
+		                      "placeholder": "„Die zentrale Frage der Zuschauer:innen …“" },
+
+		"produktmerkmale":  { "type": "richtext",  "label": "Produktmerkmale",
+		                      "placeholder": "Hauptwirkstoffe & ihre Funktion, Studien, Hintergründe …" },
+		"experte":          { "type": "richtext",  "label": "Experte – Positionierung",
+		                      "placeholder": "Wer ist die Expertin / der Experte? Werdegang, Positionierung …" },
+
+		"fragen":           { "type": "richtext",  "label": "Fragen: Moderator", "required": true,
+		                      "placeholder": "„Was braucht die Haut wirklich …?“ – eine Frage pro Zeile" },
+
+		"vorschau":         { "type": "text",      "label": "Vorschau", "placeholder": "Link zur Vorschau (z. B. Drive-Ordner)", "link": true },
+		"mazen":            { "type": "mediaList", "label": "MAZen", "itemLabel": "MAZ", "itemPlaceholder": "Dateiname / Titel, z. B. _PL_Teaser_16 Sek" },
+		"grafiken":         { "type": "mediaList", "label": "Grafiken", "itemLabel": "Grafik", "itemPlaceholder": "Titel, z. B. Haupt USP +800%" },
+		"vorhernachher":    { "type": "media",     "label": "Vorher/Nachher-Grafiken", "accept": "image/*,video/*" },
+
+		"setaufbau":        { "type": "richtext",  "label": "Setaufbau", "placeholder": "Set, Aufkleber, Licht …" },
+		"props":            { "type": "richtext",  "label": "Props", "placeholder": "Namensschild, Produkte, Dekomuster …" },
+		"dresscode_mod":    { "type": "text",      "label": "Dresscode Moderator", "placeholder": "z. B. Elegant – Hemd und Anzug/Sakko" },
+		"dresscode_exp":    { "type": "text",      "label": "Dresscode Experte", "placeholder": "z. B. Elegant – passend zum Produkt" },
+
+		"supers":           { "type": "richtext",  "label": "Supers", "placeholder": "Bauchbinden / Einblendungen – tbd" },
+		"badges":           { "type": "media",     "label": "Badges", "accept": "image/*", "compact": true },
+		"logo":             { "type": "check",     "label": "Logo", "placeholder": "Ablageort", "default": "Liegt ab → \\02_Assets\\02_Images\\02_Logos" },
+		"assets":           { "type": "check",     "label": "Vorhandene Assets", "hint": "(wie Orderscreens, MAZen, Grafiken)", "placeholder": "Ablageort", "default": "Liegen ab → \\07_Renders\\02_Final-Renders" },
+
+		"notizen":          { "type": "richtext",  "label": "Notizen", "placeholder": "Offene Punkte, Absprachen, To-dos …" }
+	},
+
+	"sections": [
+		{ "id": "artikel", "rows": [
+			{ "type": "pair", "left": "produktbild", "right": "artikelinfo" },
+			{ "type": "split", "field": "shows" }
+		] },
+		{ "id": "angebote", "rows": [
+			{ "type": "offers", "field": "angebote" }
+		] },
+		{ "id": "keyquestion", "bar": "Key Question", "rows": [
+			{ "type": "full", "field": "keyquestion" }
+		] },
+		{ "id": "produkt", "bar": "Produktübersicht", "rows": [
+			{ "type": "split", "field": "produktmerkmale" },
+			{ "type": "split", "field": "experte" }
+		] },
+		{ "id": "fragen", "bar": "Fragen: Moderator", "rows": [
+			{ "type": "full", "field": "fragen" }
+		] },
+		{ "id": "einspieler", "bar": "Einspieler: MAZen, Grafiken", "rows": [
+			{ "type": "split", "field": "vorschau" },
+			{ "type": "block", "field": "mazen" },
+			{ "type": "block", "field": "grafiken" },
+			{ "type": "block", "field": "vorhernachher" }
+		] },
+		{ "id": "studio", "bar": "Studio", "rows": [
+			{ "type": "split", "field": "setaufbau" },
+			{ "type": "split", "field": "props" },
+			{ "type": "split", "field": "dresscode_mod" },
+			{ "type": "split", "field": "dresscode_exp" }
+		] },
+		{ "id": "edit", "bar": "EDIT / Nachbearbeitung", "rows": [
+			{ "type": "split", "field": "supers" },
+			{ "type": "split", "field": "badges" },
+			{ "type": "split", "field": "logo" },
+			{ "type": "split", "field": "assets" }
+		] },
+		{ "id": "notizen", "bar": "Notizen", "rows": [
+			{ "type": "full", "field": "notizen" }
+		] }
+	]
+}

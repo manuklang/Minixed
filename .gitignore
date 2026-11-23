@@ -1,0 +1,4 @@
+# Blueprint-Daten (Inhalte, Medien, PDFs) nicht ins Repository
+blueprint/data/*
+!blueprint/data/.htaccess
+!blueprint/data/.gitkeep
