@@ -1,0 +1,785 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Genius Studios Master-Briefing</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;900&family=Hind:wght@400;500;600&display=swap">
+<style>
+/* Layout: floating glass command bar, glass section index on the left, solid studio-dark form sheets. Genius Studios CI: anthracite #282834, white, blue #3483EB, red #DC2751, Montserrat 900 + Hind. */
+:root{
+  --void:#0B0B10; --anthracite:#282834; --sheet:#15151D; --field:#0F0F15; --ink:#FFFFFF; --muted:#A3A3B3; --line:rgba(255,255,255,.09);
+  --blue:#3483EB; --blue-dark:#1665CD; --blue-glow:rgba(52,131,235,.45); --red:#DC2751; --red-soft:rgba(220,39,81,.14); --ok:#3DBE7A; --ok-soft:rgba(61,190,122,.13);
+  --glass-fill:linear-gradient(180deg,rgba(255,255,255,.16),rgba(255,255,255,.05));
+  --glass-edge:rgba(255,255,255,.22);
+  --glass-shadow:inset 0 1px 0 rgba(255,255,255,.38),inset 0 -1px 0 rgba(255,255,255,.06),0 10px 30px rgba(0,0,0,.45);
+  --f-display:"Montserrat","Helvetica Neue",Arial,sans-serif;
+  --f-body:"Hind","Segoe UI",system-ui,sans-serif;
+  --r:14px; --pill:999px;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+html,body{margin:0}
+html{scroll-behavior:smooth}
+body{background:var(--void);color:var(--ink);font:16px/1.55 var(--f-body);min-height:100vh}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--void)}
+/* studio lights behind everything */
+.lights{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.lights i{position:absolute;border-radius:50%;filter:blur(90px);opacity:.55}
+.lights i:nth-child(1){width:52vw;height:52vw;left:-14vw;top:-18vw;background:radial-gradient(circle,#1d4fae 0%,transparent 70%)}
+.lights i:nth-child(2){width:40vw;height:40vw;right:-12vw;top:30vh;background:radial-gradient(circle,#8a1838 0%,transparent 70%);opacity:.45}
+.lights i:nth-child(3){width:60vw;height:40vw;left:20vw;bottom:-22vw;background:radial-gradient(circle,#282834 0%,transparent 70%);opacity:.9}
+.page{position:relative;z-index:1}
+.wrap{padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
+
+/* ---------- Liquid glass (functional layer only) ---------- */
+.glass{position:relative;background:var(--glass-fill);-webkit-backdrop-filter:blur(22px) saturate(180%);backdrop-filter:blur(22px) saturate(180%);border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow)}
+.glass::after{content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;background:radial-gradient(120% 60% at 50% -10%,rgba(255,255,255,.22),transparent 55%);mix-blend-mode:screen}
+
+/* Command bar */
+.bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 12px);z-index:20;margin-top:12px}
+.bar-in{max-width:1220px;margin:0 auto;border-radius:22px;display:flex;flex-wrap:wrap;align-items:center;gap:14px;padding:10px 12px 10px 20px}
+.logo{display:flex;align-items:center;gap:14px;margin-right:auto;min-width:0;text-decoration:none;color:inherit}
+.logo img{height:40px;width:auto;display:block}
+.logo span{font-family:var(--f-display);font-weight:700;font-size:11px;letter-spacing:.22em;text-transform:uppercase;color:var(--muted);border-left:1px solid var(--line);padding-left:14px;line-height:1.35}
+.actions{display:flex;flex-wrap:wrap;gap:8px;position:relative;z-index:1}
+
+/* Buttons */
+.btn{position:relative;font:600 14px/1 var(--f-display);letter-spacing:.01em;color:var(--ink);border-radius:var(--pill);padding:12px 18px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  background:var(--glass-fill);border:1px solid var(--glass-edge);box-shadow:inset 0 1px 0 rgba(255,255,255,.35),inset 0 -1px 0 rgba(255,255,255,.05),0 4px 14px rgba(0,0,0,.3);
+  -webkit-backdrop-filter:blur(14px) saturate(170%);backdrop-filter:blur(14px) saturate(170%);transition:transform .18s cubic-bezier(.3,.7,.4,1.4),background .2s,box-shadow .2s,border-color .2s;overflow:hidden;white-space:nowrap}
+.btn::before{content:"";position:absolute;left:10%;right:10%;top:1px;height:45%;border-radius:var(--pill);background:linear-gradient(180deg,rgba(255,255,255,.28),rgba(255,255,255,0));pointer-events:none}
+.btn:hover{background:linear-gradient(180deg,rgba(255,255,255,.24),rgba(255,255,255,.08));border-color:rgba(255,255,255,.34)}
+.btn:active{transform:scale(.96)}
+.btn:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible,a:focus-visible{outline:2px solid var(--blue);outline-offset:3px}
+.btn.primary{background:linear-gradient(180deg,rgba(78,151,245,.92),rgba(22,101,205,.92));border-color:rgba(150,196,255,.55);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 6px rgba(0,0,0,.18),0 6px 22px var(--blue-glow)}
+.btn.primary:hover{background:linear-gradient(180deg,rgba(98,165,250,.95),rgba(30,112,215,.95))}
+.btn.danger{background:linear-gradient(180deg,rgba(234,70,108,.92),rgba(190,22,62,.92));border-color:rgba(255,160,180,.5);box-shadow:inset 0 1px 0 rgba(255,255,255,.45),0 6px 22px rgba(220,39,81,.45)}
+.btn.small{padding:8px 13px;font-size:12.5px}
+.btn.icon{width:36px;height:36px;padding:0;font-size:14px;color:var(--muted)}
+.btn.icon:hover{color:#fff;background:linear-gradient(180deg,rgba(234,70,108,.7),rgba(190,22,62,.7));border-color:rgba(255,160,180,.5)}
+.btn:disabled{opacity:.6;cursor:progress}
+.btn.add{align-self:flex-start;color:#cfe2ff}
+
+/* Shell */
+.shell{max-width:1220px;margin:0 auto;display:grid;grid-template-columns:250px minmax(0,1fr);gap:28px;padding-block:36px 40px}
+nav.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 104px);align-self:start;border-radius:20px;padding:14px 10px;display:flex;flex-direction:column;gap:2px}
+nav.index>*{position:relative;z-index:1}
+.navhead{font-family:var(--f-display);font-weight:700;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:2px 12px 10px}
+nav.index a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;color:#e9e9f1;text-decoration:none;font-size:14.5px;transition:background .2s}
+nav.index a:hover{background:rgba(255,255,255,.08)}
+nav.index .cnt{font-family:var(--f-display);font-weight:600;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:var(--pill);padding:3px 8px;background:rgba(255,255,255,.06)}
+nav.index .cnt.full{color:#06210f;background:var(--ok)}
+.navprog{margin:12px 12px 4px;height:4px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
+.navprog b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),#7db5ff);border-radius:4px;transition:width .4s}
+main{display:flex;flex-direction:column;gap:26px;min-width:0}
+#form{display:flex;flex-direction:column;gap:22px;min-width:0}
+
+/* Hero */
+.hero{display:flex;flex-direction:column;gap:14px;padding-block:6px 6px}
+.eyebrow{font-family:var(--f-display);font-weight:600;font-size:12px;letter-spacing:.32em;text-transform:uppercase;color:var(--blue)}
+.hero h1{font-weight:900;font-size:clamp(38px,6.4vw,76px);line-height:.95;letter-spacing:-.01em}
+.hero h1 .outline{display:block;color:transparent;-webkit-text-stroke:1.5px #fff}
+.hero p{margin:0;color:var(--muted);max-width:62ch;font-size:17px}
+.status{display:flex;align-items:center;gap:10px;font-size:14px;color:var(--muted)}
+.status::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 0 4px rgba(220,39,81,.18)}
+.status.on::before{background:var(--ok);box-shadow:0 0 0 4px rgba(61,190,122,.18)}
+.banner{display:flex;flex-wrap:wrap;gap:12px;align-items:center;justify-content:space-between;border-radius:16px;padding:12px 12px 12px 18px;font-size:15px;background:rgba(52,131,235,.12);border:1px solid rgba(52,131,235,.45)}
+
+/* Sections (content layer: solid sheets, no glass) */
+section.sec{background:var(--sheet);border:1px solid var(--line);border-radius:22px;padding:28px;display:flex;flex-direction:column;gap:18px;scroll-margin-top:110px;min-width:0;box-shadow:0 20px 60px rgba(0,0,0,.35)}
+.sec-head{display:flex;gap:16px;align-items:flex-end;padding-bottom:16px;border-bottom:1px solid var(--line)}
+.sec-num{font-family:var(--f-display);font-weight:900;font-size:44px;line-height:.8;color:transparent;-webkit-text-stroke:1.2px var(--blue);flex:none;font-variant-numeric:tabular-nums}
+.sec-head h2{font-size:clamp(19px,2.3vw,24px);font-weight:900;letter-spacing:-.005em;line-height:1.15}
+.note{margin:0;font-size:14.5px;color:#f3c9d3;background:var(--red-soft);border-radius:12px;padding:10px 14px;border-left:3px solid var(--red)}
+.lead{margin:0;font-size:14.5px;color:var(--muted)}
+.sub{font-family:var(--f-display);font-size:14px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:#d9d9e4;padding-top:14px}
+.sub.first{padding-top:0}
+.grid2{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.field{display:flex;flex-direction:column;gap:6px;min-width:0}
+.field.wide{grid-column:1/-1}
+label.lbl{font-weight:600;font-size:15px;color:#f1f1f6}
+.lbl .req{color:var(--red)}
+.help{font-size:13.5px;color:var(--muted);margin-top:-3px}
+input[type=text],textarea,select{width:100%;font:15.5px/1.45 var(--f-body);color:var(--ink);background:var(--field);border:1px solid rgba(255,255,255,.1);border-radius:12px;padding:11px 13px;transition:border-color .2s,box-shadow .2s}
+input[type=text]:focus,textarea:focus,select:focus{border-color:var(--blue);box-shadow:0 0 0 4px rgba(52,131,235,.18);outline:none}
+textarea{min-height:80px;resize:vertical}
+input::placeholder,textarea::placeholder{color:#6f6f80}
+.tag{font-family:var(--f-display);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;padding:3px 8px;border-radius:var(--pill);margin-left:8px;vertical-align:2px}
+.tag.no{background:var(--red-soft);color:#ff8fa8}
+.tag.yes{background:var(--ok-soft);color:#7fe0aa}
+
+/* Repeater rows */
+.rep{display:flex;flex-direction:column;gap:10px}
+.row{border:1px solid var(--line);border-radius:16px;background:rgba(255,255,255,.025);padding:14px;display:grid;gap:12px;grid-template-columns:repeat(var(--cols),minmax(0,1fr)) auto;align-items:end}
+.row .field label{font-size:12px;font-weight:600;color:var(--muted);letter-spacing:.02em}
+.row .field.span2{grid-column:span 2}
+.row textarea{min-height:62px}
+.rowno{font-family:var(--f-display);font-weight:700;font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:var(--blue);grid-column:1/-1;margin-bottom:-4px}
+.sum{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
+.sum b{color:#fff;font-family:var(--f-display);font-weight:700}
+
+/* Footer */
+footer.site{max-width:1220px;margin:0 auto;padding-block:30px 40px;display:flex;flex-wrap:wrap;gap:18px 36px;align-items:center;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
+footer.site img{height:46px;width:auto}
+footer.site address{font-style:normal;line-height:1.6}
+footer.site a{color:#cfe2ff}
+footer.site .claim{margin-left:auto;font-family:var(--f-display);font-weight:600;font-size:11px;letter-spacing:.3em;text-transform:uppercase}
+
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom,0px));padding:12px 20px;border-radius:var(--pill);font-size:15px;z-index:40;max-width:calc(100% - 32px);background:linear-gradient(180deg,rgba(60,60,76,.7),rgba(30,30,40,.7))}
+.toast span{position:relative;z-index:1}
+
+@media (max-width:960px){
+  .shell{grid-template-columns:minmax(0,1fr)}
+  nav.index{display:none}
+  .logo span{display:none}
+}
+@media (max-width:640px){
+  .bar-in{padding:10px;border-radius:18px}
+  .logo img{height:32px}
+  .actions{width:100%}
+  .actions .btn{flex:1 1 auto;padding:11px 12px}
+  .grid2{grid-template-columns:minmax(0,1fr)}
+  .row{grid-template-columns:minmax(0,1fr)}
+  .row .field.span2,.row .field.span3{grid-column:auto!important}
+  section.sec{padding:20px;border-radius:18px}
+  .sec-num{font-size:34px}
+  footer.site .claim{margin-left:0}
+}
+@supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
+  .glass,.btn{background:rgba(40,40,52,.96)}
+  .btn.primary{background:var(--blue-dark)}
+}
+@media (prefers-reduced-transparency:reduce){
+  .glass,.btn,.toast{-webkit-backdrop-filter:none;backdrop-filter:none;background:#2c2c3a}
+  .btn.primary{background:var(--blue-dark)}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+</style>
+</head>
+<body>
+<div class="lights" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="page">
+<header class="bar wrap">
+  <div class="bar-in glass">
+    <a class="logo" href="https://genius-studios.de" target="_blank" rel="noopener"><img id="logo-top" alt="Genius Studios" width="560" height="247"><span>Master-<br>Briefing</span></a>
+    <div class="actions">
+      <button type="button" class="btn" id="btn-example">Beispiel laden</button>
+      <button type="button" class="btn" id="btn-export">Entwurf sichern</button>
+      <label class="btn" for="file-import" tabindex="0" id="lbl-import">Entwurf öffnen</label>
+      <input type="file" id="file-import" accept=".json,application/json" hidden>
+      <button type="button" class="btn" id="btn-reset">Leeren</button>
+      <button type="button" class="btn primary" id="btn-pdf">PDF erstellen</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="shell">
+    <nav class="index glass" id="nav" aria-label="Abschnitte"><div class="navhead">Briefing-Abschnitte</div><div class="navprog" id="navprog"><b></b></div></nav>
+    <main id="main">
+      <div class="hero">
+        <div class="eyebrow">DRTV · Infomercial · Kampagne</div>
+        <h1><span class="outline">Master</span>Briefing</h1>
+        <p>Das Produkt- &amp; Kampagnen-Briefing für Ihre nächste Infomercial-Produktion mit Genius Studios. Felder ausfüllen, dann „PDF erstellen“. Ihre Eingaben bleiben in diesem Browser gespeichert. Zum Weitergeben den Entwurf sichern und beim Team wieder öffnen. Die grauen Texte in den Feldern sind Beispiele.</p>
+        <div class="status" id="status">Noch nichts ausgefüllt</div>
+      </div>
+      <div class="banner" id="example-banner" hidden>
+        <span>Beispieldaten „Invictus X7“ geladen. Alle Werte sind fiktiv.</span>
+        <button type="button" class="btn small" id="btn-clear-example">Beispiel entfernen</button>
+      </div>
+      <form id="form" novalidate></form>
+    </main>
+  </div>
+  <footer class="site">
+    <img id="logo-foot" alt="Genius Studios" width="560" height="247">
+    <address>Genius Studios · Im Dachsstück 8 · 65549 Limburg/Lahn<br>Telefon +49 (0) 64 31 – 9 8882222 · <a href="https://genius-studios.de" target="_blank" rel="noopener">genius-studios.de</a></address>
+    <span class="claim">Film · Audio · Broadcast</span>
+  </footer>
+</div>
+</div>
+<div class="toast glass" id="toast" hidden><span></span></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/pdfmake.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdfmake/0.2.10/vfs_fonts.js"></script>
+<script>
+/*__GS_ASSETS__*/
+</script>
+<script>
+(function(){
+"use strict";
+const A = window.GS_ASSETS || {};
+["logo-top","logo-foot"].forEach(id => { const i = document.getElementById(id); if(A.logoWhite) i.src = A.logoWhite; else i.alt = "Genius Studios"; });
+
+/* ---------- Schema ---------- */
+const SCHEMA = [
+  {id:"stamm", num:"00", title:"Stammdaten", items:[
+    {t:"grid", fields:[
+      {k:"produkt", label:"Produktname & Modell", req:true, ph:"z. B. Invictus X7"},
+      {k:"kuerzel", label:"Dokument-Kürzel / Zitierquelle", ph:"z. B. Internes Fact-Sheet Invictus X7, Version 2.1, Stand: MM/JJJJ"},
+      {k:"kategorie", label:"Kategorie", ph:"z. B. Kabelloser Staubsauger / Küchenhelfer / Winter-Zubehör"},
+      {k:"status", label:"Markteinführung / Status", ph:"z. B. Launch Q4 2026 / Bestseller-Relaunch / Abverkauf"},
+      {k:"zielgruppe", label:"Hauptzielgruppe", wide:true, ph:"z. B. Haushalte mit Haustieren, 35–65 Jahre, DACH-Region"}
+    ]}
+  ]},
+  {id:"kern", num:"01", title:"Produkt-Kern & Positionierung", items:[
+    {t:"field", k:"pain", label:"Das Kernproblem (Pain Point)", area:true, help:"Welches konkrete Alltagsproblem löst das Produkt?", ph:"z. B. Schweres Schleppen von Bodenstaubsaugern, zeitraubendes Gemüseschneiden, zugefrorene Autoscheiben am Morgen."},
+    {t:"field", k:"loesung", label:"Die Kernlösung (Big Idea in 1 Satz)", area:true, help:"Wie löst das Produkt dieses Problem sichtbar schneller, leichter oder gründlicher?", ph:"z. B. Der Invictus X7 saugt das ganze Haus in einem Durchgang – ohne Kabel und ohne Schleppen."},
+    {t:"field", k:"usp", label:"Haupt-USP (Alleinstellungsmerkmal)", area:true, help:"Was kann dieses Produkt, was kein Standard-Wettbewerber in dieser Preisklasse kann?", ph:"z. B. 25.000 Pa Saugkraft bei nur 1,4 kg Handgerät-Gewicht."}
+  ]},
+  {id:"specs", num:"02", title:"Verifizierte Spezifikationen, Benefits & UWG-Claims",
+   note:"Hinweis für Pitch-Meister: Nur Werte aus dieser Tabelle dürfen als belegte Fakten im Skript verwendet werden.", items:[
+    {t:"table", k:"specs", min:3, add:"Feature hinzufügen", rowName:"Feature", widths:["20%","28%","26%","26%"], cols:[
+      {k:"feature", label:"Technisches Feature", ph:"z. B. BLDC-Motor"},
+      {k:"benefit", label:"Kundennutzen (Benefit)", ph:"z. B. Zieht selbst tiefsitzenden Feinstaub aus Teppichen", area:true},
+      {k:"wert", label:"Belegbarer Messwert / Test-Ergebnis", ph:"z. B. 380 Watt / 25.000 Pa Saugkraft im Boost-Modus", area:true},
+      {k:"quelle", label:"Exakte Quellenangabe", ph:"z. B. Prüfbericht Labor XY Nr. 4812, Datum", area:true}
+    ]},
+    {t:"sub", title:"Rechtliche Grenzen & UWG-Tabus (Strict Compliance)"},
+    {t:"list", k:"superlative", label:"Freigegebene Superlative / Aussagen", tag:["yes","freigegeben"], ph:"Eine Aussage pro Zeile, z. B.\nUnser bisher leichtester Invictus\nTÜV-geprüfte Filtration"},
+    {t:"list", k:"nogos", label:"Verbotene Aussagen / No-Gos", tag:["no","verboten"], ph:"Eine Aussage pro Zeile, z. B.\nKeine pauschale „100 % Allergenfreiheit“ behaupten\n„Testsieger“ nur mit exakter Nennung von Institut, Ausgabe und Note"},
+    {t:"list", k:"disclaimer", label:"Pflicht-Disclaimer (Bauchbinden)", tag:["no","Pflicht"], ph:"Einer pro Zeile, z. B.\n*Im Vergleich zum manuellen Schneiden mit einem handelsüblichen Küchenmesser\n*Im Eco-Modus ohne Motorbürste"}
+  ]},
+  {id:"demos", num:"03", title:"Visuelle Demonstrationen („Magic Moments“ für Dia-TV)",
+   lead:"Welche physischen Beweise funktionieren vor der Kamera am besten?", items:[
+    {t:"group", title:"Der „Magic Moment“ (Haupt-Demo)", fields:[
+      {k:"d1_aufbau", label:"Aufbau", area:true, ph:"z. B. Glasplatte von unten gefilmt, bestreut mit feinem Mehl, Tierhaaren und groben Cornflakes"},
+      {k:"d1_aktion", label:"Aktion", area:true, ph:"z. B. Ein einziger Zug mit der motorisierten Elektrobürste – rückstandslos sauber"},
+      {k:"d1_kontrast", label:"Visueller Kontrast", area:true, ph:"z. B. Split-Screen gegen herkömmlichen Staubsauger, der das Mehl vor sich herschiebt"}
+    ]},
+    {t:"group", title:"Der Härtetest / Extrem-Beweis", fields:[
+      {k:"d2_aufbau", label:"Aufbau", area:true, ph:"z. B. Ananas mit harter Schale oder extrem weiche, reife Tomaten"},
+      {k:"d2_aktion", label:"Aktion", area:true, ph:"z. B. Ein Druck – perfektes Ergebnis ohne Kraftaufwand"}
+    ]},
+    {t:"group", title:"Der Zeit-/Komfort-Beweis", fields:[
+      {k:"d3_aufbau", label:"Aufbau", area:true, ph:"z. B. Großer Berg Gemüse für eine Familien-Suppe"},
+      {k:"d3_aktion", label:"Aktion", area:true, ph:"z. B. Live-Stoppuhr im Bild: 45 Sekunden vs. 6 Minuten"}
+    ]}
+  ]},
+  {id:"angebot", num:"04", title:"Angebots-Architektur, Value-Stacking & CTA-Hebel", items:[
+    {t:"table", k:"basis", min:1, add:"Position hinzufügen", rowName:"Position", label:"Basis-Set (Lieferumfang)", cols:[
+      {k:"item", label:"Position", ph:"z. B. 1x Hauptgerät + Standard-Zubehör", span2:true},
+      {k:"wert", label:"Einzelwert / UVP", ph:"z. B. 199,90 €"}
+    ]},
+    {t:"table", k:"boni", min:2, add:"Bonus hinzufügen", rowName:"Bonus", label:"Gratis-Boni / TV-Exklusiv-Beigaben (Value-Stacking)", cols:[
+      {k:"item", label:"Bonus", ph:"z. B. Flex-Fugendüse & Möbelpinsel", span2:true},
+      {k:"wert", label:"Einzelwert", ph:"z. B. 19,90 €"}
+    ]},
+    {t:"sum"},
+    {t:"sub", title:"Preisanker & Angebotspreis"},
+    {t:"grid", fields:[
+      {k:"gesamtwert", label:"Gesamtwert aller Einzelteile", ph:"z. B. 249,80 €"},
+      {k:"shoppreis", label:"Regulärer Shop-Preis", ph:"z. B. 179,90 €"},
+      {k:"aktionspreis", label:"Aktueller DRTV-Aktionspreis", wide:true, ph:"z. B. 129,90 € oder 3 Raten à 43,30 €"}
+    ]},
+    {t:"field", k:"cta", label:"CTA-Dringlichkeit (echter Anreiz)", area:true, ph:"z. B. „Wenn Sie innerhalb der nächsten 15 Minuten bestellen, erhalten Sie den Ersatz-HEPA-Filter im Wert von 24,90 € gratis dazu“ / „Limitiertes TV-Kontingent von 2.500 Sets“"},
+    {t:"field", k:"garantie", label:"Risiko-Umkehr / Garantie", area:true, ph:"z. B. 30 Tage Geld-zurück-Garantie – testen Sie das Gerät risikofrei in Ihrem eigenen Zuhause"},
+    {t:"sub", title:"Bestellwege"},
+    {t:"grid", fields:[
+      {k:"telefon", label:"Telefon", ph:"0800-XXXXXXX (kostenlos)"},
+      {k:"web", label:"Web / QR", ph:"www.beispielshop.de/tv"}
+    ]}
+  ]},
+  {id:"voc", num:"05", title:"Voice of Customer, Einwände & Retouren-Insights", items:[
+    {t:"sub", title:"Echte Kundenstimmen (Social Proof)", first:true},
+    {t:"table", k:"zitate", min:2, add:"Kundenstimme hinzufügen", rowName:"Stimme", cols:[
+      {k:"zitat", label:"Original-Zitat", area:true, span2:true, ph:"z. B. Endlich kein Kabelsalat mehr auf der Treppe und der Akku hält für meine komplette 90-m²-Wohnung."},
+      {k:"quelle", label:"Quelle", area:true, ph:"z. B. Verifizierter Käufer, eigener Onlineshop, 03/2026"}
+    ]},
+    {t:"sub", title:"Top-Kaufbarrieren & Konter"},
+    {t:"table", k:"einwaende", min:2, add:"Einwand hinzufügen", rowName:"Einwand", cols:[
+      {k:"einwand", label:"Einwand", area:true, ph:"z. B. „Akkusauger haben nicht genug Saugkraft für Teppiche.“"},
+      {k:"konter", label:"Belegter Konter", area:true, span2:true, ph:"z. B. BLDC-Digitalmotor + direkt angetriebene Power-Bürste demonstrieren; Saugkraft-Vergleich zeigen."}
+    ]},
+    {t:"sub", title:"Häufigste Retourengründe"},
+    {t:"list", k:"retouren", label:"Retourengründe & Konsequenz fürs Skript", help:"Wichtig für das Erwartungsmanagement im Skript. Ein Grund pro Zeile.", ph:"z. B. 18 % der Retouren: „Akku im Boost-Modus nach 12 Min. leer.“ → Im Skript klar kommunizieren, dass der Eco-Modus für Hartböden 45 Min. hält und Boost nur für hartnäckigen Teppichschmutz gedacht ist."}
+  ]},
+  {id:"kampagnen", num:"06", title:"Historische Kampagnendaten & DRTV-Performance-Benchmarks",
+   lead:"Welche Skript-Mechaniken haben in der Vergangenheit nachweislich funktioniert – und welche nicht?", items:[
+    {t:"table", k:"kampagnen", min:2, add:"Kampagne hinzufügen", rowName:"Kampagne", cols:[
+      {k:"kampagne", label:"Kampagne / Datum", ph:"z. B. Q2 2026, RTL/VOX"},
+      {k:"laenge", label:"Spot-Länge & Kanal", ph:"z. B. 60 Sek. DRTV"},
+      {k:"hook", label:"Getesteter Hook / Einstieg", ph:"z. B. Split-Screen: Tierhaare auf Sofa in 3 Sek. weg", area:true},
+      {k:"cta", label:"CTA-Mechanik", ph:"z. B. 15-Min.-Timer + Gratis-Tierhaarbürste", area:true},
+      {k:"kpi", label:"Messbare KPIs & Ergebnis", ph:"z. B. CPO: 28,40 € (Ziel: <32 €); Call-Spike ab Sek. 48", area:true},
+      {k:"ergebnis", label:"Bewertung", select:["","Gewinner","Flop","Neutral"]},
+      {k:"learning", label:"Learning", ph:"z. B. Tierhaar-Demo im ersten Frame senkte Abbruchrate um 22 %.", area:true, span3:true}
+    ]}
+  ]}
+];
+
+/* ---------- Example data ---------- */
+const EXAMPLE = {
+  f:{
+    produkt:"Invictus X7", kuerzel:"Internes Fact-Sheet Invictus X7, Version 2.1, Stand: 10/2026",
+    kategorie:"Kabelloser Staubsauger", status:"Launch Q4 2026", zielgruppe:"Haushalte mit Haustieren, 35–65 Jahre, DACH-Region",
+    pain:"Schwere Bodenstaubsauger müssen durchs ganze Haus und über Treppen geschleppt werden; Tierhaare bleiben trotzdem im Teppich.",
+    loesung:"Der Invictus X7 saugt das ganze Haus in einem Durchgang – kabellos, federleicht und gründlich bis in die Teppichfaser.",
+    usp:"25.000 Pa Saugkraft im Boost-Modus bei nur 1,4 kg Handgerät-Gewicht – in dieser Preisklasse einzigartig.",
+    superlative:"Unser bisher leichtester Invictus\nTÜV-geprüfte Filtration",
+    nogos:"Keine pauschale „100 % Allergenfreiheit“ behaupten\n„Testsieger“ nur mit exakter Nennung von Institut, Ausgabe und Note",
+    disclaimer:"*Im Eco-Modus ohne Motorbürste\n*Saugkraft gemessen am Saugrohr im Boost-Modus",
+    d1_aufbau:"Glasplatte von unten gefilmt, bestreut mit feinem Mehl, Tierhaaren und groben Cornflakes",
+    d1_aktion:"Ein einziger Zug mit der motorisierten Elektrobürste – rückstandslos sauber",
+    d1_kontrast:"Split-Screen gegen herkömmlichen Staubsauger, der das Mehl vor sich herschiebt",
+    d2_aufbau:"Hochflorteppich mit eingetretener Katzenstreu und Kaffeebohnen",
+    d2_aktion:"Ein Zug im Boost-Modus – Teppich danach in Makro-Aufnahme sauber",
+    d3_aufbau:"Komplette 90-m²-Wohnung inklusive Treppe",
+    d3_aktion:"Zeitraffer mit Live-Stoppuhr im Bild: 18 Minuten, ohne einmal umzustecken",
+    gesamtwert:"249,60 €", shoppreis:"179,90 €", aktionspreis:"129,90 € oder 3 Raten à 43,30 €",
+    cta:"„Wenn Sie innerhalb der nächsten 15 Minuten bestellen, erhalten Sie den Ersatz-HEPA-Filter im Wert von 24,90 € gratis dazu.“ Limitiertes TV-Kontingent von 2.500 Sets.",
+    garantie:"30 Tage Geld-zurück-Garantie – testen Sie das Gerät risikofrei in Ihrem eigenen Zuhause.",
+    telefon:"0800-1234567 (kostenlos)", web:"www.beispielshop.de/tv",
+    retouren:"18 % der Retouren: „Akku im Boost-Modus nach 12 Min. leer.“ → Im Skript klar kommunizieren, dass der Eco-Modus für Hartböden 45 Min. hält und Boost nur für hartnäckigen Teppichschmutz gedacht ist."
+  },
+  t:{
+    specs:[
+      {feature:"BLDC-Motor", benefit:"Zieht selbst tiefsitzenden Feinstaub aus Teppichen", wert:"380 Watt / 25.000 Pa Saugkraft im Boost-Modus", quelle:"Prüfbericht Labor XY Nr. 4812, 09/2026"},
+      {feature:"Eigengewicht", benefit:"Müheloses Saugen über Kopf & auf Treppen", wert:"Nur 1,4 kg Handgerät-Gewicht", quelle:"Technisches Datenblatt Hersteller, Rev. 3"},
+      {feature:"Wechselakku 2.500 mAh", benefit:"Ganze Wohnung ohne Nachladen", wert:"Bis zu 45 Min. Laufzeit im Eco-Modus", quelle:"Interner Laufzeittest 08/2026, n=10"}
+    ],
+    basis:[{item:"1x Invictus X7 Hauptgerät + Standard-Zubehör", wert:"189,90 €"}],
+    boni:[{item:"Flex-Fugendüse & Möbelpinsel", wert:"19,90 €"},{item:"Tierhaar-Turbobürste", wert:"14,90 €"},{item:"Ersatz-HEPA-Filter", wert:"24,90 €"}],
+    zitate:[
+      {zitat:"Endlich kein Kabelsalat mehr auf der Treppe und der Akku hält für meine komplette 90-m²-Wohnung.", quelle:"Verifizierter Käufer, eigener Onlineshop, 03/2026"},
+      {zitat:"Die Hundehaare auf dem Sofa sind in Sekunden weg.", quelle:"Amazon.de Bewertung, 4,7/5 Sterne bei 1.240 Bewertungen, Stand 10/2026"}
+    ],
+    einwaende:[
+      {einwand:"„Akkusauger haben nicht genug Saugkraft für Teppiche.“", konter:"BLDC-Digitalmotor + direkt angetriebene Power-Bürste demonstrieren; Saugkraft-Vergleich zeigen."},
+      {einwand:"„Die Reinigung des Geräts danach dauert länger als die Zeitersparnis.“", konter:"1-Klick-Behälterentleerung über dem Mülleimer in Großaufnahme zeigen."}
+    ],
+    kampagnen:[
+      {kampagne:"Q2 2026, RTL/VOX", laenge:"60 Sek. DRTV", hook:"Split-Screen: Tierhaare auf Sofa in 3 Sek. weg", cta:"15-Min.-Timer + Gratis-Tierhaarbürste", kpi:"CPO: 28,40 € (Ziel: <32 €); Call-Spike ab Sek. 48", ergebnis:"Gewinner", learning:"Tierhaar-Demo im ersten Frame senkte die Abbruchrate um 22 %."},
+      {kampagne:"Q1 2026, Meta/YouTube", laenge:"30 Sek. Social-DR", hook:"Fokus auf technische Watt-Zahlen im Intro", cta:"10 % Rabattcode im Shop", kpi:"CTR: 0,65 %; CPO: 49,10 €", ergebnis:"Flop", learning:"Technische Zahlen ohne sofortiges Problem-Bild erzeugten zu wenig Aufmerksamkeit."}
+    ]
+  }
+};
+
+/* ---------- State ---------- */
+const STORE = "drtv-briefing-v1";
+let state = blank();
+let isExample = false;
+function blank(){ const s = {f:{}, t:{}}; eachTable(tb => { s.t[tb.k] = Array.from({length:tb.min}, () => emptyRow(tb)); }); return s; }
+function emptyRow(tb){ const r = {}; tb.cols.forEach(c => r[c.k] = ""); return r; }
+function eachTable(fn){ SCHEMA.forEach(sec => sec.items.forEach(it => { if(it.t === "table") fn(it, sec); })); }
+function load(){ try{ const raw = localStorage.getItem(STORE); if(raw){ const d = JSON.parse(raw); state = normalize(d.state || d); isExample = !!d.example; } }catch(e){} }
+function persist(){ try{ localStorage.setItem(STORE, JSON.stringify({state, example:isExample})); }catch(e){} }
+function normalize(d){
+  const s = blank();
+  if(d && typeof d === "object"){
+    if(d.f) Object.keys(d.f).forEach(k => { if(typeof d.f[k] === "string") s.f[k] = d.f[k]; });
+    if(d.t) eachTable(tb => {
+      const rows = Array.isArray(d.t[tb.k]) ? d.t[tb.k] : null;
+      if(rows) s.t[tb.k] = rows.map(r => { const o = emptyRow(tb); tb.cols.forEach(c => { if(r && typeof r[c.k] === "string") o[c.k] = r[c.k]; }); return o; });
+      if(!s.t[tb.k].length) s.t[tb.k] = [emptyRow(tb)];
+    });
+  }
+  return s;
+}
+
+/* ---------- Rendering ---------- */
+const form = document.getElementById("form");
+const nav = document.getElementById("nav");
+function el(tag, attrs, kids){
+  const n = document.createElement(tag);
+  if(attrs) for(const a in attrs){
+    if(a === "text") n.textContent = attrs[a];
+    else if(a === "class") n.className = attrs[a];
+    else if(a.startsWith("on")) n.addEventListener(a.slice(2), attrs[a]);
+    else if(attrs[a] !== false && attrs[a] != null) n.setAttribute(a, attrs[a]);
+  }
+  (kids || []).forEach(k => k && n.appendChild(typeof k === "string" ? document.createTextNode(k) : k));
+  return n;
+}
+function control(def, id, value, onInput){
+  let c;
+  if(def.select){
+    c = el("select", {id});
+    def.select.forEach(o => c.appendChild(el("option", {value:o, text:o || "—"})));
+    c.value = value || "";
+    c.addEventListener("change", e => onInput(e.target.value));
+  } else if(def.area){
+    c = el("textarea", {id, placeholder:def.ph || "", rows:def.rows || 3});
+    c.value = value || "";
+    c.addEventListener("input", e => onInput(e.target.value));
+  } else {
+    c = el("input", {id, type:"text", placeholder:def.ph || "", autocomplete:"off"});
+    c.value = value || "";
+    c.addEventListener("input", e => onInput(e.target.value));
+  }
+  return c;
+}
+function fieldEl(def, extraClass){
+  const id = "f-" + def.k;
+  const lbl = el("label", {class:"lbl", for:id}, [def.label, def.req ? el("span", {class:"req", text:" *"}) : null,
+    def.tag ? el("span", {class:"tag " + def.tag[0], text:def.tag[1]}) : null]);
+  const ctl = control(def.list ? Object.assign({area:true, rows:4}, def) : def, id, state.f[def.k], v => { state.f[def.k] = v; changed(); });
+  return el("div", {class:"field" + (def.wide ? " wide" : "") + (extraClass ? " " + extraClass : "")}, [lbl, def.help ? el("div", {class:"help", text:def.help}) : null, ctl]);
+}
+function tableEl(tb){
+  const box = el("div", {class:"rep", id:"rep-" + tb.k});
+  const rows = state.t[tb.k];
+  const ncols = tb.cols.reduce((n, c) => n + (c.span3 ? 0 : c.span2 ? 2 : 1), 0);
+  rows.forEach((r, i) => {
+    const row = el("div", {class:"row"});
+    row.style.setProperty("--cols", Math.min(ncols, 4));
+    row.appendChild(el("div", {class:"rowno", text:tb.rowName + " " + String(i + 1).padStart(2, "0")}));
+    tb.cols.forEach(c => {
+      const id = "t-" + tb.k + "-" + i + "-" + c.k;
+      const f = el("div", {class:"field" + (c.span2 ? " span2" : "") + (c.span3 ? " span3" : "")}, [el("label", {for:id, text:c.label}), control(c, id, r[c.k], v => { r[c.k] = v; changed(); })]);
+      if(c.span3) f.style.gridColumn = "1 / -2";
+      row.appendChild(f);
+    });
+    row.appendChild(el("button", {type:"button", class:"btn icon", "aria-label":tb.rowName + " " + (i + 1) + " entfernen", title:"Zeile entfernen", text:"✕", onclick:() => {
+      rows.splice(i, 1); if(!rows.length) rows.push(emptyRow(tb)); rerenderTable(tb); changed();
+    }}));
+    box.appendChild(row);
+  });
+  box.appendChild(el("button", {type:"button", class:"btn add small", text:"+ " + tb.add, onclick:() => {
+    rows.push(emptyRow(tb)); rerenderTable(tb); changed();
+    const last = document.getElementById("t-" + tb.k + "-" + (rows.length - 1) + "-" + tb.cols[0].k); if(last) last.focus();
+  }}));
+  return box;
+}
+function rerenderTable(tb){ document.getElementById("rep-" + tb.k).replaceWith(tableEl(tb)); }
+
+function render(){
+  form.textContent = "";
+  nav.querySelectorAll("a").forEach(a => a.remove());
+  const prog = document.getElementById("navprog");
+  SCHEMA.forEach(sec => {
+    const s = el("section", {class:"sec", id:"sec-" + sec.id, "aria-labelledby":"h-" + sec.id});
+    s.appendChild(el("div", {class:"sec-head"}, [el("span", {class:"sec-num", "aria-hidden":"true", text:sec.num}), el("h2", {id:"h-" + sec.id, text:sec.title})]));
+    if(sec.note) s.appendChild(el("p", {class:"note", text:sec.note}));
+    if(sec.lead) s.appendChild(el("p", {class:"lead", text:sec.lead}));
+    sec.items.forEach((it, idx) => {
+      if(it.t === "grid") s.appendChild(el("div", {class:"grid2"}, it.fields.map(f => fieldEl(f))));
+      else if(it.t === "field" || it.t === "list") s.appendChild(fieldEl(it.t === "list" ? Object.assign({list:true}, it) : it));
+      else if(it.t === "sub") s.appendChild(el("h3", {class:"sub" + (it.first ? " first" : ""), text:it.title}));
+      else if(it.t === "group"){ s.appendChild(el("h3", {class:"sub", text:it.title})); s.appendChild(el("div", {class:"grid2"}, it.fields.map((f, i) => fieldEl(f, i === 2 ? "wide" : "")))); }
+      else if(it.t === "table"){ if(it.label) s.appendChild(el("h3", {class:"sub" + (idx === 0 ? " first" : ""), text:it.label})); s.appendChild(tableEl(it)); }
+      else if(it.t === "sum") s.appendChild(el("div", {class:"sum", id:"sumline"}));
+    });
+    form.appendChild(s);
+    nav.insertBefore(el("a", {href:"#sec-" + sec.id}, [el("span", {text:(sec.num === "00" ? "" : Number(sec.num) + ". ") + shortTitle(sec.title)}), el("span", {class:"cnt", id:"cnt-" + sec.id})]), prog);
+  });
+  document.getElementById("example-banner").hidden = !isExample;
+  updateStatus();
+}
+function shortTitle(t){ return t.split(/[,(]/)[0].replace(/ &.*$/, "").trim(); }
+
+/* ---------- Status / completeness ---------- */
+function filled(v){ return typeof v === "string" && v.trim() !== ""; }
+function rowFilled(r){ return Object.keys(r).some(k => filled(r[k])); }
+function secCount(sec){
+  let done = 0, total = 0;
+  sec.items.forEach(it => {
+    const fs = it.t === "grid" || it.t === "group" ? it.fields : (it.t === "field" || it.t === "list") ? [it] : [];
+    fs.forEach(f => { total++; if(filled(state.f[f.k])) done++; });
+    if(it.t === "table"){ total++; if(state.t[it.k].some(rowFilled)) done++; }
+  });
+  return [done, total];
+}
+function parseEuro(s){
+  if(!filled(s)) return null;
+  const m = s.replace(/\s/g, "").match(/-?\d[\d.]*(,\d+)?/); if(!m) return null;
+  const n = parseFloat(m[0].replace(/\./g, "").replace(",", ".")); return isNaN(n) ? null : n;
+}
+const fmtEuro = n => n.toLocaleString("de-DE", {minimumFractionDigits:2, maximumFractionDigits:2}) + " €";
+function updateStatus(){
+  let D = 0, T = 0;
+  SCHEMA.forEach(sec => { const [d, t] = secCount(sec); D += d; T += t;
+    const c = document.getElementById("cnt-" + sec.id); if(c){ c.textContent = d + "/" + t; c.classList.toggle("full", d === t); } });
+  const st = document.getElementById("status");
+  st.textContent = D ? D + " von " + T + " Feldern ausgefüllt" : "Noch nichts ausgefüllt";
+  st.classList.toggle("on", D === T);
+  const bar = document.querySelector("#navprog b"); if(bar) bar.style.width = Math.round(D / T * 100) + "%";
+  const sl = document.getElementById("sumline");
+  if(sl){
+    let sum = 0, n = 0;
+    ["basis", "boni"].forEach(k => state.t[k].forEach(r => { const v = parseEuro(r.wert); if(v != null){ sum += v; n++; } }));
+    sl.textContent = "";
+    if(n){
+      sl.append("Summe der eingetragenen Einzelwerte: ", el("b", {text:fmtEuro(sum)}));
+      sl.appendChild(el("button", {type:"button", class:"btn small", text:"Als Gesamtwert übernehmen", onclick:() => {
+        state.f.gesamtwert = fmtEuro(sum); document.getElementById("f-gesamtwert").value = state.f.gesamtwert; changed(); toast("Gesamtwert übernommen."); }}));
+    } else sl.textContent = "Tragen Sie Einzelwerte ein, um die Summe für den Preisanker zu sehen.";
+  }
+}
+let saveTimer;
+function changed(){ updateStatus(); clearTimeout(saveTimer); saveTimer = setTimeout(persist, 300); }
+
+/* ---------- Toast ---------- */
+let toastTimer;
+function toast(msg){ const t = document.getElementById("toast"); t.firstElementChild.textContent = msg; t.hidden = false; clearTimeout(toastTimer); toastTimer = setTimeout(() => t.hidden = true, 3200); }
+
+/* ---------- File saving (artifact viewer or plain browser) ---------- */
+let dlPromise = null;
+function downloadsCap(){
+  if(!dlPromise) dlPromise = (window.claude && typeof window.claude.use === "function") ? window.claude.use("downloads").catch(() => null) : Promise.resolve(null);
+  return dlPromise;
+}
+async function saveFile(filename, blob){
+  const dl = await downloadsCap();
+  if(dl){
+    try{ await dl.save({filename, data:blob}); return "saved"; }
+    catch(e){ if(e && e.code === "declined") return "declined"; if(e && e.code === "rate_limited"){ toast("Ein Speichern-Dialog ist schon offen."); return "busy"; } }
+  }
+  const url = URL.createObjectURL(blob);
+  const a = el("a", {href:url, download:filename}); document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(() => URL.revokeObjectURL(url), 4000);
+  return "saved";
+}
+function slug(s){ return (s || "Briefing").normalize("NFKD").replace(/[̀-ͯ]/g, "").replace(/[^A-Za-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 60) || "Briefing"; }
+function today(){ return new Date().toLocaleDateString("de-DE", {day:"2-digit", month:"2-digit", year:"numeric"}); }
+
+/* ---------- PDF (Genius Studios CI) ---------- */
+const C = {ink:"#1E1E28", anth:"#282834", muted:"#6B6B7B", line:"#DEDEE6", blue:"#1665CD", blueBright:"#3483EB", blueSoft:"#EAF2FD", red:"#DC2751", redSoft:"#FCEBEF", ok:"#1E8A4F", okSoft:"#E8F5EE", zebra:"#F4F4F7", light:"#F0F0F3"};
+const EMPTY = "—";
+const clean = t => String(t).replace(/[→⇒➔]/g, "->").replace(/[←]/g, "<-").replace(/[✓✔]/g, "+").replace(/[✕✗✘]/g, "x");
+const v = k => filled(state.f[k]) ? clean(state.f[k].trim()) : null;
+const lines = k => (state.f[k] || "").split(/\n+/).map(s => clean(s).replace(/^[-•*]\s(?=\S)/, "").trim()).filter(Boolean);
+const rowsOf = k => state.t[k].filter(rowFilled);
+const val = (s, style) => filled(s) ? {text:clean(s.trim()), style} : {text:EMPTY, color:C.muted, style};
+let brandFonts = false;
+function setupFonts(){
+  if(brandFonts || !A.fonts || !window.pdfMake) return brandFonts;
+  try{
+    pdfMake.vfs = Object.assign({}, pdfMake.vfs || {}, A.fonts);
+    pdfMake.fonts = Object.assign({}, pdfMake.fonts || {}, {
+      Roboto:{normal:"Roboto-Regular.ttf", bold:"Roboto-Medium.ttf", italics:"Roboto-Italic.ttf", bolditalics:"Roboto-MediumItalic.ttf"},
+      Hind:{normal:"hind-400.woff", bold:"hind-600.woff", italics:"hind-400.woff", bolditalics:"hind-600.woff"},
+      Montserrat:{normal:"montserrat-700.woff", bold:"montserrat-900.woff", italics:"montserrat-700.woff", bolditalics:"montserrat-900.woff"}
+    });
+    brandFonts = true;
+  }catch(e){ brandFonts = false; }
+  return brandFonts;
+}
+
+function pdfSecHead(sec, extra){
+  return Object.assign({margin:[0, 20, 0, 10], unbreakable:true, headlineLevel:1, stack:[
+    {columns:[
+      {width:"auto", text:sec.num, style:"secNum"},
+      {width:"*", text:sec.title, style:"secTitle", margin:[10, 4, 0, 0]}
+    ]},
+    {canvas:[{type:"line", x1:0, y1:0, x2:499, y2:0, lineWidth:0.8, lineColor:C.anth}], margin:[0, 6, 0, 0]}
+  ]}, extra || {});
+}
+function labelValue(label, value){ return {margin:[0, 0, 0, 9], stack:[{text:label.toUpperCase(), style:"label"}, val(value, "body")], unbreakable:true}; }
+function bulletBlock(label, items, color, fill){
+  const body = items.length ? {ul:items.map(t => ({text:t, style:"body"})), markerColor:color, margin:[0, 2, 0, 0]} : {text:EMPTY, color:C.muted, style:"body"};
+  return {margin:[0, 0, 0, 8], unbreakable:true, table:{widths:["*"], body:[[{fillColor:fill, margin:[10, 7, 10, 7], stack:[{text:label.toUpperCase(), style:"label", color:color}, body]}]]},
+    layout:{hLineWidth:() => 0, vLineWidth:i => i === 0 ? 3 : 0, vLineColor:() => color, paddingLeft:() => 0, paddingRight:() => 0, paddingTop:() => 0, paddingBottom:() => 0}};
+}
+const gridLayout = {hLineWidth:(i, n) => (i === 0 || i === n.table.body.length) ? 0 : (i === 1 ? 0 : 0.4), vLineWidth:() => 0,
+  hLineColor:() => C.line, paddingTop:() => 6, paddingBottom:() => 6, paddingLeft:() => 6, paddingRight:() => 6,
+  fillColor:(i) => i === 0 ? C.anth : (i % 2 === 0 ? C.zebra : null)};
+function dataTable(heads, keys, rows, widths){
+  const head = heads.map(t => ({text:t, style:"th"}));
+  const body = rows.length ? rows.map(r => keys.map(k => val(r[k], "td"))) : [keys.map((c, i) => i === 0 ? {text:"Keine Einträge", color:C.muted, style:"td", colSpan:keys.length} : {})];
+  return {table:{headerRows:1, keepWithHeaderRows:1, dontBreakRows:true, widths:widths || keys.map(() => "*"), body:[head].concat(body)}, layout:gridLayout, margin:[0, 0, 0, 10]};
+}
+
+function buildDoc(){
+  const name = v("produkt") || "Ohne Produktnamen";
+  const kz = v("kuerzel");
+  const s = id => SCHEMA.find(x => x.id === id);
+  const content = [];
+
+  // Cover band (drawn by background on page 1)
+  content.push({margin:[0, -18, 0, 0], columns:[
+    {width:"*", stack:[
+      {text:"PRODUKT- & KAMPAGNEN-MASTER-BRIEFING", style:"eyebrow"},
+      {text:name, style:"title"},
+      {text:[v("kategorie") || "", v("kategorie") && v("status") ? "  ·  " : "", v("status") || ""], style:"coverSub"}
+    ]},
+    A.logoWhite ? {width:120, image:A.logoWhite, fit:[120, 54], margin:[0, 6, 0, 0]} : {width:1, text:""}
+  ]});
+  content.push({text:"", margin:[0, 66, 0, 0]});
+  const meta = [["Dokument-Kürzel / Zitierquelle", "kuerzel"], ["Hauptzielgruppe", "zielgruppe"], ["Erstellt am", null]];
+  content.push({table:{widths:[150, "*"], body:meta.map(([l, k]) => [{text:l.toUpperCase(), style:"label", margin:[0, 2, 0, 0]}, k ? val(state.f[k], "metaV") : {text:today(), style:"metaV"}])},
+    layout:{hLineWidth:(i, n) => i === 0 ? 0 : 0.4, vLineWidth:() => 0, hLineColor:() => C.line, paddingTop:() => 6, paddingBottom:() => 6, paddingLeft:() => 0, paddingRight:() => 6}});
+
+  // 01
+  content.push(pdfSecHead(s("kern")));
+  content.push(labelValue("Das Kernproblem (Pain Point)", state.f.pain));
+  content.push({margin:[0, 2, 0, 10], unbreakable:true, table:{widths:["*"], body:[[{fillColor:C.anth, margin:[14, 11, 14, 12], stack:[
+    {text:"DIE KERNLÖSUNG · BIG IDEA", style:"label", color:"#8DBBF7"}, filled(state.f.loesung) ? {text:clean(state.f.loesung.trim()), style:"bigIdea"} : {text:EMPTY, style:"bigIdea", color:"#9A9AAA"}]}]]}, layout:"noBorders"});
+  content.push(labelValue("Haupt-USP (Alleinstellungsmerkmal)", state.f.usp));
+
+  // 02
+  const sp = s("specs");
+  content.push(pdfSecHead(sp));
+  content.push({text:sp.note, style:"note", margin:[0, 0, 0, 8]});
+  content.push(dataTable(["Technisches Feature", "Kundennutzen (Benefit)", "Belegbarer Messwert / Test", "Exakte Quellenangabe"], ["feature", "benefit", "wert", "quelle"], rowsOf("specs"), sp.items[0].widths));
+  content.push({text:"Rechtliche Grenzen & UWG-Tabus (Strict Compliance)", style:"sub"});
+  content.push(bulletBlock("Freigegebene Superlative / Aussagen", lines("superlative"), C.ok, C.okSoft));
+  content.push(bulletBlock("Verbotene Aussagen / No-Gos", lines("nogos"), C.red, C.redSoft));
+  content.push(bulletBlock("Pflicht-Disclaimer (Bauchbinden)", lines("disclaimer"), C.anth, C.zebra));
+
+  // 03
+  const dm = s("demos");
+  content.push(pdfSecHead(dm));
+  content.push({text:dm.lead, style:"note", margin:[0, 0, 0, 8]});
+  dm.items.forEach((g, gi) => {
+    const rows = g.fields.map(f => [{text:f.label.toUpperCase(), style:"label", margin:[0, 2, 0, 0]}, val(state.f[f.k], "body")]);
+    content.push({unbreakable:true, margin:[0, 0, 0, 10], stack:[
+      {text:[{text:String(gi + 1).padStart(2, "0") + "  ", color:C.blueBright}, g.title], style:"demoTitle", margin:[0, 0, 0, 4]},
+      {table:{widths:[100, "*"], body:rows}, layout:{hLineWidth:(i) => i === 0 ? 0 : 0.4, vLineWidth:() => 0, hLineColor:() => C.line, paddingTop:() => 5, paddingBottom:() => 5, paddingLeft:() => 0, paddingRight:() => 6}}
+    ]});
+  });
+
+  // 04
+  content.push(pdfSecHead(s("angebot")));
+  const priceRows = (k, prefix) => {
+    const rs = rowsOf(k);
+    if(!rs.length) return [[{text:EMPTY, color:C.muted, style:"td"}, {text:"", style:"td"}]];
+    return rs.map((r, i) => [{text:[prefix ? {text:prefix + " " + (i + 1) + "  ", color:C.blue, bold:true} : "", clean(r.item || EMPTY)], style:"td"}, {text:clean(r.wert || EMPTY), style:"tdNum", alignment:"right", color:r.wert ? C.ink : C.muted}]);
+  };
+  const priceLayout = {hLineWidth:(i, n) => i === 1 ? 0.9 : (i === 0 ? 0 : 0.4), vLineWidth:() => 0, hLineColor:i => i === 1 ? C.anth : C.line, paddingTop:() => 5, paddingBottom:() => 5, paddingLeft:() => 0, paddingRight:() => 0};
+  content.push({unbreakable:true, table:{headerRows:1, widths:["*", 90], body:[[{text:"BASIS-SET (LIEFERUMFANG)", style:"label"}, {text:"EINZELWERT / UVP", style:"label", alignment:"right"}]].concat(priceRows("basis"))}, layout:priceLayout, margin:[0, 0, 0, 12]});
+  content.push({unbreakable:true, table:{headerRows:1, widths:["*", 90], body:[[{text:"GRATIS-BONI / TV-EXKLUSIV-BEIGABEN", style:"label"}, {text:"EINZELWERT", style:"label", alignment:"right"}]].concat(priceRows("boni", "Bonus"))}, layout:priceLayout, margin:[0, 0, 0, 14]});
+  const pa = [["Gesamtwert aller Einzelteile", "gesamtwert", 0], ["Regulärer Shop-Preis", "shoppreis", 1], ["DRTV-Aktionspreis", "aktionspreis", 2]];
+  content.push({unbreakable:true, margin:[0, 0, 0, 14], table:{widths:["*", "*", "*"], body:[pa.map(([l, k, lvl]) => ({
+    fillColor:lvl === 2 ? C.blue : (lvl === 1 ? C.anth : C.light), margin:[10, 8, 10, 9], stack:[
+      {text:l.toUpperCase(), style:"label", color:lvl === 0 ? C.muted : (lvl === 1 ? "#B9B9C8" : "#D6E6FD")},
+      {text:v(k) || EMPTY, style:"price", color:lvl === 0 ? (v(k) ? C.ink : C.muted) : "#FFFFFF", decoration:(lvl === 0 && v(k)) ? "lineThrough" : undefined, decorationColor:C.red}
+    ]}))]}, layout:{hLineWidth:() => 0, vLineWidth:(i) => (i === 1 || i === 2) ? 4 : 0, vLineColor:() => "#FFFFFF", paddingLeft:() => 0, paddingRight:() => 0, paddingTop:() => 0, paddingBottom:() => 0}});
+  content.push(labelValue("CTA-Dringlichkeit (echter Anreiz)", state.f.cta));
+  content.push(labelValue("Risiko-Umkehr / Garantie", state.f.garantie));
+  content.push({unbreakable:true, margin:[0, 2, 0, 8], columns:[
+    {width:"*", stack:[{text:"BESTELLWEG TELEFON", style:"label"}, val(state.f.telefon, "contact")]},
+    {width:"*", stack:[{text:"BESTELLWEG WEB / QR", style:"label"}, val(state.f.web, "contact")]}], columnGap:16});
+
+  // 05
+  content.push(pdfSecHead(s("voc")));
+  content.push({text:"Echte Kundenstimmen (Social Proof)", style:"sub"});
+  const zs = rowsOf("zitate");
+  if(!zs.length) content.push({text:EMPTY, color:C.muted, style:"body", margin:[0, 0, 0, 8]});
+  zs.forEach(z => content.push({unbreakable:true, margin:[0, 0, 0, 9], columns:[
+    {width:22, text:"“", style:"quoteMark"},
+    {width:"*", stack:[
+      {text:filled(z.zitat) ? clean(z.zitat.trim().replace(/^[„"“]|[“"”]$/g, "")) : EMPTY, style:"quote"},
+      {text:[{text:"Quelle: ", bold:true}, clean(z.quelle || EMPTY)], style:"small", margin:[0, 3, 0, 0]}]}]}));
+  content.push({text:"Top-Kaufbarrieren & belegte Konter", style:"sub"});
+  const ew = rowsOf("einwaende");
+  content.push({table:{headerRows:1, keepWithHeaderRows:1, dontBreakRows:true, widths:[20, "40%", "*"], body:[[{text:"#", style:"th"}, {text:"Einwand (Skepsis des Zuschauers)", style:"th"}, {text:"Belegter Konter", style:"th"}]].concat(
+    ew.length ? ew.map((r, i) => [{text:String(i + 1).padStart(2, "0"), style:"td", color:C.blue, bold:true}, val(r.einwand, "td"), val(r.konter, "td")]) : [[{text:"Keine Einträge", style:"td", color:C.muted, colSpan:3}, {}, {}]])}, layout:gridLayout, margin:[0, 0, 0, 10]});
+  content.push(bulletBlock("Häufigste Retourengründe (Erwartungsmanagement im Skript)", lines("retouren"), C.red, C.redSoft));
+
+  // 06 — landscape
+  const kp = s("kampagnen");
+  content.push(Object.assign(pdfSecHead(kp, {pageBreak:"before", pageOrientation:"landscape"})));
+  content[content.length - 1].stack[1].canvas[0].x2 = 745;
+  content.push({text:kp.lead, style:"note", margin:[0, 0, 0, 8]});
+  const ks = rowsOf("kampagnen");
+  const kHead = ["Kampagne / Datum", "Spot-Länge & Kanal", "Getesteter Hook / Einstieg", "CTA-Mechanik", "Messbare KPIs & Ergebnis", "Learning (Gewinner / Flop)"].map(t => ({text:t, style:"th"}));
+  const kBody = ks.length ? ks.map(r => {
+    const col = r.ergebnis === "Gewinner" ? C.ok : r.ergebnis === "Flop" ? C.red : C.muted;
+    const learn = {style:"td", text:[]};
+    if(r.ergebnis) learn.text.push({text:r.ergebnis.toUpperCase() + "  ", bold:true, color:col});
+    learn.text.push(filled(r.learning) ? clean(r.learning.trim()) : (r.ergebnis ? "" : EMPTY));
+    return [val(r.kampagne, "td"), val(r.laenge, "td"), val(r.hook, "td"), val(r.cta, "td"), val(r.kpi, "td"), learn];
+  }) : [[{text:"Keine Einträge", style:"td", color:C.muted, colSpan:6}, {}, {}, {}, {}, {}]];
+  content.push({table:{headerRows:1, keepWithHeaderRows:1, dontBreakRows:true, widths:["13%", "11%", "19%", "16%", "18%", "*"], body:[kHead].concat(kBody)}, layout:gridLayout});
+
+  const F = brandFonts;
+  const disp = F ? "Montserrat" : "Roboto";
+  return {
+    pageSize:"A4", pageMargins:[48, 62, 48, 56],
+    pageBreakBefore:(node, followingOnPage) => node.headlineLevel === 1 && node.pageBreak !== "before" && followingOnPage.length === 0,
+    info:{title:"Master-Briefing " + name, subject:kz || "Produkt- & Kampagnen-Master-Briefing", author:"Genius Studios", creator:"Genius Studios Master-Briefing"},
+    background:(page, size) => page === 1 ? {canvas:[
+      {type:"rect", x:0, y:0, w:size.width, h:168, color:C.anth},
+      {type:"rect", x:0, y:168, w:size.width, h:3, color:C.blueBright}
+    ]} : null,
+    header:(page, pages, size) => page === 1 ? null : {margin:[48, 22, 48, 0], columns:[
+      A.logoDark ? {image:A.logoDark, fit:[64, 28], width:64} : {text:"Genius Studios", style:"running", width:80},
+      {text:name, style:"runningName", alignment:"right", margin:[0, 9, 0, 0]}]},
+    footer:(page, pages, size) => ({margin:[48, 20, 48, 0], columns:[
+      {text:[{text:"Genius Studios", bold:true}, "  ·  Film · Audio · Broadcast  ·  " + (kz || "Master-Briefing")], style:"running", width:"*"},
+      {text:"Seite " + page + " / " + pages, style:"running", alignment:"right", width:70}]}),
+    content,
+    defaultStyle:{font:F ? "Hind" : "Roboto", fontSize:9.8, lineHeight:1.22, color:C.ink},
+    styles:{
+      eyebrow:{font:disp, fontSize:7.5, bold:false, color:"#8DBBF7", characterSpacing:1.6},
+      title:{font:disp, fontSize:28, bold:true, color:"#FFFFFF", margin:[0, 6, 0, 2], lineHeight:1},
+      coverSub:{fontSize:10.5, color:"#C9C9D6"},
+      metaV:{fontSize:10, bold:true},
+      secNum:{font:disp, fontSize:22, bold:true, color:C.blueBright, lineHeight:1},
+      secTitle:{font:disp, fontSize:13, bold:true, color:C.anth},
+      sub:{font:disp, fontSize:9, bold:false, color:C.anth, characterSpacing:.4, margin:[0, 8, 0, 6]},
+      label:{font:disp, fontSize:6.6, bold:false, color:C.muted, characterSpacing:.9, margin:[0, 0, 0, 2]},
+      body:{fontSize:10},
+      bigIdea:{font:disp, fontSize:12.5, bold:false, color:"#FFFFFF", lineHeight:1.25},
+      note:{fontSize:9, color:C.muted},
+      th:{font:disp, fontSize:7.2, color:"#FFFFFF", characterSpacing:.3},
+      td:{fontSize:9},
+      tdNum:{fontSize:9.5, bold:true},
+      demoTitle:{font:disp, fontSize:10, color:C.anth},
+      price:{font:disp, fontSize:14, bold:true, lineHeight:1.1},
+      contact:{font:disp, fontSize:12, bold:false, color:C.anth},
+      quote:{fontSize:11.5, color:C.anth, lineHeight:1.25},
+      quoteMark:{font:disp, fontSize:30, bold:true, color:C.blueBright, lineHeight:.9},
+      small:{fontSize:8.4, color:C.muted},
+      running:{fontSize:7.6, color:C.muted},
+      runningName:{font:disp, fontSize:8, color:C.anth}
+    }
+  };
+}
+
+function createBlob(dd){ return new Promise((res, rej) => { try{ pdfMake.createPdf(dd).getBlob(res); }catch(e){ rej(e); } }); }
+async function makePdf(){
+  const btn = document.getElementById("btn-pdf");
+  if(!window.pdfMake){ toast("Der PDF-Baustein ist nicht geladen. Prüfen Sie die Internetverbindung und laden Sie die Seite neu."); return; }
+  if(!v("produkt")){ toast("Bitte zuerst den Produktnamen eintragen."); document.getElementById("f-produkt").focus(); return; }
+  btn.disabled = true; btn.textContent = "PDF wird erstellt …";
+  try{
+    setupFonts();
+    let blob;
+    try{ blob = await createBlob(buildDoc()); }
+    catch(e){ if(!brandFonts) throw e; brandFonts = false; blob = await createBlob(buildDoc()); }
+    const r = await saveFile("Master-Briefing_" + slug(v("produkt")) + ".pdf", blob);
+    if(r === "saved") toast("PDF erstellt.");
+  }catch(e){ console.error(e); toast("Das PDF konnte nicht erstellt werden: " + (e && e.message || e)); }
+  finally{ btn.disabled = false; btn.textContent = "PDF erstellen"; }
+}
+
+/* ---------- Actions ---------- */
+document.getElementById("btn-pdf").addEventListener("click", makePdf);
+document.getElementById("btn-example").addEventListener("click", () => { state = normalize(JSON.parse(JSON.stringify(EXAMPLE))); isExample = true; render(); persist(); toast("Beispiel geladen."); });
+document.getElementById("btn-clear-example").addEventListener("click", () => { state = blank(); isExample = false; render(); persist(); });
+const resetBtn = document.getElementById("btn-reset"); let armed = null;
+resetBtn.addEventListener("click", () => {
+  if(!armed){ resetBtn.textContent = "Wirklich leeren?"; resetBtn.classList.add("danger"); armed = setTimeout(disarm, 3500); return; }
+  disarm(); state = blank(); isExample = false; render(); persist(); toast("Alle Felder geleert.");
+});
+function disarm(){ clearTimeout(armed); armed = null; resetBtn.textContent = "Leeren"; resetBtn.classList.remove("danger"); }
+document.getElementById("lbl-import").addEventListener("keydown", e => { if(e.key === "Enter" || e.key === " "){ e.preventDefault(); document.getElementById("file-import").click(); } });
+document.getElementById("btn-export").addEventListener("click", async () => {
+  const blob = new Blob([JSON.stringify({format:"drtv-master-briefing", version:1, state}, null, 2)], {type:"application/json"});
+  const r = await saveFile("Briefing-Entwurf_" + slug(v("produkt")) + ".json", blob);
+  if(r === "saved") toast("Entwurf gesichert.");
+});
+document.getElementById("file-import").addEventListener("change", e => {
+  const file = e.target.files && e.target.files[0]; if(!file) return;
+  const rd = new FileReader();
+  rd.onload = () => {
+    try{ const d = JSON.parse(rd.result); if(!d || (!d.state && !d.f)) throw new Error("format");
+      state = normalize(d.state || d); isExample = false; render(); persist(); toast("Entwurf „" + file.name + "“ geöffnet.");
+    }catch(err){ toast("Diese Datei ist kein Briefing-Entwurf. Wählen Sie eine mit „Entwurf sichern“ erstellte .json-Datei."); }
+    e.target.value = "";
+  };
+  rd.readAsText(file);
+});
+
+load(); render();
+})();
+</script>
+</body>
+</html>
