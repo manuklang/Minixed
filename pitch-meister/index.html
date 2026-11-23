@@ -928,34 +928,43 @@ const A = {
     download(slug(p.title) + '-szenen.csv', '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv;charset=utf-8'); },
   exportJSON: async () => { const p = P(); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
   backupAll: async () => download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...S }, null, 2), 'application/json'),
-  importJSON: async () => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json'; i.onchange = () => { const f = i.files[0]; if (!f) return; f.text().then(async t => {
+  importJSON: async () => fileInput('.json,application/json', false, files => { const f = files[0]; return f.text().then(async t => {
     let d; try { d = JSON.parse(t); } catch (e) { return toast('Datei ist kein gültiges JSON.'); }
     if (d.format === 'pitchmeister-backup' && Array.isArray(d.projects)) { if (!await ask('Komplett-Backup einspielen? Alle aktuellen Daten in diesem Browser werden ersetzt.', 'Einspielen')) return; const cu = S.currentUser; S = migrate(d); delete S.format; delete S.version; if (S.users.some(u => u.id === cu)) S.currentUser = cu; else S.currentUser = null; save(true); render(); return toast('Backup eingespielt.'); }
     const proj = d.project || (d.scenes ? d : null); if (!proj) return toast('Unbekanntes Format.');
     (d.users || []).forEach(u => { if (!S.users.some(x => x.id === u.id)) S.users.push(u); });
-    proj.id = uid(); migrate({ projects: [proj] }); S.projects.unshift(proj); S.activeProjectId = proj.id; log('Projekt importiert'); save(); render(); toast(`Projekt „${proj.title}“ importiert.`); }); }; i.click(); }
+    proj.id = uid(); migrate({ projects: [proj] }); S.projects.unshift(proj); S.activeProjectId = proj.id; log('Projekt importiert'); save(); render(); toast(`Projekt „${proj.title}“ importiert.`); }); })
 };
 
 /* uploads (images are downscaled to keep storage small) */
+function fileInput(accept, multi, onPick) {
+  // im DOM verankert: Safari/iPad und Sandbox-Frames öffnen den Dateidialog sonst nicht zuverlässig
+  const i = document.createElement('input'); i.type = 'file'; i.accept = accept; i.multiple = !!multi;
+  i.style.cssText = 'position:fixed;left:-9999px;width:1px;height:1px;opacity:0';
+  document.body.appendChild(i);
+  i.addEventListener('change', async () => { try { if (i.files.length) await onPick([...i.files]); } catch (e) { toast('Datei konnte nicht gelesen werden: ' + (e.message || e)); } finally { i.remove(); } }, { once: true });
+  i.click();
+}
 function pickFiles(d) {
-  const i = document.createElement('input'); i.type = 'file'; i.accept = d.accept || 'image/*'; if (d.multi) i.multiple = true;
-  i.onchange = async () => {
-    const p = P();
-    for (const f of i.files) {
+  fileInput(d.accept || 'image/*', d.multi, async files => {
+    const p = P(); let n = 0;
+    for (const f of files) {
       let m;
       if (f.type.startsWith('image/')) m = { type: 'image', src: await downscale(f, 1280) };
       else if (f.type.startsWith('video/')) { if (f.size > 4 * 1024 * 1024) { toast('Video ist größer als 4 MB – bitte als Link zum Clip eintragen.'); continue; } m = { type: 'video', src: await readURL(f) }; }
       else continue;
       if (d.mode === 'push') { resolve(p, d.path.split('.')).push({ id: uid(), caption: f.name.replace(/\.[^.]+$/, ''), ...m }); }
       else setPath(p, d.path, m);
+      n++;
     }
+    if (!n) return toast('Dateityp wird nicht unterstützt – bitte Bild (JPG, PNG, WebP) oder Video wählen.');
     commit(describe(d.path.replace(/\.(media|image|preview|images)$/, '') + '.' + (d.mode === 'push' ? 'images' : 'Bild')), d.path);
-  };
-  i.click();
+    toast(n === 1 ? 'Datei hochgeladen.' : n + ' Dateien hochgeladen.');
+  });
 }
 const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
 function downscale(f, max) {
-  return new Promise(res => { const img = new Image(); const url = URL.createObjectURL(f); img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', .82)); }; img.onerror = () => { URL.revokeObjectURL(url); readURL(f).then(res); }; img.src = url; });
+  return new Promise((res, rej) => { const img = new Image(); const url = URL.createObjectURL(f); img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', .82)); }; img.onerror = () => { URL.revokeObjectURL(url); if (f.size > 2.5 * 1024 * 1024) return rej(new Error('Bildformat nicht lesbar (z. B. HEIC) – bitte als JPG/PNG exportieren.')); readURL(f).then(res, rej); }; img.src = url; });
 }
 
 /* ---------- events ---------- */
