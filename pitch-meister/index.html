@@ -1,0 +1,1004 @@
+<!doctype html>
+<html lang="de">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<title>Pitch-Meister 2.0</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Jost:wght@300;400;500;600&display=swap">
+<style>
+:root{
+  --bg:#eef1f5; --bg2:#e6eaf0; --panel:#ffffff; --panel2:#f6f8fb; --line:#dfe4ec; --line2:#c9d1dc;
+  --text:#2c3340; --muted:#6b7585; --faint:#98a1af;
+  --brand:#1f3d74; --brand2:#2d5aa8; --brandSoft:#e4ecf8; --accent:#e0a21b;
+  --ok:#2f8f5b; --okSoft:#e2f3ea; --warn:#c0392b; --warnSoft:#fbe7e4;
+  --shadow:0 1px 2px rgba(20,30,50,.06),0 4px 16px rgba(20,30,50,.06);
+  --onBrand:#fff; --r:12px; --font:"Gill Sans","Gill Sans MT","Jost",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#14181f; --bg2:#1a1f28; --panel:#1e242e; --panel2:#232a35; --line:#2e3642; --line2:#3a4452;
+    --text:#e4e8ef; --muted:#a2acba; --faint:#76808f;
+    --brand:#7fa6ea; --brand2:#9dbbf0; --brandSoft:#243248; --accent:#f0b73a;
+    --ok:#5cc28b; --okSoft:#1d3328; --warn:#ef7a6c; --warnSoft:#3a2321;
+    --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); --onBrand:#10151d;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#14181f; --bg2:#1a1f28; --panel:#1e242e; --panel2:#232a35; --line:#2e3642; --line2:#3a4452;
+  --text:#e4e8ef; --muted:#a2acba; --faint:#76808f;
+  --brand:#7fa6ea; --brand2:#9dbbf0; --brandSoft:#243248; --accent:#f0b73a;
+  --ok:#5cc28b; --okSoft:#1d3328; --warn:#ef7a6c; --warnSoft:#3a2321;
+  --shadow:0 1px 2px rgba(0,0,0,.3),0 4px 16px rgba(0,0,0,.25); --onBrand:#10151d;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{background:var(--bg);color:var(--text);font:15px/1.45 var(--font);-webkit-font-smoothing:antialiased}
+button,input,select,textarea{font:inherit;color:inherit}
+a{color:var(--brand2)}
+#app{display:grid;grid-template-columns:232px 1fr;grid-template-rows:60px 1fr;height:100vh;height:100dvh}
+header.top{grid-column:1/-1;display:flex;align-items:center;gap:16px;padding:0 20px;background:var(--panel);border-bottom:1px solid var(--line)}
+.logo{display:flex;align-items:center;gap:10px;font-weight:300;letter-spacing:.06em;font-size:20px;white-space:nowrap}
+.logo b{font-weight:500}
+.logo .mark{width:30px;height:30px;border-radius:9px;background:linear-gradient(135deg,var(--brand),var(--brand2));display:grid;place-items:center;color:#fff;font-weight:600;font-size:14px;letter-spacing:0}
+.top .proj{margin-left:12px;min-width:0;flex:1;display:flex;align-items:center;gap:8px}
+.top .proj select{max-width:340px}
+.top .status{font-size:12px;color:var(--faint);white-space:nowrap}
+.userchip{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:999px;padding:4px 12px 4px 4px;background:var(--panel2);cursor:pointer}
+.avatar{width:26px;height:26px;border-radius:50%;display:grid;place-items:center;color:#fff;font-size:12px;font-weight:600;flex:none}
+nav.side{background:var(--panel);border-right:1px solid var(--line);padding:14px 10px;overflow:auto}
+nav.side .grp{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--faint);margin:14px 10px 6px}
+nav.side .grp:first-child{margin-top:2px}
+nav.side button{display:flex;align-items:center;gap:10px;width:100%;border:0;background:none;padding:8px 10px;border-radius:9px;cursor:pointer;text-align:left;color:var(--muted)}
+nav.side button:hover{background:var(--panel2);color:var(--text)}
+nav.side button.on{background:var(--brandSoft);color:var(--brand);font-weight:500}
+nav.side button:disabled{opacity:.4;cursor:default}
+nav.side svg{width:18px;height:18px;flex:none}
+nav.side .cnt{margin-left:auto;font-size:11px;color:var(--faint)}
+main{overflow:auto;padding:24px 28px 80px}
+h1{font-weight:300;font-size:28px;letter-spacing:.03em;margin:0}
+h2{font-weight:500;font-size:16px;margin:0 0 12px}
+h3{font-weight:500;font-size:14px;margin:0 0 8px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+.pagehead{display:flex;align-items:flex-end;gap:16px;flex-wrap:wrap;margin-bottom:20px}
+.pagehead .sub{color:var(--muted);font-size:14px;margin-top:2px}
+.pagehead .actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:18px;box-shadow:var(--shadow)}
+.grid{display:grid;gap:16px}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.gauto{grid-template-columns:repeat(auto-fill,minmax(260px,1fr))}
+.stack>*+*{margin-top:16px}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.field>span{font-size:12px;color:var(--muted);letter-spacing:.02em}
+input,select,textarea{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:8px 10px;width:100%;min-width:0;outline:none;transition:border-color .15s,box-shadow .15s}
+input:focus,select:focus,textarea:focus{border-color:var(--brand2);box-shadow:0 0 0 3px var(--brandSoft)}
+textarea{resize:vertical;min-height:90px}
+input[type=checkbox]{width:16px;height:16px;padding:0;accent-color:var(--brand2);flex:none}
+input[type=color]{padding:2px;height:36px;width:46px}
+.btn{display:inline-flex;align-items:center;gap:6px;border:1px solid var(--line2);background:var(--panel);border-radius:8px;padding:7px 13px;cursor:pointer;white-space:nowrap;font-size:14px}
+.btn:hover{border-color:var(--brand2);color:var(--brand)}
+.btn.pri,.btn.pri:hover{background:var(--brand);border-color:var(--brand);color:var(--onBrand)}
+.btn.pri:hover{filter:brightness(1.1)}
+.btn:disabled{opacity:.45;cursor:default;pointer-events:none}
+.btn.sm{padding:4px 9px;font-size:13px}
+.btn.ghost{border-color:transparent;background:none}
+.btn.danger:hover{border-color:var(--warn);color:var(--warn)}
+.icon-btn{border:0;background:none;cursor:pointer;color:var(--faint);padding:4px;border-radius:6px;line-height:1}
+.icon-btn:hover{color:var(--warn);background:var(--warnSoft)}
+.chip{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;padding:2px 8px;border-radius:999px;background:var(--panel2);border:1px solid var(--line);white-space:nowrap;letter-spacing:.02em}
+.chip .dot{width:8px;height:8px;border-radius:50%}
+.muted{color:var(--muted)} .faint{color:var(--faint)} .small{font-size:13px}
+.empty{padding:28px;text-align:center;color:var(--muted);border:1.5px dashed var(--line2);border-radius:var(--r)}
+table{width:100%;border-collapse:collapse}
+th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;font-weight:500;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.tbl-wrap{overflow:auto}
+/* project cards */
+.pcard{cursor:pointer;transition:transform .15s,border-color .15s;display:flex;flex-direction:column;gap:10px}
+.pcard:hover{border-color:var(--brand2);transform:translateY(-2px)}
+.pcard .t{font-size:18px;font-weight:500}
+.pcard.active{border-color:var(--brand);box-shadow:0 0 0 2px var(--brandSoft),var(--shadow)}
+.meter{height:6px;border-radius:4px;background:var(--panel2);overflow:hidden;border:1px solid var(--line)}
+.meter>i{display:block;height:100%;background:var(--brand2)}
+.meter.over>i{background:var(--warn)}
+/* timeline */
+.timeline{display:flex;gap:4px;align-items:stretch;width:100%}
+.tl-seg{display:flex;flex-direction:column;gap:4px;min-width:24px}
+.tl-bar{display:flex;height:34px;border-radius:6px;overflow:hidden;background:var(--panel2);border:1px solid var(--line)}
+.tl-bar>div{min-width:3px;border-right:1px solid rgba(255,255,255,.55);cursor:pointer;position:relative}
+.tl-bar>div:hover{filter:brightness(1.12)}
+.tl-lab{font-size:11.5px;color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12.5px;color:var(--muted);margin-top:10px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:3px;display:inline-block}
+/* storyboard board */
+.board{display:flex;gap:16px;overflow-x:auto;padding-bottom:10px;align-items:flex-start}
+.col{flex:0 0 290px;background:var(--bg2);border:1px solid var(--line);border-radius:var(--r);padding:10px;display:flex;flex-direction:column;gap:10px;min-height:120px}
+.col.drop{border-color:var(--brand2);background:var(--brandSoft)}
+.colhead{display:flex;align-items:center;gap:6px}
+.colhead input{font-weight:500;background:transparent;border-color:transparent;padding:5px 6px}
+.colhead input:hover{border-color:var(--line)}
+.scard{background:var(--panel);border:1px solid var(--line);border-radius:10px;overflow:hidden;cursor:pointer;box-shadow:var(--shadow);transition:border-color .15s}
+.scard:hover{border-color:var(--brand2)}
+.scard.dragging{opacity:.4}
+.scard.dropbefore{box-shadow:0 -3px 0 var(--brand2)}
+.scard .thumb{aspect-ratio:16/9;background:var(--panel2);display:grid;place-items:center;color:var(--faint);font-size:12px;overflow:hidden;position:relative}
+.scard .thumb img,.scard .thumb video{width:100%;height:100%;object-fit:cover}
+.scard .thumb .num{position:absolute;left:8px;top:8px;background:rgba(15,25,45,.72);color:#fff;font-size:11px;padding:2px 7px;border-radius:6px}
+.scard .thumb .dur{position:absolute;right:8px;top:8px;background:rgba(15,25,45,.72);color:#fff;font-size:11px;padding:2px 7px;border-radius:6px;font-variant-numeric:tabular-nums}
+.scard .body{padding:9px 11px;display:flex;flex-direction:column;gap:6px}
+.scard .name{font-weight:500;font-size:14px}
+.addscene{border:1.5px dashed var(--line2);border-radius:10px;padding:12px;text-align:center;color:var(--muted);cursor:pointer;background:none;width:100%}
+.addscene:hover{border-color:var(--brand2);color:var(--brand)}
+/* scene editor */
+.scene-grid{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,.9fr) minmax(0,1fr);gap:16px}
+.media{aspect-ratio:4/3;background:var(--panel2);border:1.5px dashed var(--line2);border-radius:10px;display:grid;place-items:center;overflow:hidden;position:relative;color:var(--muted);text-align:center}
+.media img,.media video{width:100%;height:100%;object-fit:contain;background:#000}
+.media .ov{position:absolute;right:8px;bottom:8px;display:flex;gap:6px}
+.checklist{max-height:260px;overflow:auto;border:1px solid var(--line);border-radius:8px;background:var(--panel2)}
+.checklist label{display:flex;gap:9px;align-items:flex-start;padding:7px 10px;border-bottom:1px solid var(--line);cursor:pointer;font-size:14px}
+.checklist label:last-child{border-bottom:0}
+.checklist label:hover{background:var(--panel)}
+.checklist label.on{background:var(--brandSoft)}
+.checklist .grouphead{padding:6px 10px;font-size:11px;text-transform:uppercase;letter-spacing:.08em;color:var(--faint);background:var(--panel);border-bottom:1px solid var(--line)}
+.tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:12px;flex-wrap:wrap}
+.tabs button{border:1px solid transparent;border-bottom:0;background:none;padding:8px 14px;border-radius:8px 8px 0 0;cursor:pointer;color:var(--muted);margin-bottom:-1px}
+.tabs button.on{background:var(--panel);border-color:var(--line);color:var(--text);font-weight:500}
+.tabs .badge{font-size:11px;background:var(--brandSoft);color:var(--brand);border-radius:999px;padding:0 6px;margin-left:4px}
+.toggle{display:inline-flex;align-items:center;gap:8px;cursor:pointer;user-select:none}
+.toggle input{appearance:none;-webkit-appearance:none;width:36px;height:20px;border-radius:999px;background:var(--line2);position:relative;border:0;padding:0;transition:background .15s;cursor:pointer}
+.toggle input::after{content:"";position:absolute;left:2px;top:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:left .15s}
+.toggle input:checked{background:var(--brand2)}
+.toggle input:checked::after{left:18px}
+.comment{display:flex;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.comment:last-child{border-bottom:0}
+.comment .meta{font-size:12px;color:var(--faint)}
+/* images */
+.imggrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px}
+.imgtile{border:1px solid var(--line);border-radius:10px;overflow:hidden;background:var(--panel2);display:flex;flex-direction:column}
+.imgtile img,.imgtile video{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:#000}
+.imgtile .cap{display:flex;gap:4px;padding:6px}
+.imgtile .cap input{padding:5px 8px;font-size:13px}
+.item-img{width:72px;height:72px;border-radius:8px;object-fit:cover;background:var(--panel2);border:1px solid var(--line);display:grid;place-items:center;color:var(--faint);font-size:11px;cursor:pointer;overflow:hidden;flex:none}
+.item-img img{width:100%;height:100%;object-fit:cover}
+.listrow{display:grid;gap:10px;align-items:start;padding:12px 0;border-bottom:1px solid var(--line)}
+.listrow:last-child{border-bottom:0}
+/* bars */
+.bars{display:flex;flex-direction:column;gap:9px}
+.barrow{display:grid;grid-template-columns:minmax(90px,170px) 1fr 104px;gap:10px;align-items:center;font-size:13.5px}
+.barrow .lab{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.barrow .track{height:14px;background:var(--panel2);border-radius:4px;overflow:hidden;border:1px solid var(--line)}
+.barrow .track i{display:block;height:100%;border-radius:3px}
+.barrow .val{text-align:right;font-variant-numeric:tabular-nums;color:var(--muted);white-space:nowrap}
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:16px}
+.kpi{background:var(--panel);border:1px solid var(--line);border-radius:var(--r);padding:14px 16px}
+.kpi .v{font-size:26px;font-weight:300;font-variant-numeric:tabular-nums}
+.kpi .l{font-size:12px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+.kpi .d{font-size:12.5px;margin-top:2px}
+.pos{color:var(--ok)} .neg{color:var(--warn)}
+.swatch{width:36px;height:36px;border-radius:8px;border:1px solid var(--line)}
+.history{max-height:360px;overflow:auto}
+.history td{font-size:13px}
+.done td{color:var(--faint);text-decoration:line-through}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--text);color:var(--bg);padding:10px 18px;border-radius:10px;z-index:50;box-shadow:var(--shadow);font-size:14px;max-width:90vw}
+/* login */
+.login{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(160deg,var(--bg),var(--bg2));z-index:40;padding:16px}
+.login .box{width:min(440px,100%);background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow)}
+.login h1{font-size:30px;text-align:center}
+.login .tag{text-align:center;color:var(--muted);margin:6px 0 22px;font-size:14px}
+.userlist{display:flex;flex-direction:column;gap:8px;margin-bottom:18px}
+.userlist button{display:flex;align-items:center;gap:10px;padding:9px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel2);cursor:pointer;text-align:left}
+.userlist button:hover{border-color:var(--brand2)}
+.export-opts label.opt{display:flex;gap:12px;padding:12px;border:1px solid var(--line);border-radius:10px;cursor:pointer;align-items:flex-start;background:var(--panel)}
+.export-opts label.opt.on{border-color:var(--brand2);background:var(--brandSoft)}
+.export-opts input[type=radio]{width:16px;margin-top:3px;accent-color:var(--brand2)}
+.preview-print{background:#fff;color:#222;border-radius:8px;padding:24px;max-height:70vh;overflow:auto;border:1px solid var(--line)}
+#print{display:none}
+.preview-print,#print{--bg:#fff;--bg2:#f3f5f8;--panel:#fff;--panel2:#f6f8fb;--line:#dfe4ec;--line2:#c9d1dc;--text:#222;--muted:#555;--faint:#888;--brand:#1f3d74;--brand2:#2d5aa8;--brandSoft:#e4ecf8;--ok:#2f8f5b;--warn:#c0392b;--accent:#e0a21b;--shadow:none;color:#222}
+/* responsive (iPad / mobile) */
+@media (max-width:1100px){ .scene-grid{grid-template-columns:1fr 1fr} .scene-grid>.c3{grid-column:1/-1} }
+@media (max-width:860px){
+  #app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr}
+  header.top{padding:10px 16px;flex-wrap:wrap;gap:10px}
+  .top .proj{order:3;flex-basis:100%;margin:0}
+  .top .proj select{max-width:none}
+  .top .status{display:none}
+  nav.side{display:flex;gap:4px;overflow-x:auto;padding:8px 12px;border-right:0;border-bottom:1px solid var(--line)}
+  nav.side .grp{display:none}
+  nav.side button{width:auto;flex:none;white-space:nowrap;padding:7px 10px}
+  nav.side .cnt{display:none}
+  main{padding:18px 16px 70px}
+  .g2,.g3,.scene-grid{grid-template-columns:1fr}
+  .barrow{grid-template-columns:100px 1fr 88px}
+  .col{flex-basis:250px}
+  #sceneLower,#exportGrid{grid-template-columns:1fr!important}
+}
+/* print */
+@media print{
+  @page{margin:14mm}
+  body{background:#fff;color:#111}
+  #app,.toast,.login{display:none!important}
+  #print{display:block}
+}
+.pr{font:11pt/1.4 var(--font);color:#111}
+.pr h1{font-size:20pt;margin:0 0 2pt;font-weight:400;color:#111}
+.pr .prmeta{color:#555;font-size:9.5pt;margin-bottom:12pt;border-bottom:1.5pt solid #1f3d74;padding-bottom:6pt}
+.pr h2{font-size:13pt;margin:14pt 0 6pt;color:#1f3d74;font-weight:500}
+.pr table{border-collapse:collapse;width:100%;font-size:9.5pt}
+.pr th,.pr td{border:.5pt solid #bbb;padding:4pt 6pt;vertical-align:top;color:#111}
+.pr th{background:#eef2f8;font-weight:600;text-transform:none;letter-spacing:0;font-size:9pt;color:#111}
+.pr .sc{border:.75pt solid #bbb;border-radius:4pt;padding:8pt;margin-bottom:8pt;page-break-inside:avoid;display:grid;grid-template-columns:150pt 1fr;gap:10pt}
+.pr .sc.noimg{grid-template-columns:1fr}
+.pr .sc img{width:150pt;border-radius:3pt}
+.pr .sc .h{font-weight:600;font-size:11pt}
+.pr .sc .k{font-size:8.5pt;color:#666;text-transform:uppercase;letter-spacing:.04em;margin-top:4pt}
+.pr .pre{white-space:pre-wrap}
+.pr .seghead{page-break-after:avoid;break-after:avoid;background:#1f3d74;color:#fff;padding:4pt 8pt;border-radius:3pt;margin:12pt 0 6pt;font-weight:500;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pr .barrow .track{border-color:#ccc;background:#f2f2f2}
+.pr .barrow .track i,.pr .chip .dot{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.pr .barrow .val{color:#333}
+.pr .avoid{page-break-inside:avoid}
+</style>
+</head>
+<body>
+<div id="app"></div>
+<div id="print"></div>
+<script>
+"use strict";
+/* ============================================================
+   PITCH-MEISTER 2.0 – Infomercial Storyboard & Projekttool
+   Lokale Web-App: Daten im Browser (localStorage), JSON-Backup.
+   ============================================================ */
+const KEY = 'pitchmeister.v1';
+const DEFAULT_CATS = ['LIVE','B-ROLL','FEATURE SEGMENT','DEMO','TESTIMONIAL','ANIMATION','OFFER / CTA'];
+const DEFAULT_RCATS = ['VORSPEISE','HAUPTGANG','FISCH','FLEISCH','VEGETARISCH','DESSERT','SNACK'];
+const PALETTE = ['#2d5aa8','#e0a21b','#2f8f5b','#c0392b','#8e44ad','#16a2b8','#d35400','#5d6d7e','#c2185b','#7cb342'];
+const USER_COLORS = ['#2d5aa8','#2f8f5b','#c0392b','#8e44ad','#d35400','#16a2b8','#c2185b','#5d6d7e'];
+
+/* ---------- helpers ---------- */
+const $ = (s, r = document) => r.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const uid = () => Math.random().toString(36).slice(2, 10) + Date.now().toString(36).slice(-3);
+const sum = a => a.reduce((x, y) => x + (+y || 0), 0);
+const clone = o => JSON.parse(JSON.stringify(o));
+const fmtDur = sec => { sec = Math.max(0, Math.round(+sec || 0)); const h = Math.floor(sec / 3600), m = Math.floor(sec % 3600 / 60), s = sec % 60; return (h ? h + ':' + String(m).padStart(2, '0') : m) + ':' + String(s).padStart(2, '0'); };
+const parseDur = v => { v = String(v || '').trim().replace(',', '.'); if (!v) return 0; if (v.includes(':')) { return v.split(':').map(Number).reduce((a, b) => a * 60 + (b || 0), 0); } return Math.round(parseFloat(v) || 0); };
+const pct = (a, b) => b ? Math.round(a / b * 1000) / 10 : 0;
+const fmtDate = ts => new Date(ts).toLocaleString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit'});
+const fmtDay = d => d ? new Date(d + 'T00:00').toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit', year:'numeric'}) : '–';
+const initials = n => String(n || '?').split(/\s+/).map(w => w[0]).join('').slice(0, 2).toUpperCase();
+
+/* ---------- state ---------- */
+let S = null;
+S = load() || seed();
+let ui = { view: S.lastView || 'projects', sceneId: null, segFilter: 'all', sceneTab: 'desc', sideTab: 'recipe', exportLayout: 'storyboard', exportImages: true, newUser: false };
+let saveTimer = null;
+
+function load() { try { const d = JSON.parse(localStorage.getItem(KEY)); return d && d.projects ? migrate(d) : null; } catch (e) { return null; } }
+function migrate(d) { d.users = d.users || []; d.projects.forEach(p => { p.categories ||= [...DEFAULT_CATS]; p.recipeCategories ||= [...DEFAULT_RCATS]; ['hosts','history','salesPoints','segments','scenes','animations','brolls','post','notes'].forEach(k => p[k] ||= []); p.setDesign ||= {images: [], specs: '', colors: []}; p.offer ||= {overview: '', price: '', items: []}; }); return d; }
+function save(now) {
+  clearTimeout(saveTimer);
+  const run = () => { try { localStorage.setItem(KEY, JSON.stringify(S)); setStatus('Gespeichert ' + new Date().toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})); } catch (e) { toast('Speichern fehlgeschlagen – Browser-Speicher voll? Große Bilder/Videos entfernen oder als JSON sichern.'); setStatus('Nicht gespeichert'); } };
+  setStatus('Speichert …');
+  now ? run() : (saveTimer = setTimeout(run, 350));
+}
+function setStatus(t) { const el = $('#status'); if (el) el.textContent = t; }
+const P = () => S.projects.find(p => p.id === S.activeProjectId);
+const me = () => S.users.find(u => u.id === S.currentUser);
+const userById = id => S.users.find(u => u.id === id);
+const avatar = (u, size = 26) => u ? `<span class="avatar" title="${esc(u.name)}" style="background:${u.color};width:${size}px;height:${size}px">${esc(initials(u.name))}</span>` : '';
+
+function log(msg, key = msg) {
+  const p = P(); if (!p) return;
+  const now = Date.now(), last = p.history[0];
+  p.updated = now; p.updatedBy = S.currentUser;
+  if (last && last.key === key && last.user === S.currentUser && now - last.ts < 120000) { last.ts = now; return; }
+  p.history.unshift({ ts: now, user: S.currentUser, msg, key });
+  if (p.history.length > 600) p.history.length = 600;
+}
+
+/* path binding: "scenes.<id>.name" -> arrays resolved by id */
+function resolve(obj, keys) { for (const k of keys) { if (obj == null) return undefined; obj = Array.isArray(obj) ? obj.find(x => x.id === k) : obj[k]; } return obj; }
+function setPath(root, path, val) { const keys = path.split('.'); const last = keys.pop(); const o = resolve(root, keys); if (o) o[last] = val; return o; }
+const SECTION = { title:'Projekttitel', duration:'Showdauer', studio:'Studio', studioContact:'Studio-Kontakt', shootingDate:'Drehtermin', strategy:'Strategisches Konzept', hosts:'Host', setDesign:'Set-Design', offer:'Angebot', salesPoints:'Sales-Point', segments:'Segment', scenes:'Szene', animations:'Animation', brolls:'B-Roll', post:'Post-Shooting', notes:'Notiz' };
+const FIELD = { name:'Name', duration:'Dauer', description:'Beschreibung', textVO:'Text/VO', recipe:'Rezept', ingredients:'Zutaten', recipeOn:'Rezept an/aus', recipeCategory:'Rezeptkategorie', segmentId:'Segment', text:'Text', itemId:'Produkt', contact:'Kontakt', role:'Rolle', specs:'Spezifikationen', overview:'Übersicht', price:'Preis', size:'Größe', spec:'Spezifikation', title:'Titel', link:'Link', caption:'Bildunterschrift', status:'Status', done:'erledigt', mediaUrl:'Clip-Link', priority:'Priorität', sceneId:'Szene', hex:'Farbe' };
+function describe(path) {
+  const keys = path.split('.'); const p = P();
+  const sec = SECTION[keys[0]] || keys[0];
+  if (keys.length === 1) return sec + ' geändert';
+  if (keys[0] === 'setDesign' || keys[0] === 'offer') {
+    if (keys[1] === 'items' && keys[2]) { const it = resolve(p, keys.slice(0, 3)); return `Produkt „${it?.name || '?'}“: ${FIELD[keys[3]] || keys[3]} geändert`; }
+    if (keys[1] === 'colors' || keys[1] === 'images') return sec + ' geändert';
+    return `${sec}: ${FIELD[keys[1]] || keys[1]} geändert`;
+  }
+  const ent = resolve(p, keys.slice(0, 2));
+  const nm = ent ? (ent.name || ent.title || ent.text || '').slice(0, 40) : '';
+  return `${sec} „${nm}“: ${FIELD[keys[2]] || keys[2]} geändert`;
+}
+
+/* ---------- derived ---------- */
+const catColor = (p, c) => PALETTE[Math.max(0, p.categories.indexOf(c)) % PALETTE.length];
+const rcatColor = (p, c) => PALETTE[(p.recipeCategories.indexOf(c) + 3) % PALETTE.length];
+function ordered(p) { return p.segments.flatMap(seg => p.scenes.filter(s => s.segmentId === seg.id)); }
+function sceneMeta(p) {
+  const m = {}; let t = 0;
+  p.segments.forEach((seg, si) => { p.scenes.filter(s => s.segmentId === seg.id).forEach((s, i) => { m[s.id] = { no: `${si + 1}.${i + 1}`, start: t, seg, segIdx: si }; t += +s.duration || 0; }); });
+  return m;
+}
+const totalDur = p => sum(p.scenes.map(s => s.duration));
+const segDur = (p, segId) => sum(p.scenes.filter(s => s.segmentId === segId).map(s => s.duration));
+function catChips(p, cats) { return (cats || []).map(c => `<span class="chip"><span class="dot" style="background:${catColor(p, c)}"></span>${esc(c)}</span>`).join(' '); }
+
+/* ---------- seed / factories ---------- */
+function newProject(title = 'Neues Projekt') {
+  const seg = { id: uid(), name: 'Opener' };
+  return { id: uid(), title, duration: 1710, studio: '', studioContact: '', shootingDate: '', userIds: S?.currentUser ? [S.currentUser] : [], strategy: '', hosts: [], history: [], created: Date.now(), updated: Date.now(),
+    setDesign: { images: [], specs: '', colors: [] }, offer: { overview: '', price: '', items: [] }, salesPoints: [], segments: [seg], scenes: [], animations: [], brolls: [], post: [], notes: [],
+    categories: [...DEFAULT_CATS], recipeCategories: [...DEFAULT_RCATS] };
+}
+function newScene(segId, name = 'Neue Szene') { return { id: uid(), segmentId: segId, name, duration: 60, categories: [], recipeOn: false, recipeCategory: '', recipe: '', ingredients: '', media: null, mediaUrl: '', itemIds: [], description: '', textVO: '', salesPointIds: [], comments: [] }; }
+function seed() {
+  const d = { users: [], currentUser: null, projects: [], activeProjectId: null };
+  const p = newProject('Gemüseschneider „Fusion“ – Infomercial (Demo)');
+  p.userIds = []; p.studio = 'Studio Köln, Halle 3'; p.studioContact = 'Produktionsbüro · +49 221 000000'; p.shootingDate = '2027-02-16';
+  p.strategy = 'Problem → Lösung → Demo → Rezepte → Angebot.\nFokus: Zeitersparnis in der Küche, Vielseitigkeit (5 Einsätze), einfache Reinigung.\nZwei Hosts (Präsentator + Köchin), Live-Publikum für Reaktionen.';
+  p.hosts = [{ id: uid(), name: 'Präsentator (Host 1)', role: 'Moderation / Pitch', contact: 'Agentur XY' }, { id: uid(), name: 'Köchin (Host 2)', role: 'Kochdemo', contact: 'Management Z' }];
+  p.setDesign.specs = 'Offene Showküche, Arbeitsfläche 3,2 m Weiß/Eiche, Rückwand mit Logo-Aussparung.\nZwei Kamerapositionen frontal, eine Top-Shot-Kamera über der Arbeitsfläche.';
+  p.setDesign.colors = [{ id: uid(), name: 'Markenblau', hex: '#1f3d74' }, { id: uid(), name: 'Mint Akzent', hex: '#3fb39b' }, { id: uid(), name: 'Arbeitsfläche', hex: '#efe6d8' }];
+  p.offer.overview = 'Komplettset mit Grundgerät, 3 Messereinsätzen, Spiralschneider und Auffangbehälter. Bonus: zweiter Behälter + Rezeptheft.';
+  p.offer.price = '3 × 19,95 €';
+  const it = (name, size, description) => ({ id: uid(), name, size, spec: '', description, image: null });
+  const items = [it('Messereinsatz 5×5', '5 × 5 mm', 'Für feine Würfel, z. B. Zwiebeln, Schalotten'), it('Messereinsatz 10×10', '10 × 10 mm', 'Für Gemüsewürfel, Obstsalat'), it('Messereinsatz 20×20', '20 × 20 mm', 'Für grobe Stücke, Kartoffeln'), it('Spiralschneider', '', 'Gemüsespaghetti aus Zucchini, Karotten'), it('Auffangbehälter 1,5 l', '1,5 l', 'Mit Frischhaltedeckel'), it('Pfanne 24 cm', 'Ø 24 cm', 'Requisite für Kochdemo')];
+  p.offer.items = items;
+  const sp = (text, itemId = null) => ({ id: uid(), text, itemId });
+  p.salesPoints = [sp('Schneidet in Sekunden – spart bis zu 70 % Zeit'), sp('Spülmaschinenfest'), sp('Rostfreie Edelstahlklingen'), sp('Platzsparend verstaubar'),
+    sp('Perfekte Würfel ohne Tränen', items[0].id), sp('Gleichmäßige Stücke für gleichmäßiges Garen', items[1].id), sp('Schafft sogar Kartoffeln mühelos', items[2].id), sp('Gesunde Gemüsenudeln statt Pasta', items[3].id), sp('Direkt schneiden, aufbewahren, servieren', items[4].id)];
+  const [s1, s2, s3] = [{ id: uid(), name: 'Opener & Problem' }, { id: uid(), name: 'Demo & Rezepte' }, { id: uid(), name: 'Angebot & Abschluss' }];
+  p.segments = [s1, s2, s3];
+  const sc = (seg, name, dur, cats, extra = {}) => Object.assign(newScene(seg.id, name), { duration: dur, categories: cats }, extra);
+  const SP = i => p.salesPoints[i].id;
+  p.scenes = [
+    sc(s1, 'Cold Open – Küchenchaos', 45, ['B-ROLL'], { description: 'Schnelle Schnitte: tränende Augen beim Zwiebelschneiden, ungleiche Stücke, Zeitdruck.', textVO: 'VO: Kennen Sie das? Jeden Tag schnippeln, schneiden, weinen …', salesPointIds: [] }),
+    sc(s1, 'Host-Intro & Produktreveal', 90, ['LIVE','FEATURE SEGMENT'], { itemIds: [items[0].id, items[1].id, items[4].id], salesPointIds: [SP(0), SP(4)], description: 'Host 1 begrüßt Publikum, enthüllt das Set am Tresen.', textVO: 'Host 1: „Heute zeige ich Ihnen, wie Sie in Sekunden …“' }),
+    sc(s1, 'Testimonial Hausfrau', 40, ['TESTIMONIAL'], { salesPointIds: [SP(0)], description: 'Kurzes Statement einer Kundin in ihrer Küche.' }),
+    sc(s2, 'Zwiebeln 5×5', 120, ['LIVE','DEMO'], { itemIds: [items[0].id, items[4].id], salesPointIds: [SP(4), SP(0)], description: 'Zwei Zwiebeln halbieren, in einem Zug würfeln, Ergebnis im Behälter zeigen.', recipeOn: true, recipeCategory: 'VORSPEISE', recipe: 'Bruschetta mit Tomaten-Zwiebel-Topping', ingredients: '4 Tomaten\n1 rote Zwiebel\n1 Bund Basilikum\n1 Baguette\nOlivenöl' }),
+    sc(s2, 'Animation: Klingentechnik', 30, ['ANIMATION'], { salesPointIds: [SP(2)], description: '3D-Animation der Klinge, Schnitt durch die Tomate in Zeitlupe.' }),
+    sc(s2, 'Obstsalat 10×10', 150, ['LIVE','DEMO'], { itemIds: [items[1].id, items[4].id], salesPointIds: [SP(5)], recipeOn: true, recipeCategory: 'DESSERT', recipe: 'Bunter Obstsalat mit Minze', ingredients: '2 Äpfel\n1 Mango\n200 g Melone\n1 Bund Minze\n1 Limette' }),
+    sc(s2, 'Lachs-Tatar', 110, ['LIVE','FEATURE SEGMENT'], { itemIds: [items[0].id], salesPointIds: [SP(4), SP(1)], recipeOn: true, recipeCategory: 'FISCH', recipe: 'Lachs-Tatar mit Gurke', ingredients: '300 g Lachsfilet\n1 Gurke\n1 Schalotte\nDill\nZitrone' }),
+    sc(s2, 'Zucchini-Spaghetti', 130, ['LIVE','DEMO'], { itemIds: [items[3].id, items[5].id], salesPointIds: [SP(7)], recipeOn: true, recipeCategory: 'VEGETARISCH', recipe: 'Zucchini-Spaghetti mit Kirschtomaten', ingredients: '2 Zucchini\n200 g Kirschtomaten\n1 Knoblauchzehe\nParmesan\n1 Rote Zwiebel' }),
+    sc(s2, 'Kartoffeln 20×20 – B-Roll', 50, ['B-ROLL'], { itemIds: [items[2].id, items[5].id], salesPointIds: [SP(6)], recipeOn: true, recipeCategory: 'HAUPTGANG', recipe: 'Ofenkartoffeln mit Rosmarin', ingredients: '1 kg Kartoffeln\nRosmarin\nOlivenöl\nMeersalz' }),
+    sc(s3, 'Reinigung & Verstauen', 60, ['LIVE','DEMO'], { itemIds: [items[4].id], salesPointIds: [SP(1), SP(3)] }),
+    sc(s3, 'Angebot / Preis', 90, ['OFFER / CTA','FEATURE SEGMENT'], { itemIds: items.slice(0, 5).map(i => i.id), salesPointIds: [SP(0), SP(1), SP(2)], textVO: 'VO: Bestellen Sie jetzt! Das Komplettset für nur 3 × 19,95 € …' }),
+    sc(s3, 'Call to Action', 45, ['OFFER / CTA'], { textVO: 'Rufen Sie jetzt an – die Leitungen sind freigeschaltet!' })
+  ];
+  p.animations = [{ id: uid(), name: 'Klingentechnik Zeitlupe', description: '3D-Klinge schneidet Tomate, Hervorhebung der Edelstahlkante.', preview: null, sceneIds: [p.scenes[4].id] }];
+  p.brolls = [{ id: uid(), name: 'Gemüse fällt in Behälter (Slow-Mo)', description: '120 fps, Top-Shot', sceneId: p.scenes[3].id, done: false }, { id: uid(), name: 'Familie am Esstisch', description: 'Warme Lichtstimmung', sceneId: '', done: false }];
+  p.post = [{ id: uid(), text: 'Pick-up: Close-up Behälterdeckel einrasten', sceneId: p.scenes[9].id, priority: 'hoch', done: false }];
+  p.notes = [{ id: uid(), title: 'Referenz: Schnittrhythmus Opener', link: '', text: 'Schnelle Schnitte (1–1,5 s) im Cold Open, danach ruhiger.', image: null }];
+  d.projects.push(p); d.activeProjectId = p.id;
+  return d;
+}
+
+/* ---------- icons ---------- */
+const IC = {
+  projects: '<path d="M3 6a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>',
+  details: '<circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/>',
+  set: '<rect x="3" y="4" width="18" height="16" rx="2"/><circle cx="9" cy="10" r="2"/><path d="m21 17-5-5-9 8"/>',
+  offer: '<path d="M3 12V4h8l10 10-8 8z"/><circle cx="7.5" cy="8.5" r="1.5"/>',
+  sp: '<path d="m12 3 2.7 5.6 6.3.9-4.5 4.4 1 6.1L12 17l-5.5 3 1-6.1L3 9.5l6.3-.9z"/>',
+  storyboard: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/>',
+  anim: '<circle cx="12" cy="12" r="9"/><path d="m10 8 6 4-6 4z"/>',
+  broll: '<rect x="2" y="7" width="14" height="10" rx="2"/><path d="m16 11 6-3v8l-6-3"/>',
+  post: '<path d="M10 6h11M10 12h11M10 18h11M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/>',
+  notes: '<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
+  analysis: '<path d="M3 3v18h18"/><path d="M8 16v-3M13 16V9M18 16V6"/>',
+  export: '<path d="M12 3v12m-5-5 5 5 5-5M4 21h16"/>'
+};
+const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
+const NAV = [
+  ['Projekt', [['projects','Projekte'],['details','Projekt-Details'],['set','Set-Design'],['offer','Angebot'],['sp','Sales-Points']]],
+  ['Produktion', [['storyboard','Storyboard'],['anim','Animationen'],['broll','B-Rolls'],['post','Post-Shooting'],['notes','Notizen & Inspiration']]],
+  ['Auswertung', [['analysis','Analyse'],['export','Export & Druck']]]
+];
+
+/* ---------- form helpers ---------- */
+const field = (label, inner, cls = '') => `<label class="field ${cls}"><span>${label}</span>${inner}</label>`;
+const inp = (path, val, attrs = '') => `<input data-bind="${path}" value="${esc(val)}" ${attrs}>`;
+const ta = (path, val, attrs = '') => `<textarea data-bind="${path}" ${attrs}>${esc(val)}</textarea>`;
+const durInp = (path, val) => `<input data-bind="${path}" data-type="dur" data-rerender value="${fmtDur(val)}" inputmode="numeric" placeholder="m:ss">`;
+const sel = (path, val, opts, attrs = '') => `<select data-bind="${path}" ${attrs}>${opts.map(([v, l]) => `<option value="${esc(v)}" ${String(v) === String(val ?? '') ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>`;
+const del = (action, data, title = 'Löschen') => `<button class="icon-btn" data-action="${action}" ${Object.entries(data).map(([k, v]) => `data-${k}="${esc(v)}"`).join(' ')} title="${title}" aria-label="${title}"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/></svg></button>`;
+function mediaTag(m, cls = '') {
+  if (!m || !m.src) return '';
+  return m.type === 'video' ? `<video class="${cls}" src="${esc(m.src)}" muted playsinline controls preload="metadata"></video>` : `<img class="${cls}" src="${esc(m.src)}" alt="">`;
+}
+function sceneThumb(s) {
+  if (s.media?.src) return s.media.type === 'video' ? `<video src="${esc(s.media.src)}" muted preload="metadata"></video>` : `<img src="${esc(s.media.src)}" alt="">`;
+  if (s.mediaUrl && /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl)) return `<img src="${esc(s.mediaUrl)}" alt="">`;
+  return 'Kein Bild';
+}
+
+/* ============================================================
+   RENDER
+   ============================================================ */
+function render() {
+  const app = $('#app');
+  if (!me()) { app.innerHTML = ''; renderLogin(); return; }
+  $('.login')?.remove();
+  const p = P();
+  if (!p && ui.view !== 'projects') ui.view = 'projects';
+  // keep focus across re-render
+  const fa = document.activeElement, fb = fa?.dataset?.bind, fs = fa && 'selectionStart' in fa ? fa.selectionStart : null;
+  const scroll = $('main')?.scrollTop || 0;
+
+  const counts = p ? { sp: p.salesPoints.length, storyboard: p.scenes.length, anim: p.animations.length, broll: p.brolls.length, post: p.post.filter(x => !x.done).length, notes: p.notes.length, offer: p.offer.items.length } : {};
+  app.innerHTML = `
+  <header class="top">
+    <div class="logo"><span class="mark">PM</span><span><b>PITCH-MEISTER</b> 2.0</span></div>
+    <div class="proj">${S.projects.length ? `<select id="projSel" aria-label="Aktives Projekt">${S.projects.map(x => `<option value="${x.id}" ${x.id === S.activeProjectId ? 'selected' : ''}>${esc(x.title)}</option>`).join('')}</select>` : ''}</div>
+    <span class="status" id="status">Gespeichert</span>
+    <button class="btn ghost sm" data-action="theme" title="Hell/Dunkel umschalten" aria-label="Design umschalten" style="font-size:18px">◐</button>
+    <div class="userchip" data-action="logout" title="Benutzer wechseln">${avatar(me())}<span class="small">${esc(me().name)}</span></div>
+  </header>
+  <nav class="side">${NAV.map(([g, items]) => `<div class="grp">${g}</div>` + items.map(([k, l]) => `<button class="${ui.view === k ? 'on' : ''}" data-action="nav" data-v="${k}" ${!p && k !== 'projects' ? 'disabled' : ''}>${icon(k)}<span>${l}</span>${counts[k] ? `<span class="cnt">${counts[k]}</span>` : ''}</button>`).join('')).join('')}</nav>
+  <main id="main">${VIEWS[ui.view](p)}</main>`;
+  if (fb) { const el = app.querySelector(`[data-bind="${CSS.escape(fb)}"]`); if (el) { el.focus(); try { if (fs != null) el.setSelectionRange(fs, fs); } catch (e) {} } }
+  $('main').scrollTop = scroll;
+}
+
+function renderLogin() {
+  let el = $('.login'); if (!el) { el = document.createElement('div'); el.className = 'login'; document.body.appendChild(el); }
+  el.innerHTML = `<div class="box">
+    <div class="logo" style="justify-content:center;margin-bottom:6px"><span class="mark">PM</span></div>
+    <h1>PITCH-MEISTER 2.0</h1>
+    <div class="tag">Infomercial Storyboard und Projekttool mit Auswertung &amp; Export</div>
+    ${S.users.length ? `<h3>Anmelden als</h3><div class="userlist">${S.users.map(u => `<button data-action="login" data-id="${u.id}">${avatar(u)}<span><b style="font-weight:500">${esc(u.name)}</b><br><span class="small muted">${esc(u.role || '')}</span></span></button>`).join('')}</div>` : ''}
+    <h3>${S.users.length ? 'Neuer Benutzer' : 'Ersten Benutzer anlegen'}</h3>
+    <form id="loginForm" class="stack" style="--gap:10px">
+      ${field('Name', '<input name="name" required placeholder="z. B. Anna Schmidt" autocomplete="name">')}
+      ${field('Rolle', `<select name="role"><option>Regie</option><option>Produktion</option><option>Kitchen-Crew</option><option>Stage-Crew</option><option>Kunde</option><option>Redaktion</option></select>`)}
+      <button class="btn pri" style="justify-content:center">Anlegen &amp; anmelden</button>
+    </form>
+    <p class="small faint" style="margin-top:16px">Alle Änderungen werden pro Benutzer in der Projekt-History protokolliert. Daten werden lokal in diesem Browser gespeichert – Backup über <i>Export → JSON</i>.</p>
+  </div>`;
+}
+
+/* ---------- Projects ---------- */
+function vProjects() {
+  return `<div class="pagehead"><div><h1>Projekte</h1><div class="sub">${S.projects.length} Projekt(e) · Titel, Showdauer, Studio, Drehtermin, Benutzer</div></div>
+    <div class="actions"><button class="btn" data-action="importJSON">JSON importieren</button><button class="btn pri" data-action="addProject">+ Neues Projekt</button></div></div>
+  ${S.projects.length ? `<div class="grid gauto">${S.projects.map(p => {
+    const t = totalDur(p), over = t > p.duration;
+    return `<div class="card pcard ${p.id === S.activeProjectId ? 'active' : ''}" data-action="openProject" data-id="${p.id}">
+      <div class="t">${esc(p.title)}</div>
+      <div class="small muted">${esc(p.studio || 'Kein Studio')} · ${fmtDay(p.shootingDate)}</div>
+      <div><div class="row small" style="justify-content:space-between"><span>Szenen ${fmtDur(t)}</span><span class="${over ? 'neg' : 'faint'}">Ziel ${fmtDur(p.duration)}</span></div>
+      <div class="meter ${over ? 'over' : ''}"><i style="width:${Math.min(100, pct(t, p.duration))}%"></i></div></div>
+      <div class="row small muted"><span>${p.segments.length} Segmente</span>·<span>${p.scenes.length} Szenen</span>·<span>${p.offer.items.length} Produkte</span></div>
+      <div class="row" style="justify-content:space-between">
+        <div class="row" style="gap:4px">${(p.userIds || []).map(id => avatar(userById(id), 24)).join('') || '<span class="small faint">Keine Benutzer zugeordnet</span>'}</div>
+        <div class="row" style="gap:2px"><button class="btn sm ghost" data-action="dupProject" data-id="${p.id}">Duplizieren</button>${del('delProject', { id: p.id }, 'Projekt löschen')}</div>
+      </div>
+      <div class="small faint">Zuletzt geändert ${fmtDate(p.updated || p.created)}${p.updatedBy && userById(p.updatedBy) ? ' von ' + esc(userById(p.updatedBy).name) : ''}</div>
+    </div>`; }).join('')}</div>` : `<div class="empty">Noch keine Projekte. Lege dein erstes Infomercial-Projekt an.</div>`}`;
+}
+
+/* ---------- Project details ---------- */
+function vDetails(p) {
+  const chipEditor = (key, colorFn) => `<div class="row" style="gap:6px">${p[key].map(c => `<span class="chip"><span class="dot" style="background:${colorFn(p, c)}"></span>${esc(c)}<button class="icon-btn" style="padding:0 2px" data-action="delCat" data-key="${key}" data-v="${esc(c)}" aria-label="${esc(c)} entfernen">×</button></span>`).join('')}
+    <input style="width:170px;padding:4px 8px" placeholder="+ hinzufügen (Enter)" data-addcat="${key}"></div>`;
+  return `<div class="pagehead"><div><h1>Projekt-Details</h1><div class="sub">Strategie, Hosts &amp; Kontakt, History der Änderungen</div></div></div>
+  <div class="grid g2">
+    <div class="card stack">
+      <h2>Projekt-Übersicht</h2>
+      ${field('Projekt / Produktname', inp('title', p.title, 'data-rerender'))}
+      <div class="grid g2">${field('Dauer der Show (Ziel)', durInp('duration', p.duration))}${field('Drehtermin', inp('shootingDate', p.shootingDate, 'type="date"'))}</div>
+      <div class="grid g2">${field('Studio', inp('studio', p.studio))}${field('Studio-Kontakt', inp('studioContact', p.studioContact))}</div>
+      <div class="field"><span>Benutzerzuordnung</span><div class="row" style="gap:6px">${S.users.map(u => `<label class="chip" style="cursor:pointer;padding:3px 9px"><input type="checkbox" data-action="toggle" data-list="userIds" data-val="${u.id}" ${p.userIds.includes(u.id) ? 'checked' : ''}> ${esc(u.name)} <span class="faint">${esc(u.role || '')}</span></label>`).join('')}</div></div>
+    </div>
+    <div class="card stack">
+      <h2>Strategisches Konzept</h2>
+      ${ta('strategy', p.strategy, 'style="min-height:200px" placeholder="Zielgruppe, Dramaturgie, Kernbotschaften …"')}
+    </div>
+    <div class="card">
+      <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Hosts &amp; Kontakt</h2><button class="btn sm" data-action="add" data-list="hosts">+ Host</button></div>
+      ${p.hosts.length ? p.hosts.map(h => `<div class="listrow" style="grid-template-columns:1fr 1fr 1fr auto">${inp(`hosts.${h.id}.name`, h.name, 'placeholder="Name"')}${inp(`hosts.${h.id}.role`, h.role, 'placeholder="Rolle"')}${inp(`hosts.${h.id}.contact`, h.contact, 'placeholder="Kontakt / Agentur"')}${del('remove', { list: 'hosts', id: h.id })}</div>`).join('') : '<div class="empty small">Noch keine Hosts.</div>'}
+    </div>
+    <div class="card stack">
+      <h2>Kategorien</h2>
+      <div class="field"><span>Szenen-Kategorien (LIVE / B-ROLL / TESTIMONIAL …)</span>${chipEditor('categories', catColor)}</div>
+      <div class="field"><span>Rezept-Kategorien</span>${chipEditor('recipeCategories', rcatColor)}</div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px">
+    <h2>History der Änderungen &amp; Updates <span class="faint small">(${p.history.length})</span></h2>
+    ${p.history.length ? `<div class="history tbl-wrap"><table><thead><tr><th style="width:170px">Zeitpunkt</th><th style="width:180px">Benutzer</th><th>Änderung</th></tr></thead><tbody>${p.history.slice(0, 200).map(h => { const u = userById(h.user); return `<tr><td class="faint">${fmtDate(h.ts)}</td><td><span class="row" style="gap:6px">${avatar(u, 20)}${esc(u?.name || '–')}</span></td><td>${esc(h.msg)}</td></tr>`; }).join('')}</tbody></table></div>` : '<div class="empty small">Noch keine Änderungen protokolliert.</div>'}
+  </div>`;
+}
+
+/* ---------- Set design ---------- */
+function vSet(p) {
+  const sd = p.setDesign;
+  return `<div class="pagehead"><div><h1>Set-Design</h1><div class="sub">Bilder vom Set, Spezifikationen, Farben</div></div>
+    <div class="actions"><button class="btn pri" data-action="upload" data-mode="push" data-path="setDesign.images" data-accept="image/*" data-multi="1">+ Bilder hochladen</button></div></div>
+  <div class="card" style="margin-bottom:16px">
+    ${sd.images.length ? `<div class="imggrid">${sd.images.map(im => `<div class="imgtile">${mediaTag(im)}<div class="cap">${inp(`setDesign.images.${im.id}.caption`, im.caption, 'placeholder="Bildunterschrift"')}${del('remove', { list: 'setDesign.images', id: im.id })}</div></div>`).join('')}</div>` : '<div class="empty">Noch keine Set-Bilder. Lade Skizzen, Renderings oder Fotos vom Set hoch.</div>'}
+  </div>
+  <div class="grid g2">
+    <div class="card stack"><h2>Spezifikationen</h2>${ta('setDesign.specs', sd.specs, 'style="min-height:180px" placeholder="Maße, Materialien, Kamerapositionen, Licht …"')}</div>
+    <div class="card"><div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Farben</h2><button class="btn sm" data-action="add" data-list="setDesign.colors">+ Farbe</button></div>
+      ${sd.colors.length ? sd.colors.map(c => `<div class="listrow" style="grid-template-columns:auto 1fr 120px auto;align-items:center"><input type="color" data-bind="setDesign.colors.${c.id}.hex" value="${esc(c.hex)}" data-rerender>${inp(`setDesign.colors.${c.id}.name`, c.name, 'placeholder="Bezeichnung"')}${inp(`setDesign.colors.${c.id}.hex`, c.hex, 'data-rerender')}${del('remove', { list: 'setDesign.colors', id: c.id })}</div>`).join('') : '<div class="empty small">Noch keine Farben.</div>'}
+    </div>
+  </div>`;
+}
+
+/* ---------- Offer ---------- */
+function vOffer(p) {
+  const usage = id => p.scenes.filter(s => s.itemIds.includes(id)).length;
+  return `<div class="pagehead"><div><h1>Angebot</h1><div class="sub">Übersicht, Bestandteile, Bilder und Beschreibungen</div></div>
+    <div class="actions"><button class="btn pri" data-action="add" data-list="offer.items">+ Bestandteil</button></div></div>
+  <div class="grid g2" style="margin-bottom:16px">
+    <div class="card stack"><h2>Übersicht</h2>${ta('offer.overview', p.offer.overview, 'placeholder="Was ist im Angebot enthalten? Boni, Garantie …"')}</div>
+    <div class="card stack"><h2>Preis &amp; Konditionen</h2>${ta('offer.price', p.offer.price, 'placeholder="z. B. 3 × 19,95 € zzgl. Versand"')}</div>
+  </div>
+  <div class="card"><h2>Bestandteile / Produkte <span class="faint small">(${p.offer.items.length})</span></h2>
+  ${p.offer.items.length ? p.offer.items.map(it => `<div class="listrow" style="grid-template-columns:auto 1.2fr 1fr 2fr auto">
+      <div class="item-img" data-action="upload" data-mode="set" data-path="offer.items.${it.id}.image" data-accept="image/*" title="Bild hochladen">${it.image ? `<img src="${esc(it.image.src)}" alt="">` : '+ Bild'}</div>
+      <div class="stack" style="--x:0">${field('Name', inp(`offer.items.${it.id}.name`, it.name))}<span class="small faint">In ${usage(it.id)} Szene(n) · ${p.salesPoints.filter(s => s.itemId === it.id).length} Sales-Point(s)</span></div>
+      <div class="stack">${field('Größe (optional)', inp(`offer.items.${it.id}.size`, it.size))}${field('Spezifikation (optional)', inp(`offer.items.${it.id}.spec`, it.spec))}</div>
+      ${field('Beschreibung', ta(`offer.items.${it.id}.description`, it.description, 'style="min-height:96px"'))}
+      ${del('delItem', { id: it.id })}
+    </div>`).join('') : '<div class="empty">Noch keine Bestandteile. Füge Produkte/Teile hinzu (z. B. Messereinsatz 5×5, Pfanne 24 cm).</div>'}
+  </div>`;
+}
+
+/* ---------- Sales points ---------- */
+function vSP(p) {
+  const meta = sceneMeta(p);
+  const row = sp => { const used = p.scenes.filter(s => s.salesPointIds.includes(sp.id)); return `<div class="listrow" style="grid-template-columns:2fr 1fr 1.2fr auto;align-items:center">
+    ${inp(`salesPoints.${sp.id}.text`, sp.text, 'placeholder="Sales-Point"')}
+    ${sel(`salesPoints.${sp.id}.itemId`, sp.itemId || '', [['', '— Generell —'], ...p.offer.items.map(i => [i.id, i.name])], 'data-rerender')}
+    <div class="small">${used.length ? used.map(s => `<a href="#" data-action="openScene" data-id="${s.id}">${meta[s.id]?.no}</a>`).join(', ') : '<span class="neg">nicht verwendet</span>'}</div>
+    ${del('delSP', { id: sp.id })}</div>`; };
+  const general = p.salesPoints.filter(s => !s.itemId || !p.offer.items.some(i => i.id === s.itemId));
+  return `<div class="pagehead"><div><h1>Sales-Points</h1><div class="sub">Generelle Sales-Points und mit Bestandteilen verknüpfte – Zuordnung zu Szenen im Storyboard</div></div>
+    <div class="actions"><button class="btn pri" data-action="add" data-list="salesPoints">+ Sales-Point</button></div></div>
+  <div class="card" style="margin-bottom:16px"><h2>Generelle Sales-Points</h2>
+    <div class="listrow small muted" style="grid-template-columns:2fr 1fr 1.2fr auto;padding-top:0"><span>Text</span><span>Verknüpftes Produkt</span><span>Verwendet in Szene</span><span></span></div>
+    ${general.length ? general.map(row).join('') : '<div class="empty small">Keine generellen Sales-Points.</div>'}</div>
+  ${p.offer.items.map(it => { const l = p.salesPoints.filter(s => s.itemId === it.id); return `<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${esc(it.name)}</h2><button class="btn sm" data-action="add" data-list="salesPoints" data-item="${it.id}">+ Sales-Point</button></div>
+    ${l.length ? l.map(row).join('') : '<div class="small faint" style="padding:10px 0">Noch keine Sales-Points für dieses Produkt.</div>'}</div>`; }).join('')}`;
+}
+
+/* ---------- Storyboard ---------- */
+function timeline(p, scenes) {
+  const meta = sceneMeta(p);
+  const total = sum(scenes.map(s => s.duration)) || 1;
+  const groups = p.segments.map(seg => ({ seg, list: scenes.filter(s => s.segmentId === seg.id) })).filter(g => g.list.length);
+  const usedCats = [...new Set(scenes.map(s => s.categories[0] || '—'))];
+  return `<div class="timeline">${groups.map(g => { const t = sum(g.list.map(s => s.duration)); return `<div class="tl-seg" style="flex:${Math.max(t, 1)}">
+    <div class="tl-bar">${g.list.map(s => `<div style="flex:${Math.max(+s.duration || 0, 1)};background:${s.categories[0] ? catColor(p, s.categories[0]) : 'var(--line2)'}" title="${esc(meta[s.id]?.no + ' ' + s.name + ' · ' + fmtDur(s.duration) + ' · ' + (s.categories.join(', ') || 'ohne Kategorie'))}" data-action="openScene" data-id="${s.id}"></div>`).join('')}</div>
+    <div class="tl-lab"><b style="font-weight:500">${esc(g.seg.name)}</b> · ${fmtDur(t)} · ${pct(t, total)} %</div></div>`; }).join('')}</div>
+  <div class="legend">${usedCats.map(c => `<span><i style="background:${c === '—' ? 'var(--line2)' : catColor(p, c)}"></i>${esc(c === '—' ? 'ohne Kategorie' : c)}</span>`).join('')}<span class="faint">Farbe = erste Kategorie der Szene</span></div>`;
+}
+function vStoryboard(p) {
+  const scene = ui.sceneId && p.scenes.find(s => s.id === ui.sceneId);
+  if (scene) return vScene(p, scene);
+  ui.sceneId = null;
+  const meta = sceneMeta(p), total = totalDur(p), diff = total - p.duration;
+  let start = 0;
+  return `<div class="pagehead"><div><h1>Storyboard</h1><div class="sub">Segment-Übersicht mit Timings, Kategorien &amp; Szenenboard · Szenen per Drag &amp; Drop verschieben</div></div>
+    <div class="actions"><button class="btn" data-action="addSegment">+ Segment</button></div></div>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Laufzeit Szenen</div><div class="v">${fmtDur(total)}</div><div class="d ${diff > 0 ? 'neg' : 'faint'}">${diff === 0 ? 'exakt im Ziel' : (diff > 0 ? '+' : '−') + fmtDur(Math.abs(diff)) + (diff > 0 ? ' über Ziel' : ' bis Ziel')}</div></div>
+    <div class="kpi"><div class="l">Zieldauer Show</div><div class="v">${fmtDur(p.duration)}</div><div class="d faint">${pct(total, p.duration)} % gefüllt</div></div>
+    <div class="kpi"><div class="l">Segmente / Szenen</div><div class="v">${p.segments.length} / ${p.scenes.length}</div></div>
+    <div class="kpi"><div class="l">Ø Szenenlänge</div><div class="v">${fmtDur(p.scenes.length ? total / p.scenes.length : 0)}</div></div>
+  </div>
+  <div class="card" style="margin-bottom:16px"><h2>Zeitliche Verteilung</h2>${p.scenes.length ? timeline(p, ordered(p)) : '<div class="small faint">Noch keine Szenen.</div>'}</div>
+  <div class="card" style="margin-bottom:16px"><h2>Segment-Übersicht</h2><div class="tbl-wrap"><table>
+    <thead><tr><th>#</th><th>Segment</th><th class="num">Szenen</th><th class="num">Start</th><th class="num">Dauer</th><th class="num">Anteil</th><th>Kategorien</th><th></th></tr></thead>
+    <tbody>${p.segments.map((seg, i) => { const l = p.scenes.filter(s => s.segmentId === seg.id), t = sum(l.map(s => s.duration)); const st = start; start += t; const cats = [...new Set(l.flatMap(s => s.categories))];
+      return `<tr><td>${i + 1}</td><td>${esc(seg.name)}</td><td class="num">${l.length}</td><td class="num">${fmtDur(st)}</td><td class="num">${fmtDur(t)}</td><td class="num">${pct(t, total)} %</td><td>${catChips(p, cats)}</td>
+      <td style="white-space:nowrap"><button class="btn sm ghost" data-action="moveSeg" data-id="${seg.id}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="nach oben">↑</button><button class="btn sm ghost" data-action="moveSeg" data-id="${seg.id}" data-d="1" ${i === p.segments.length - 1 ? 'disabled' : ''} aria-label="nach unten">↓</button>${del('delSegment', { id: seg.id }, 'Segment löschen')}</td></tr>`; }).join('')}
+    <tr><td></td><td><b style="font-weight:500">Total</b></td><td class="num">${p.scenes.length}</td><td></td><td class="num"><b style="font-weight:500">${fmtDur(total)}</b></td><td class="num">100 %</td><td></td><td></td></tr></tbody></table></div></div>
+  <h2>Szenenboard</h2>
+  <div class="board">${p.segments.map((seg, si) => { const l = p.scenes.filter(s => s.segmentId === seg.id);
+    return `<div class="col" data-drop-seg="${seg.id}">
+      <div class="colhead"><span class="chip">${si + 1}</span>${inp(`segments.${seg.id}.name`, seg.name, 'aria-label="Segmentname"')}<span class="small faint" style="white-space:nowrap">${fmtDur(segDur(p, seg.id))}</span></div>
+      ${l.map(s => `<div class="scard" draggable="true" data-drag-scene="${s.id}" data-action="openScene" data-id="${s.id}">
+        <div class="thumb">${sceneThumb(s)}<span class="num">${meta[s.id].no}</span><span class="dur">${fmtDur(s.duration)}</span></div>
+        <div class="body"><div class="name">${esc(s.name)}</div>
+          <div class="row" style="gap:4px">${catChips(p, s.categories)}${s.recipeOn ? `<span class="chip" style="border-color:${rcatColor(p, s.recipeCategory)}">🍳 ${esc(s.recipeCategory || 'Rezept')}</span>` : ''}</div>
+          <div class="small faint">${s.itemIds.length} Produkt(e) · ${s.salesPointIds.length} Sales-Point(s)${s.comments.length ? ' · 💬 ' + s.comments.length : ''} · ab ${fmtDur(meta[s.id].start)}</div></div></div>`).join('')}
+      <button class="addscene" data-action="addScene" data-seg="${seg.id}">+ Szene</button></div>`; }).join('')}</div>`;
+}
+
+function vScene(p, s) {
+  const meta = sceneMeta(p), m = meta[s.id], ord = ordered(p), idx = ord.indexOf(s);
+  const prev = ord[idx - 1], next = ord[idx + 1];
+  const b = k => `scenes.${s.id}.${k}`;
+  const itemSet = new Set(s.itemIds);
+  const spRelevant = p.salesPoints.filter(sp => sp.itemId && itemSet.has(sp.itemId));
+  const spGeneral = p.salesPoints.filter(sp => !sp.itemId || !p.offer.items.some(i => i.id === sp.itemId));
+  const spOther = p.salesPoints.filter(sp => !spRelevant.includes(sp) && !spGeneral.includes(sp));
+  const spList = (title, list) => list.length ? `<div class="grouphead">${title}</div>` + list.map(sp => `<label class="${s.salesPointIds.includes(sp.id) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('salesPointIds')}" data-val="${sp.id}" ${s.salesPointIds.includes(sp.id) ? 'checked' : ''}><span>${esc(sp.text)}${sp.itemId ? ` <span class="faint small">· ${esc(p.offer.items.find(i => i.id === sp.itemId)?.name || '')}</span>` : ''}</span></label>`).join('') : '';
+  const anims = p.animations;
+  const tabs = [['desc', 'Beschreibung'], ['sp', 'Sales-Points in Szene', s.salesPointIds.length], ['vo', 'Text / VO']];
+  return `<div class="pagehead"><div>
+      <button class="btn sm ghost" data-action="closeScene" style="margin:0 0 6px -10px">← Szenenboard</button>
+      <h1>Szene ${m.no}</h1><div class="sub">${esc(m.seg.name)} · Timecode ${fmtDur(m.start)} – ${fmtDur(m.start + (+s.duration || 0))}</div></div>
+    <div class="actions">
+      <button class="btn" data-action="openScene" data-id="${prev?.id || ''}" ${prev ? '' : 'disabled'}>‹ Vorherige</button>
+      <button class="btn" data-action="openScene" data-id="${next?.id || ''}" ${next ? '' : 'disabled'}>Nächste ›</button>
+      <button class="btn" data-action="dupScene" data-id="${s.id}">Duplizieren</button>
+      <button class="btn danger" data-action="delScene" data-id="${s.id}">Löschen</button></div></div>
+  <div class="scene-grid">
+    <div class="card stack">
+      ${field('Bezeichnung der Szene', inp(b('name'), s.name, 'placeholder="Name of scene"'))}
+      <div class="media">${s.media?.src ? mediaTag(s.media) : (s.mediaUrl ? (/\.(mp4|webm|mov)(\?|$)/i.test(s.mediaUrl) ? `<video src="${esc(s.mediaUrl)}" controls muted playsinline></video>` : /\.(png|jpe?g|gif|webp)(\?|$)/i.test(s.mediaUrl) ? `<img src="${esc(s.mediaUrl)}" alt="">` : `<a href="${esc(s.mediaUrl)}" target="_blank" rel="noopener">Clip öffnen ↗</a>`) : '<div>Bild oder Clip<br><span class="small faint">Scribble, Foto oder kurzes Video</span></div>')}
+        <div class="ov"><button class="btn sm" data-action="upload" data-mode="set" data-path="${b('media')}" data-accept="image/*,video/*">${s.media ? 'Ersetzen' : 'Hochladen'}</button>${s.media ? `<button class="btn sm danger" data-action="clearMedia" data-id="${s.id}">Entfernen</button>` : ''}</div></div>
+      ${field('oder Link zu Clip / Bild', inp(b('mediaUrl'), s.mediaUrl, 'placeholder="https://…" data-rerender'))}
+    </div>
+    <div class="card stack">
+      <div class="grid g2">${field('Dauer', durInp(b('duration'), s.duration))}${field('Segment', sel(b('segmentId'), s.segmentId, p.segments.map(x => [x.id, x.name]), 'data-rerender'))}</div>
+      <div class="field"><span>Produkte / Teile in Szene</span>
+        <div class="checklist">${p.offer.items.length ? p.offer.items.map(it => `<label class="${itemSet.has(it.id) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('itemIds')}" data-val="${it.id}" ${itemSet.has(it.id) ? 'checked' : ''}><span>${esc(it.name)}${it.size ? ` <span class="faint small">${esc(it.size)}</span>` : ''}</span></label>`).join('') : '<div class="small faint" style="padding:10px">Keine Produkte – unter „Angebot“ anlegen.</div>'}</div></div>
+    </div>
+    <div class="card stack c3">
+      <div class="field"><span>Kategorie</span>
+        <div class="checklist">${p.categories.map(c => `<label class="${s.categories.includes(c) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('categories')}" data-val="${esc(c)}" ${s.categories.includes(c) ? 'checked' : ''}><span class="chip"><span class="dot" style="background:${catColor(p, c)}"></span>${esc(c)}</span></label>`).join('')}</div></div>
+      <label class="toggle"><input type="checkbox" data-bind="${b('recipeOn')}" data-rerender ${s.recipeOn ? 'checked' : ''}> Rezept in dieser Szene</label>
+      ${s.recipeOn ? field('Rezept-Kategorie', sel(b('recipeCategory'), s.recipeCategory, [['', '— wählen —'], ...p.recipeCategories.map(c => [c, c])], 'data-rerender')) : ''}
+      ${anims.length ? `<div class="field"><span>Verknüpfte Animationen</span><div class="row" style="gap:6px">${anims.map(a => `<label class="chip" style="cursor:pointer;padding:3px 9px"><input type="checkbox" data-action="toggleAnim" data-anim="${a.id}" data-scene="${s.id}" ${a.sceneIds.includes(s.id) ? 'checked' : ''}> ${esc(a.name)}</label>`).join('')}</div></div>` : ''}
+    </div>
+  </div>
+  <div class="grid" style="grid-template-columns:minmax(0,1.6fr) minmax(0,1fr);margin-top:16px" id="sceneLower">
+    <div class="card">
+      <div class="tabs">${tabs.map(([k, l, n]) => `<button class="${ui.sceneTab === k ? 'on' : ''}" data-action="tab" data-k="sceneTab" data-v="${k}">${l}${n ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
+      ${ui.sceneTab === 'desc' ? ta(b('description'), s.description, 'style="min-height:220px" placeholder="Was passiert in der Szene? Kamera, Handlung, Requisiten …"') : ''}
+      ${ui.sceneTab === 'vo' ? ta(b('textVO'), s.textVO, 'style="min-height:220px" placeholder="Moderationstext / Voice-Over"') : ''}
+      ${ui.sceneTab === 'sp' ? (p.salesPoints.length ? `<div class="checklist" style="max-height:320px">${spList('Passend zu Produkten in der Szene', spRelevant)}${spList('Generelle Sales-Points', spGeneral)}${spList('Weitere Produkte', spOther)}</div>` : '<div class="empty small">Keine Sales-Points – unter „Sales-Points“ anlegen.</div>') : ''}
+    </div>
+    <div class="card">
+      ${s.recipeOn ? `<div class="tabs">${[['recipe', 'Rezept'], ['ingr', 'Zutaten']].map(([k, l]) => `<button class="${ui.sideTab === k ? 'on' : ''}" data-action="tab" data-k="sideTab" data-v="${k}">${l}</button>`).join('')}</div>
+        ${ui.sideTab === 'recipe' ? ta(b('recipe'), s.recipe, 'style="min-height:220px" placeholder="Rezeptname, Zubereitung …"') : ta(b('ingredients'), s.ingredients, 'style="min-height:220px" placeholder="Eine Zutat pro Zeile, z. B.\n4 Tomaten\n1 rote Zwiebel"')}`
+      : `<h3>Rezept</h3><div class="empty small">Kein Rezept in dieser Szene.<br>Schalte „Rezept in dieser Szene“ ein, um Rezept &amp; Zutaten zu erfassen.</div>`}
+    </div>
+  </div>
+  <div class="card" style="margin-top:16px"><h2>Kommentare <span class="faint small">(${s.comments.length})</span></h2>
+    ${s.comments.map(c => { const u = userById(c.user); return `<div class="comment">${avatar(u)}<div style="flex:1"><div class="meta">${esc(u?.name || '–')} · ${fmtDate(c.ts)}</div><div style="white-space:pre-wrap">${esc(c.text)}</div></div>${c.user === S.currentUser ? del('delComment', { scene: s.id, id: c.id }) : ''}</div>`; }).join('')}
+    <div class="row" style="margin-top:10px;align-items:flex-end"><textarea id="commentDraft" style="flex:1;min-height:60px" placeholder="Kommentar schreiben …"></textarea><button class="btn pri" data-action="addComment" data-id="${s.id}">Senden</button></div>
+  </div>`;
+}
+
+/* ---------- Animations ---------- */
+function vAnim(p) {
+  const meta = sceneMeta(p);
+  return `<div class="pagehead"><div><h1>Animations-Übersicht</h1><div class="sub">Vorschau der Animationen und Beschreibung – verknüpft mit dem Szenenboard</div></div>
+    <div class="actions"><button class="btn pri" data-action="add" data-list="animations">+ Animation</button></div></div>
+  ${p.animations.length ? `<div class="grid gauto">${p.animations.map(a => `<div class="card stack">
+    <div class="media" style="aspect-ratio:16/9">${a.preview ? mediaTag(a.preview) : '<div>Vorschau</div>'}<div class="ov"><button class="btn sm" data-action="upload" data-mode="set" data-path="animations.${a.id}.preview" data-accept="image/*,video/*">${a.preview ? 'Ersetzen' : 'Hochladen'}</button></div></div>
+    ${field('Name', inp(`animations.${a.id}.name`, a.name))}
+    ${field('Beschreibung', ta(`animations.${a.id}.description`, a.description))}
+    <div class="field"><span>Verknüpfte Szenen</span><div class="checklist" style="max-height:160px">${ordered(p).map(s => `<label class="${a.sceneIds.includes(s.id) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="animations.${a.id}.sceneIds" data-val="${s.id}" ${a.sceneIds.includes(s.id) ? 'checked' : ''}><span>${meta[s.id].no} ${esc(s.name)}</span></label>`).join('') || '<div class="small faint" style="padding:8px">Keine Szenen.</div>'}</div></div>
+    <div class="row" style="justify-content:flex-end">${del('remove', { list: 'animations', id: a.id })}</div></div>`).join('')}</div>` : '<div class="empty">Noch keine Animationen. <span class="faint">(Nice to have – weitere Features geplant)</span></div>'}`;
+}
+
+/* ---------- B-Rolls ---------- */
+function vBroll(p) {
+  const meta = sceneMeta(p);
+  const sceneOpts = [['', '— keine —'], ...ordered(p).map(s => [s.id, meta[s.id].no + ' ' + s.name])];
+  return `<div class="pagehead"><div><h1>B-Rolls</h1><div class="sub">Liste der B-Rolls (ständig erweiterbar) · ${p.brolls.filter(x => x.done).length} von ${p.brolls.length} gedreht</div></div>
+    <div class="actions"><button class="btn pri" data-action="add" data-list="brolls">+ B-Roll</button></div></div>
+  <div class="card tbl-wrap">${p.brolls.length ? `<table><thead><tr><th style="width:40px">✓</th><th>B-Roll</th><th>Beschreibung / Technik</th><th style="width:240px">Szene</th><th style="width:40px"></th></tr></thead><tbody>
+    ${p.brolls.map(r => `<tr class="${r.done ? 'done' : ''}"><td><input type="checkbox" data-bind="brolls.${r.id}.done" data-rerender ${r.done ? 'checked' : ''} aria-label="gedreht"></td><td>${inp(`brolls.${r.id}.name`, r.name)}</td><td>${inp(`brolls.${r.id}.description`, r.description)}</td><td>${sel(`brolls.${r.id}.sceneId`, r.sceneId, sceneOpts)}</td><td>${del('remove', { list: 'brolls', id: r.id })}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">Noch keine B-Rolls.</div>'}</div>`;
+}
+
+/* ---------- Post shooting ---------- */
+function vPost(p) {
+  const meta = sceneMeta(p);
+  const sceneOpts = [['', '— allgemein —'], ...ordered(p).map(s => [s.id, meta[s.id].no + ' ' + s.name])];
+  const open = p.post.filter(x => !x.done).length;
+  return `<div class="pagehead"><div><h1>Post Shooting Operations</h1><div class="sub">Notizen, was nach dem Shooting noch gedreht werden soll (Missing Scenes) · ${open} offen</div></div>
+    <div class="actions"><button class="btn pri" data-action="add" data-list="post">+ Eintrag</button></div></div>
+  <div class="card tbl-wrap">${p.post.length ? `<table><thead><tr><th style="width:40px">✓</th><th>Aufgabe / fehlende Szene</th><th style="width:240px">Szene</th><th style="width:130px">Priorität</th><th style="width:40px"></th></tr></thead><tbody>
+    ${p.post.map(r => `<tr class="${r.done ? 'done' : ''}"><td><input type="checkbox" data-bind="post.${r.id}.done" data-rerender ${r.done ? 'checked' : ''} aria-label="erledigt"></td><td>${inp(`post.${r.id}.text`, r.text)}</td><td>${sel(`post.${r.id}.sceneId`, r.sceneId, sceneOpts)}</td><td>${sel(`post.${r.id}.priority`, r.priority, [['hoch', 'hoch'], ['mittel', 'mittel'], ['niedrig', 'niedrig']])}</td><td>${del('remove', { list: 'post', id: r.id })}</td></tr>`).join('')}</tbody></table>` : '<div class="empty">Keine offenen Punkte nach dem Shooting.</div>'}</div>`;
+}
+
+/* ---------- Notes ---------- */
+function vNotes(p) {
+  return `<div class="pagehead"><div><h1>Notizen, Clips &amp; Inspiration</h1><div class="sub">Ideen, Referenzen, Links und Bilder</div></div>
+    <div class="actions"><button class="btn pri" data-action="add" data-list="notes">+ Notiz</button></div></div>
+  ${p.notes.length ? `<div class="grid gauto">${p.notes.map(n => `<div class="card stack">
+    ${n.image ? `<div class="media" style="aspect-ratio:16/9">${mediaTag(n.image)}</div>` : ''}
+    ${field('Titel', inp(`notes.${n.id}.title`, n.title))}
+    ${field('Link / Clip', inp(`notes.${n.id}.link`, n.link, 'placeholder="https://…" data-rerender'))}
+    ${n.link ? `<a class="small" href="${esc(n.link)}" target="_blank" rel="noopener">Link öffnen ↗</a>` : ''}
+    ${field('Notiz', ta(`notes.${n.id}.text`, n.text))}
+    <div class="row" style="justify-content:space-between"><button class="btn sm" data-action="upload" data-mode="set" data-path="notes.${n.id}.image" data-accept="image/*,video/*">${n.image ? 'Bild ersetzen' : '+ Bild / Clip'}</button>${del('remove', { list: 'notes', id: n.id })}</div></div>`).join('')}</div>` : '<div class="empty">Noch keine Notizen.</div>'}`;
+}
+
+/* ---------- Analysis ---------- */
+function stats(p, segId = 'all') {
+  const all = ordered(p), sc = segId === 'all' ? all : all.filter(s => s.segmentId === segId);
+  const total = sum(sc.map(s => s.duration));
+  const agg = (list, pred) => { const l = list.filter(pred); return { count: l.length, time: sum(l.map(s => s.duration)), scenes: l }; };
+  return {
+    sc, total,
+    cats: p.categories.map(c => ({ name: c, color: catColor(p, c), ...agg(sc, s => s.categories.includes(c)) })),
+    noCat: agg(sc, s => !s.categories.length),
+    recipes: p.recipeCategories.map(c => ({ name: c, color: rcatColor(p, c), ...agg(sc, s => s.recipeOn && s.recipeCategory === c) })),
+    recipeTotal: agg(sc, s => s.recipeOn),
+    items: p.offer.items.map(it => ({ name: it.name, color: 'var(--brand2)', ...agg(sc, s => s.itemIds.includes(it.id)) })),
+    sps: p.salesPoints.map(sp => ({ name: sp.text, item: p.offer.items.find(i => i.id === sp.itemId)?.name || 'Generell', color: 'var(--accent)', ...agg(sc, s => s.salesPointIds.includes(sp.id)) })),
+    segs: p.segments.map(seg => ({ name: seg.name, color: 'var(--brand)', ...agg(all, s => s.segmentId === seg.id) }))
+  };
+}
+function bars(rows, mode, total, empty = 'Keine Daten') {
+  const vis = rows.filter(r => r.count > 0 || mode === 'all');
+  if (!vis.length) return `<div class="small faint">${empty}</div>`;
+  const max = Math.max(...vis.map(r => mode === 'count' ? r.count : r.time), 1);
+  return `<div class="bars">${vis.map(r => { const v = mode === 'count' ? r.count : r.time;
+    return `<div class="barrow"><span class="lab" title="${esc(r.name)}">${esc(r.name)}</span><span class="track"><i style="width:${v / max * 100}%;background:${r.color}"></i></span><span class="val">${mode === 'count' ? r.count + '×' : fmtDur(r.time)}${total ? ' · ' + pct(mode === 'count' ? r.count : r.time, total) + ' %' : ''}</span></div>`; }).join('')}</div>`;
+}
+function analysisHTML(p, segId, print = false) {
+  const st = stats(p, segId), meta = sceneMeta(p);
+  const segName = segId === 'all' ? 'Total (alle Segmente)' : p.segments.find(s => s.id === segId)?.name;
+  const spUsed = st.sps.filter(s => s.count), spUnused = st.sps.filter(s => !s.count);
+  const card = (title, inner, cls = '') => `<div class="card avoid ${cls}">${print ? `<h2>${title}</h2>` : `<h2>${title}</h2>`}${inner}</div>`;
+  const sceneRefs = l => l.map(s => meta[s.id].no).join(', ');
+  return `
+  <div class="kpis">
+    <div class="kpi"><div class="l">Laufzeit · ${esc(segName)}</div><div class="v">${fmtDur(st.total)}</div><div class="d faint">${segId === 'all' ? 'Ziel ' + fmtDur(p.duration) + ' · ' + pct(st.total, p.duration) + ' %' : pct(st.total, totalDur(p)) + ' % der Show'}</div></div>
+    <div class="kpi"><div class="l">Szenen</div><div class="v">${st.sc.length}</div><div class="d faint">Ø ${fmtDur(st.sc.length ? st.total / st.sc.length : 0)}</div></div>
+    <div class="kpi"><div class="l">Sales-Points genutzt</div><div class="v">${spUsed.length}/${st.sps.length}</div><div class="d ${spUnused.length ? 'neg' : 'pos'}">${spUnused.length ? spUnused.length + ' ungenutzt' : 'alle verwendet'}</div></div>
+    <div class="kpi"><div class="l">Rezept-Szenen</div><div class="v">${st.recipeTotal.count}</div><div class="d faint">${fmtDur(st.recipeTotal.time)} · ${pct(st.recipeTotal.time, st.total)} %</div></div>
+  </div>
+  ${segId === 'all' ? card('Zeitliche Verteilung der Szenen (Segmente)', (p.scenes.length ? timeline(p, st.sc) : '') + `<div style="margin-top:14px">${bars(st.segs, 'time', st.total)}</div>`) : card('Zeitliche Verteilung im Segment', timeline(p, st.sc))}
+  <div class="grid g2" style="margin-top:16px">
+    ${card('Verteilung der Kategorien – Zeit', bars([...st.cats, { name: 'ohne Kategorie', color: 'var(--line2)', ...st.noCat }], 'time', st.total) + '<div class="small faint" style="margin-top:8px">Mehrfachzuordnung möglich – Summe kann 100 % übersteigen.</div>')}
+    ${card('Verteilung der Kategorien – Anzahl', bars([...st.cats, { name: 'ohne Kategorie', color: 'var(--line2)', ...st.noCat }], 'count', st.sc.length))}
+    ${card('Verteilung der Rezept-Kategorien', bars(st.recipes, 'time', st.recipeTotal.time, 'Keine Rezepte im Auswahlbereich') + `<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Kategorie</th><th class="num">Anz.</th><th class="num">Zeit</th><th>Szenen</th></tr></thead><tbody>${st.recipes.filter(r => r.count).map(r => `<tr><td>${esc(r.name)}</td><td class="num">${r.count}</td><td class="num">${fmtDur(r.time)}</td><td class="small">${sceneRefs(r.scenes)}</td></tr>`).join('') || '<tr><td colspan="4" class="faint">–</td></tr>'}</tbody></table></div>`)}
+    ${card('Wo und wie oft wird welches Produkt benutzt', bars(st.items, 'count', 0, 'Keine Produkte verwendet') + `<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Produkt</th><th class="num">Szenen</th><th class="num">Zeit im Bild</th><th>Wo</th></tr></thead><tbody>${st.items.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${r.count}</td><td class="num">${fmtDur(r.time)}</td><td class="small">${sceneRefs(r.scenes) || '<span class="neg">nicht verwendet</span>'}</td></tr>`).join('')}</tbody></table></div>`)}
+  </div>
+  <div style="margin-top:16px">${card('Wo sind welche Sales-Points verteilt', `<div class="tbl-wrap"><table><thead><tr><th>Sales-Point</th><th>Produkt</th><th class="num">Anz.</th><th class="num">Zeit</th><th>Szenen</th></tr></thead><tbody>${st.sps.sort((a, b) => b.count - a.count).map(r => `<tr><td>${esc(r.name)}</td><td class="small">${esc(r.item)}</td><td class="num">${r.count}</td><td class="num">${fmtDur(r.time)}</td><td class="small">${r.count ? sceneRefs(r.scenes) : '<span class="neg">nicht verwendet</span>'}</td></tr>`).join('')}</tbody></table></div>`)}</div>
+  <div style="margin-top:16px">${card('Zeitliche Aufschlüsselung – wie setzt sich welches Segment zusammen', `<div class="tbl-wrap"><table><thead><tr><th>Nr.</th><th>Szene</th><th>Segment</th><th>Kategorien</th><th class="num">Start</th><th class="num">Dauer</th><th class="num">Anteil</th></tr></thead><tbody>${st.sc.map(s => `<tr><td>${meta[s.id].no}</td><td>${esc(s.name)}</td><td class="small">${esc(meta[s.id].seg.name)}</td><td>${catChips(p, s.categories)}</td><td class="num">${fmtDur(meta[s.id].start)}</td><td class="num">${fmtDur(s.duration)}</td><td class="num">${pct(s.duration, st.total)} %</td></tr>`).join('')}</tbody></table></div>`)}</div>`;
+}
+function vAnalysis(p) {
+  return `<div class="pagehead"><div><h1>Analyse</h1><div class="sub">Numerisch, prozentual und als Diagramm – pro Segment und Total</div></div>
+    <div class="actions"><select data-action-change="segFilter" style="width:auto">${[['all', 'Total – alle Segmente'], ...p.segments.map(s => [s.id, 'Segment: ' + s.name])].map(([v, l]) => `<option value="${v}" ${ui.segFilter === v ? 'selected' : ''}>${esc(l)}</option>`).join('')}</select>
+    <button class="btn pri" data-action="printAnalysis">Drucken / PDF</button></div></div>
+  ${p.scenes.length ? analysisHTML(p, ui.segFilter) : '<div class="empty">Noch keine Szenen im Storyboard – die Analyse füllt sich automatisch.</div>'}`;
+}
+
+/* ---------- Export ---------- */
+const LAYOUTS = [
+  ['storyboard', 'Storyboard komplett', 'Alle Szenen mit Bild, Beschreibung, Text/VO, Produkten, Sales-Points, Rezept und Kommentaren.'],
+  ['kitchen', 'Kitchen-Crew', 'Rezept-Szenen mit Zutaten, benötigten Produkten und Timecode – plus Einkaufsliste.'],
+  ['stage', 'Stage-Crew', 'Ablaufplan: Timecode, Szene, Kategorie, Produkte/Requisiten, Set-Spezifikationen.'],
+  ['shopping', 'Einkaufsliste', 'Alle Zutaten aus den Rezepten zusammengefasst, mit Szenen-Referenz.'],
+  ['sp', 'Sales-Points pro Szene', 'Welche Sales-Points in welcher Szene vorkommen + ungenutzte Sales-Points.'],
+  ['lists', 'B-Rolls & Post-Shooting', 'Offene B-Rolls und Nachdreh-Liste.'],
+  ['analysis', 'Analyse', 'Alle Auswertungen (Total) als Report.']
+];
+function exportHTML(p, layout, withImg) {
+  const meta = sceneMeta(p), ord = ordered(p);
+  const L = LAYOUTS.find(l => l[0] === layout);
+  const head = `<h1>${esc(p.title)}</h1><div class="prmeta">${esc(L[1])} · Showdauer ${fmtDur(p.duration)} (Szenen ${fmtDur(totalDur(p))}) · Studio: ${esc(p.studio || '–')} · Dreh: ${fmtDay(p.shootingDate)} · Stand ${fmtDate(Date.now())} · ${esc(me()?.name || '')}</div>`;
+  const items = s => s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', ');
+  const sps = s => s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean);
+  const img = s => withImg && s.media?.src && s.media.type !== 'video' ? `<img src="${esc(s.media.src)}" alt="">` : '';
+  let body = '';
+  if (layout === 'storyboard') {
+    body = p.segments.map((seg, si) => `<div class="seghead">${si + 1}. ${esc(seg.name)} · ${fmtDur(segDur(p, seg.id))}</div>` + p.scenes.filter(s => s.segmentId === seg.id).map(s => { const im = img(s);
+      return `<div class="sc ${im ? '' : 'noimg'}">${im ? `<div>${im}</div>` : ''}<div><div class="h">${meta[s.id].no} ${esc(s.name)} <span style="font-weight:400;color:#666">· ${fmtDur(meta[s.id].start)} · ${fmtDur(s.duration)} · ${esc(s.categories.join(', '))}</span></div>
+      ${s.description ? `<div class="k">Beschreibung</div><div class="pre">${esc(s.description)}</div>` : ''}
+      ${s.textVO ? `<div class="k">Text / VO</div><div class="pre">${esc(s.textVO)}</div>` : ''}
+      ${s.itemIds.length ? `<div class="k">Produkte</div><div>${esc(items(s))}</div>` : ''}
+      ${sps(s).length ? `<div class="k">Sales-Points</div><div>${sps(s).map(esc).join(' · ')}</div>` : ''}
+      ${s.recipeOn ? `<div class="k">Rezept (${esc(s.recipeCategory || '–')})</div><div class="pre">${esc(s.recipe)}</div>` : ''}
+      ${s.comments.length ? `<div class="k">Kommentare</div>${s.comments.map(c => `<div>${esc(userById(c.user)?.name || '')}: ${esc(c.text)}</div>`).join('')}` : ''}</div></div>`; }).join('')).join('');
+  } else if (layout === 'kitchen') {
+    const rs = ord.filter(s => s.recipeOn);
+    body = rs.length ? `<table><thead><tr><th>Nr.</th><th>Timecode</th><th>Szene</th><th>Rezept</th><th>Kategorie</th><th>Zutaten</th><th>Produkte / Geräte</th></tr></thead><tbody>${rs.map(s => `<tr><td>${meta[s.id].no}</td><td>${fmtDur(meta[s.id].start)}</td><td>${esc(s.name)}</td><td class="pre">${esc(s.recipe)}</td><td>${esc(s.recipeCategory)}</td><td class="pre">${esc(s.ingredients)}</td><td>${esc(items(s))}</td></tr>`).join('')}</tbody></table>` + '<h2>Einkaufsliste</h2>' + shoppingTable(p) : '<p>Keine Rezept-Szenen.</p>';
+  } else if (layout === 'stage') {
+    body = `<table><thead><tr><th>Nr.</th><th>Start</th><th>Dauer</th><th>Segment</th><th>Szene</th><th>Kategorie</th><th>Produkte / Requisiten</th><th>Animation / B-Roll</th></tr></thead><tbody>${ord.map(s => `<tr><td>${meta[s.id].no}</td><td>${fmtDur(meta[s.id].start)}</td><td>${fmtDur(s.duration)}</td><td>${esc(meta[s.id].seg.name)}</td><td>${esc(s.name)}</td><td>${esc(s.categories.join(', '))}</td><td>${esc(items(s))}</td><td>${esc([...p.animations.filter(a => a.sceneIds.includes(s.id)).map(a => '▶ ' + a.name), ...p.brolls.filter(r => r.sceneId === s.id).map(r => '🎥 ' + r.name)].join(', '))}</td></tr>`).join('')}</tbody></table>
+      <h2>Set-Design</h2><div class="pre">${esc(p.setDesign.specs || '–')}</div>
+      ${p.setDesign.colors.length ? `<p>${p.setDesign.colors.map(c => `<span class="chip"><span class="dot" style="background:${esc(c.hex)}"></span>${esc(c.name)} ${esc(c.hex)}</span>`).join(' ')}</p>` : ''}
+      ${p.hosts.length ? `<h2>Hosts</h2><table><tbody>${p.hosts.map(h => `<tr><td>${esc(h.name)}</td><td>${esc(h.role)}</td><td>${esc(h.contact)}</td></tr>`).join('')}</tbody></table>` : ''}`;
+  } else if (layout === 'shopping') {
+    body = shoppingTable(p) + `<h2>Produkte aus dem Angebot</h2><table><thead><tr><th>Produkt</th><th>Größe</th><th>Anzahl Szenen</th></tr></thead><tbody>${p.offer.items.map(i => `<tr><td>${esc(i.name)}</td><td>${esc(i.size)}</td><td>${p.scenes.filter(s => s.itemIds.includes(i.id)).length}</td></tr>`).join('')}</tbody></table>`;
+  } else if (layout === 'sp') {
+    body = `<table><thead><tr><th>Nr.</th><th>Szene</th><th>Dauer</th><th>Sales-Points</th></tr></thead><tbody>${ord.map(s => `<tr><td>${meta[s.id].no}</td><td>${esc(s.name)}</td><td>${fmtDur(s.duration)}</td><td>${sps(s).map(esc).join('<br>') || '–'}</td></tr>`).join('')}</tbody></table>`;
+    const unused = p.salesPoints.filter(sp => !p.scenes.some(s => s.salesPointIds.includes(sp.id)));
+    body += `<h2>Nicht verwendete Sales-Points</h2>${unused.length ? '<ul>' + unused.map(u => `<li>${esc(u.text)}</li>`).join('') + '</ul>' : '<p>Alle Sales-Points sind im Storyboard verwendet.</p>'}`;
+  } else if (layout === 'lists') {
+    const sn = id => id && meta[id] ? meta[id].no + ' ' + (p.scenes.find(s => s.id === id)?.name || '') : '–';
+    body = `<h2>B-Rolls</h2><table><thead><tr><th>✓</th><th>B-Roll</th><th>Beschreibung</th><th>Szene</th></tr></thead><tbody>${p.brolls.map(r => `<tr><td>${r.done ? '✓' : '☐'}</td><td>${esc(r.name)}</td><td>${esc(r.description)}</td><td>${esc(sn(r.sceneId))}</td></tr>`).join('') || '<tr><td colspan="4">–</td></tr>'}</tbody></table>
+      <h2>Post-Shooting / Missing Scenes</h2><table><thead><tr><th>✓</th><th>Aufgabe</th><th>Szene</th><th>Priorität</th></tr></thead><tbody>${p.post.map(r => `<tr><td>${r.done ? '✓' : '☐'}</td><td>${esc(r.text)}</td><td>${esc(sn(r.sceneId))}</td><td>${esc(r.priority)}</td></tr>`).join('') || '<tr><td colspan="4">–</td></tr>'}</tbody></table>`;
+  } else if (layout === 'analysis') {
+    body = analysisHTML(p, 'all', true);
+  }
+  return `<div class="pr">${head}${body}</div>`;
+}
+function shoppingList(p) {
+  const meta = sceneMeta(p), map = new Map();
+  ordered(p).filter(s => s.recipeOn).forEach(s => String(s.ingredients || '').split('\n').map(x => x.trim()).filter(Boolean).forEach(line => {
+    const k = line.toLowerCase(); if (!map.has(k)) map.set(k, { line, scenes: [] }); map.get(k).scenes.push(meta[s.id].no);
+  }));
+  return [...map.values()].sort((a, b) => a.line.localeCompare(b.line, 'de'));
+}
+function shoppingTable(p) { const l = shoppingList(p); return l.length ? `<table><thead><tr><th style="width:30px">☐</th><th>Zutat</th><th>Szenen</th></tr></thead><tbody>${l.map(x => `<tr><td>☐</td><td>${esc(x.line)}</td><td>${x.scenes.join(', ')}</td></tr>`).join('')}</tbody></table>` : '<p>Keine Zutaten erfasst.</p>'; }
+
+function vExport(p) {
+  return `<div class="pagehead"><div><h1>Export &amp; Druck</h1><div class="sub">PDF und Druck mit verschiedenen Layouts, Listen als CSV, Projekt-Backup als JSON</div></div>
+    <div class="actions"><button class="btn" data-action="csv">Szenenliste CSV</button><button class="btn" data-action="exportJSON">Projekt JSON</button><button class="btn" data-action="backupAll">Komplett-Backup</button><button class="btn pri" data-action="print">Drucken / PDF</button></div></div>
+  <div class="grid" style="grid-template-columns:minmax(0,320px) minmax(0,1fr)" id="exportGrid">
+    <div class="stack export-opts">
+      ${LAYOUTS.map(([k, l, d]) => `<label class="opt ${ui.exportLayout === k ? 'on' : ''}"><input type="radio" name="layout" data-action-change="layout" value="${k}" ${ui.exportLayout === k ? 'checked' : ''}><span><b style="font-weight:500">${l}</b><br><span class="small muted">${d}</span></span></label>`).join('')}
+      <label class="toggle"><input type="checkbox" data-action-change="exportImages" ${ui.exportImages ? 'checked' : ''}> Bilder einbeziehen</label>
+      <p class="small faint">Tipp: Im Druckdialog „Als PDF speichern“ wählen, um ein PDF zu erzeugen.</p>
+    </div>
+    <div class="card"><h2>Vorschau</h2><div class="preview-print">${exportHTML(p, ui.exportLayout, ui.exportImages)}</div></div>
+  </div>`;
+}
+
+const VIEWS = { projects: vProjects, details: vDetails, set: vSet, offer: vOffer, sp: vSP, storyboard: vStoryboard, anim: vAnim, broll: vBroll, post: vPost, notes: vNotes, analysis: vAnalysis, export: vExport };
+
+/* ============================================================
+   ACTIONS
+   ============================================================ */
+function toast(msg) { const t = document.createElement('div'); t.className = 'toast'; t.textContent = msg; document.body.appendChild(t); setTimeout(() => t.remove(), 3200); }
+function download(name, data, type) { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([data], { type })); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 500); }
+const slug = s => String(s).toLowerCase().replace(/[äöüß]/g, c => ({ ä: 'ae', ö: 'oe', ü: 'ue', ß: 'ss' }[c])).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 50) || 'projekt';
+function doPrint(html) { $('#print').innerHTML = html; setTimeout(() => window.print(), 80); }
+function commit(msg, key) { log(msg, key); save(); render(); }
+
+const FACTORY = {
+  hosts: () => ({ id: uid(), name: '', role: '', contact: '' }),
+  'setDesign.colors': () => ({ id: uid(), name: 'Neue Farbe', hex: '#888888' }),
+  'offer.items': () => ({ id: uid(), name: 'Neues Produkt', size: '', spec: '', description: '', image: null }),
+  salesPoints: d => ({ id: uid(), text: '', itemId: d.item || null }),
+  animations: () => ({ id: uid(), name: 'Neue Animation', description: '', preview: null, sceneIds: [] }),
+  brolls: () => ({ id: uid(), name: '', description: '', sceneId: '', done: false }),
+  post: () => ({ id: uid(), text: '', sceneId: '', priority: 'mittel', done: false }),
+  notes: () => ({ id: uid(), title: 'Neue Notiz', link: '', text: '', image: null })
+};
+const LISTNAME = { hosts: 'Host', 'setDesign.colors': 'Farbe', 'setDesign.images': 'Set-Bild', 'offer.items': 'Produkt', salesPoints: 'Sales-Point', animations: 'Animation', brolls: 'B-Roll', post: 'Post-Shooting-Eintrag', notes: 'Notiz' };
+
+const A = {
+  nav: d => { ui.view = d.v; ui.sceneId = null; S.lastView = d.v; save(); render(); $('main').scrollTop = 0; },
+  theme: () => { const r = document.documentElement; const dark = r.dataset.theme ? r.dataset.theme === 'dark' : matchMedia('(prefers-color-scheme: dark)').matches; r.dataset.theme = dark ? 'light' : 'dark'; try { localStorage.setItem(KEY + '.theme', r.dataset.theme); } catch (e) {} },
+  login: d => { S.currentUser = d.id; save(true); render(); },
+  logout: () => { if (confirm('Benutzer wechseln / abmelden?')) { S.currentUser = null; save(true); render(); } },
+  addProject: () => { const p = newProject(); S.projects.unshift(p); S.activeProjectId = p.id; log('Projekt angelegt'); save(); ui.view = 'details'; render(); },
+  openProject: (d, el, e) => { if (e.target.closest('button')) return; S.activeProjectId = d.id; ui.view = 'storyboard'; ui.sceneId = null; save(); render(); },
+  dupProject: d => { const src = S.projects.find(p => p.id === d.id); const c = clone(src); c.id = uid(); c.title += ' (Kopie)'; c.history = []; c.created = Date.now(); S.projects.unshift(c); S.activeProjectId = c.id; log('Projekt dupliziert aus „' + src.title + '“'); save(); render(); },
+  delProject: d => { const p = S.projects.find(x => x.id === d.id); if (!confirm(`Projekt „${p.title}“ wirklich löschen? Dies kann nicht rückgängig gemacht werden.`)) return; S.projects = S.projects.filter(x => x.id !== d.id); if (S.activeProjectId === d.id) S.activeProjectId = S.projects[0]?.id || null; save(); render(); },
+  add: d => { const p = P(); const arr = resolve(p, d.list.split('.')); const o = FACTORY[d.list](d); arr.push(o); commit(`${LISTNAME[d.list]} hinzugefügt`); setTimeout(() => { const el = document.querySelector(`[data-bind^="${d.list}.${o.id}."]`); el?.focus(); el?.scrollIntoView({ block: 'center', behavior: 'smooth' }); }, 30); },
+  remove: d => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.findIndex(x => x.id === d.id); if (i < 0) return; const nm = arr[i].name || arr[i].title || arr[i].text || arr[i].caption || ''; if (!confirm(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} löschen?`)) return; arr.splice(i, 1); commit(`${LISTNAME[d.list]}${nm ? ' „' + nm + '“' : ''} gelöscht`); },
+  toggle: (d, el) => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.indexOf(d.val); i >= 0 ? arr.splice(i, 1) : arr.push(d.val); if (d.list === 'userIds') return commit('Benutzerzuordnung geändert', d.list); commit(describe(d.list.replace(/\.[^.]+$/, '') + '.' + ({ itemIds: 'Produkte', salesPointIds: 'Sales-Points', categories: 'Kategorien', sceneIds: 'Szenen', userIds: 'Benutzer' }[d.list.split('.').pop()] || 'Liste')), d.list); },
+  toggleAnim: d => { const a = P().animations.find(x => x.id === d.anim); const i = a.sceneIds.indexOf(d.scene); i >= 0 ? a.sceneIds.splice(i, 1) : a.sceneIds.push(d.scene); commit(`Animation „${a.name}“ verknüpft`); },
+  delCat: d => { const p = P(); if (!confirm(`Kategorie „${d.v}“ entfernen? Sie wird auch aus allen Szenen entfernt.`)) return; p[d.key] = p[d.key].filter(c => c !== d.v); p.scenes.forEach(s => { s.categories = s.categories.filter(c => c !== d.v); if (s.recipeCategory === d.v && d.key === 'recipeCategories') s.recipeCategory = ''; }); commit(`Kategorie „${d.v}“ entfernt`); },
+  delItem: d => { const p = P(); const it = p.offer.items.find(i => i.id === d.id); if (!confirm(`Produkt „${it.name}“ löschen? Verknüpfungen in Szenen werden entfernt.`)) return; p.offer.items = p.offer.items.filter(i => i.id !== d.id); p.scenes.forEach(s => s.itemIds = s.itemIds.filter(x => x !== d.id)); p.salesPoints.forEach(sp => { if (sp.itemId === d.id) sp.itemId = null; }); commit(`Produkt „${it.name}“ gelöscht`); },
+  delSP: d => { const p = P(); const sp = p.salesPoints.find(i => i.id === d.id); if (!confirm(`Sales-Point „${sp.text}“ löschen?`)) return; p.salesPoints = p.salesPoints.filter(i => i.id !== d.id); p.scenes.forEach(s => s.salesPointIds = s.salesPointIds.filter(x => x !== d.id)); commit(`Sales-Point „${sp.text}“ gelöscht`); },
+  addSegment: () => { const p = P(); const seg = { id: uid(), name: 'Segment ' + (p.segments.length + 1) }; p.segments.push(seg); commit(`Segment „${seg.name}“ angelegt`); },
+  moveSeg: d => { const p = P(); const i = p.segments.findIndex(s => s.id === d.id), j = i + +d.d; if (j < 0 || j >= p.segments.length) return; [p.segments[i], p.segments[j]] = [p.segments[j], p.segments[i]]; commit('Segment-Reihenfolge geändert'); },
+  delSegment: d => { const p = P(); if (p.segments.length < 2) return toast('Mindestens ein Segment wird benötigt.'); const i = p.segments.findIndex(s => s.id === d.id), seg = p.segments[i]; const n = p.scenes.filter(s => s.segmentId === seg.id).length; const target = p.segments[i - 1] || p.segments[i + 1]; if (!confirm(`Segment „${seg.name}“ löschen?${n ? ` Die ${n} Szene(n) werden nach „${target.name}“ verschoben.` : ''}`)) return; p.scenes.forEach(s => { if (s.segmentId === seg.id) s.segmentId = target.id; }); p.segments.splice(i, 1); commit(`Segment „${seg.name}“ gelöscht`); },
+  addScene: d => { const p = P(); const s = newScene(d.seg, 'Szene ' + (p.scenes.filter(x => x.segmentId === d.seg).length + 1)); const segScenes = p.scenes.filter(x => x.segmentId === d.seg); const lastIdx = segScenes.length ? p.scenes.indexOf(segScenes[segScenes.length - 1]) + 1 : p.scenes.length; p.scenes.splice(lastIdx, 0, s); log(`Szene „${s.name}“ angelegt`); save(); ui.sceneId = s.id; ui.sceneTab = 'desc'; render(); $('main').scrollTop = 0; setTimeout(() => { const el = $(`[data-bind="scenes.${s.id}.name"]`); el?.focus(); el?.select(); }, 30); },
+  openScene: (d, el, e) => { if (!d.id) return; e.preventDefault(); ui.view = 'storyboard'; ui.sceneId = d.id; render(); $('main').scrollTop = 0; },
+  closeScene: () => { ui.sceneId = null; render(); },
+  dupScene: d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); const c = clone(s); c.id = uid(); c.name += ' (Kopie)'; c.comments = []; p.scenes.splice(p.scenes.indexOf(s) + 1, 0, c); log(`Szene „${s.name}“ dupliziert`); save(); ui.sceneId = c.id; render(); },
+  delScene: d => { const p = P(); const s = p.scenes.find(x => x.id === d.id); if (!confirm(`Szene „${s.name}“ löschen?`)) return; p.scenes = p.scenes.filter(x => x.id !== d.id); p.animations.forEach(a => a.sceneIds = a.sceneIds.filter(x => x !== d.id)); p.brolls.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); p.post.forEach(r => { if (r.sceneId === d.id) r.sceneId = ''; }); ui.sceneId = null; commit(`Szene „${s.name}“ gelöscht`); },
+  clearMedia: d => { const s = P().scenes.find(x => x.id === d.id); s.media = null; commit(`Szene „${s.name}“: Bild entfernt`); },
+  addComment: d => { const t = $('#commentDraft').value.trim(); if (!t) return; const s = P().scenes.find(x => x.id === d.id); s.comments.push({ id: uid(), user: S.currentUser, ts: Date.now(), text: t }); commit(`Kommentar zu Szene „${s.name}“`, 'c' + uid()); },
+  delComment: d => { const s = P().scenes.find(x => x.id === d.scene); s.comments = s.comments.filter(c => c.id !== d.id); commit(`Kommentar in Szene „${s.name}“ gelöscht`); },
+  tab: d => { ui[d.k] = d.v; render(); },
+  upload: d => pickFiles(d),
+  printAnalysis: () => doPrint(`<div class="pr"><h1>${esc(P().title)}</h1><div class="prmeta">Analyse · ${esc(ui.segFilter === 'all' ? 'Total' : P().segments.find(s => s.id === ui.segFilter)?.name)} · Stand ${fmtDate(Date.now())}</div>${analysisHTML(P(), ui.segFilter, true)}</div>`),
+  print: () => doPrint(exportHTML(P(), ui.exportLayout, ui.exportImages)),
+  csv: () => { const p = P(), meta = sceneMeta(p); const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
+    const rows = [['Nr', 'Start', 'Dauer', 'Segment', 'Szene', 'Kategorien', 'Produkte', 'Sales-Points', 'Rezept', 'Rezeptkategorie', 'Zutaten', 'Beschreibung', 'Text/VO']];
+    ordered(p).forEach(s => rows.push([meta[s.id].no, fmtDur(meta[s.id].start), fmtDur(s.duration), meta[s.id].seg.name, s.name, s.categories.join(', '), s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', '), s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean).join(' | '), s.recipeOn ? s.recipe : '', s.recipeOn ? s.recipeCategory : '', s.recipeOn ? s.ingredients : '', s.description, s.textVO]));
+    download(slug(p.title) + '-szenen.csv', '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv;charset=utf-8'); },
+  exportJSON: () => { const p = P(); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
+  backupAll: () => download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...S }, null, 2), 'application/json'),
+  importJSON: () => { const i = document.createElement('input'); i.type = 'file'; i.accept = '.json,application/json'; i.onchange = () => { const f = i.files[0]; if (!f) return; f.text().then(t => {
+    let d; try { d = JSON.parse(t); } catch (e) { return toast('Datei ist kein gültiges JSON.'); }
+    if (d.format === 'pitchmeister-backup' && Array.isArray(d.projects)) { if (!confirm('Komplett-Backup einspielen? Alle aktuellen Daten in diesem Browser werden ersetzt.')) return; const cu = S.currentUser; S = migrate(d); delete S.format; delete S.version; if (S.users.some(u => u.id === cu)) S.currentUser = cu; else S.currentUser = null; save(true); render(); return toast('Backup eingespielt.'); }
+    const proj = d.project || (d.scenes ? d : null); if (!proj) return toast('Unbekanntes Format.');
+    (d.users || []).forEach(u => { if (!S.users.some(x => x.id === u.id)) S.users.push(u); });
+    proj.id = uid(); migrate({ projects: [proj] }); S.projects.unshift(proj); S.activeProjectId = proj.id; log('Projekt importiert'); save(); render(); toast(`Projekt „${proj.title}“ importiert.`); }); }; i.click(); }
+};
+
+/* uploads (images are downscaled to keep storage small) */
+function pickFiles(d) {
+  const i = document.createElement('input'); i.type = 'file'; i.accept = d.accept || 'image/*'; if (d.multi) i.multiple = true;
+  i.onchange = async () => {
+    const p = P();
+    for (const f of i.files) {
+      let m;
+      if (f.type.startsWith('image/')) m = { type: 'image', src: await downscale(f, 1280) };
+      else if (f.type.startsWith('video/')) { if (f.size > 4 * 1024 * 1024) { toast('Video ist größer als 4 MB – bitte als Link zum Clip eintragen.'); continue; } m = { type: 'video', src: await readURL(f) }; }
+      else continue;
+      if (d.mode === 'push') { resolve(p, d.path.split('.')).push({ id: uid(), caption: f.name.replace(/\.[^.]+$/, ''), ...m }); }
+      else setPath(p, d.path, m);
+    }
+    commit(describe(d.path.replace(/\.(media|image|preview|images)$/, '') + '.' + (d.mode === 'push' ? 'images' : 'Bild')), d.path);
+  };
+  i.click();
+}
+const readURL = f => new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(f); });
+function downscale(f, max) {
+  return new Promise(res => { const img = new Image(); const url = URL.createObjectURL(f); img.onload = () => { const k = Math.min(1, max / Math.max(img.width, img.height)); const c = document.createElement('canvas'); c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext('2d').drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url); res(c.toDataURL('image/jpeg', .82)); }; img.onerror = () => { URL.revokeObjectURL(url); readURL(f).then(res); }; img.src = url; });
+}
+
+/* ---------- events ---------- */
+document.addEventListener('click', e => {
+  const el = e.target.closest('[data-action]'); if (!el || el.disabled) return;
+  if (el.type === 'checkbox' || el.tagName === 'INPUT' && el.type !== 'checkbox') { /* checkboxes with data-action handled on change */ if (el.type === 'checkbox') return; }
+  const fn = A[el.dataset.action]; if (!fn) return;
+  if (el.tagName === 'A') e.preventDefault();
+  fn(el.dataset, el, e);
+});
+function applyBind(el, isChange) {
+  const p = P(); if (!p) return;
+  const t = el.dataset.type || el.type; let v;
+  if (t === 'checkbox') v = el.checked;
+  else if (t === 'dur') { if (!isChange) return; v = parseDur(el.value); el.value = fmtDur(v); }
+  else v = el.value;
+  if (el.dataset.bind.endsWith('.itemId') && !v) v = null;
+  setPath(p, el.dataset.bind, v);
+  log(describe(el.dataset.bind), el.dataset.bind);
+  save();
+}
+document.addEventListener('input', e => { const el = e.target.closest('[data-bind]'); if (el && el.type !== 'checkbox' && el.tagName !== 'SELECT') applyBind(el, false); });
+document.addEventListener('change', e => {
+  const el = e.target;
+  if (el.matches('[data-bind]')) { applyBind(el, true); if (el.dataset.rerender !== undefined || el.type === 'checkbox' || el.tagName === 'SELECT') render(); return; }
+  if (el.type === 'checkbox' && el.dataset.action) { A[el.dataset.action](el.dataset, el, e); return; }
+  if (el.id === 'projSel') { S.activeProjectId = el.value; ui.sceneId = null; if (ui.view === 'projects') ui.view = 'storyboard'; save(); render(); return; }
+  const ac = el.dataset.actionChange;
+  if (ac === 'segFilter') { ui.segFilter = el.value; render(); }
+  if (ac === 'layout') { ui.exportLayout = el.value; render(); }
+  if (ac === 'exportImages') { ui.exportImages = el.checked; render(); }
+});
+document.addEventListener('keydown', e => {
+  const el = e.target;
+  if (el.dataset?.addcat && e.key === 'Enter') { e.preventDefault(); const v = el.value.trim().toUpperCase(); const p = P(); if (v && !p[el.dataset.addcat].includes(v)) { p[el.dataset.addcat].push(v); commit(`Kategorie „${v}“ hinzugefügt`); setTimeout(() => $(`[data-addcat="${el.dataset.addcat}"]`)?.focus(), 20); } }
+  if (el.id === 'commentDraft' && e.key === 'Enter' && (e.metaKey || e.ctrlKey)) { $('[data-action="addComment"]').click(); }
+  if (e.key === 'Enter' && el.dataset?.type === 'dur') el.blur();
+});
+document.addEventListener('submit', e => {
+  if (e.target.id !== 'loginForm') return; e.preventDefault();
+  const f = new FormData(e.target); const name = String(f.get('name')).trim(); if (!name) return;
+  const u = { id: uid(), name, role: f.get('role'), color: USER_COLORS[S.users.length % USER_COLORS.length] };
+  S.users.push(u); S.currentUser = u.id;
+  S.projects.forEach(p => { if (!p.userIds.length) p.userIds.push(u.id); });
+  save(true); render();
+});
+/* drag & drop scenes between segments */
+let dragId = null;
+document.addEventListener('dragstart', e => { const c = e.target.closest?.('[data-drag-scene]'); if (!c) return; dragId = c.dataset.dragScene; e.dataTransfer.setData('text/plain', dragId); e.dataTransfer.effectAllowed = 'move'; c.classList.add('dragging'); });
+document.addEventListener('dragend', () => { dragId = null; document.querySelectorAll('.dragging,.drop,.dropbefore').forEach(x => x.classList.remove('dragging', 'drop', 'dropbefore')); });
+document.addEventListener('dragover', e => { const col = e.target.closest?.('[data-drop-seg]'); if (!col || !dragId) return; e.preventDefault(); document.querySelectorAll('.drop,.dropbefore').forEach(x => x.classList.remove('drop', 'dropbefore')); col.classList.add('drop'); const before = e.target.closest('[data-drag-scene]'); if (before && before.dataset.dragScene !== dragId) before.classList.add('dropbefore'); });
+document.addEventListener('drop', e => {
+  const col = e.target.closest?.('[data-drop-seg]'); if (!col || !dragId) return; e.preventDefault();
+  const p = P(), s = p.scenes.find(x => x.id === dragId); if (!s) return;
+  const beforeId = e.target.closest('[data-drag-scene]')?.dataset.dragScene;
+  p.scenes.splice(p.scenes.indexOf(s), 1); s.segmentId = col.dataset.dropSeg;
+  if (beforeId && beforeId !== s.id) p.scenes.splice(p.scenes.findIndex(x => x.id === beforeId), 0, s);
+  else { const l = p.scenes.filter(x => x.segmentId === s.segmentId); p.scenes.splice(l.length ? p.scenes.indexOf(l[l.length - 1]) + 1 : p.scenes.length, 0, s); }
+  dragId = null; commit(`Szene „${s.name}“ verschoben`);
+});
+window.addEventListener('storage', e => { if (e.key === KEY) { const d = load(); if (d) { const cu = S.currentUser; S = d; S.currentUser = cu; render(); } } });
+
+try { const th = localStorage.getItem(KEY + '.theme'); if (th) document.documentElement.dataset.theme = th; } catch (e) {}
+render();
+</script>
+</body>
+</html>
