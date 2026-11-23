@@ -15,8 +15,8 @@ Eine Webseite mit Eingabemasken für das *Produkt- & Kampagnen-Master-Briefing*.
   Details und Einbau in den Pitch-Meister: [UEBERGABE.md](UEBERGABE.md), Modul: `pitchmeister-import.js`.
 
 ## Design
-- CI nach genius-studios.de: Anthrazit `#282834`, Schwarz, Weiß, Blau `#3483EB` / `#1665CD`, Rot `#DC2751`; Montserrat (Überschriften) und Hind (Text).
-- Liquid-Glass-Optik nur auf der Bedienebene (Kopfleiste, Navigation, Buttons, Hinweise), die Formularflächen sind bewusst massiv und gut lesbar.
+- Logo, Firmendaten und PDF-Gestaltung nach genius-studios.de: Anthrazit `#282834`, Schwarz, Weiß, Blau `#3483EB` / `#1665CD`, Rot `#DC2751`; Montserrat (Überschriften) und Hind (Text).
+- Oberfläche im Stil der shadcn/ui-Vorlage „Solaris“: dieselben Design-Tokens (Hintergrund `#0A0A0A`, Karten `#171717`, Primär-Blau `#0065FC`, Radius 0,625 rem), Schrift Geist, Lucide-Icons, schwebende Navbar, Hero mit Lichtkegel und App-Fenster mit Sidebar, Kennzahl-Karten und Cards. Ohne React/Tailwind-Build nachgebaut, damit die App eine einzelne Datei ohne Server bleibt.
 - Responsiv von 320 px bis Desktop: Unter 960 px stecken die Nebenaktionen und die Abschnitts-Navigation in einem **Menü**, die Kopfleiste bleibt einzeilig.
 - Das PDF bettet Logo und Schriften ein (Titelband in Anthrazit, Logo in der Kopfzeile, Firmenfußzeile).
 
