@@ -29,7 +29,7 @@ const H2P = require.resolve('html2pdf.js/dist/html2pdf.bundle.min.js');
   await choose('[data-action=importJSON]', ['imp.json']); ok('JSON importieren', await ev(() => S.projects.some(p => p.title === 'Import-Test')));
   await nav('projects'); await pg.click('[data-action=loadDemo]'); ok('Demo neu laden', await ev(() => P().dispo.days.length === 3 && P().scenes.length === 12));
   // details
-  await nav('details'); await pg.click('[data-action=add][data-list=hosts]'); await pg.locator('[data-bind$=".name"]').last().fill('Host X');
+  await nav('details'); await pg.click('[data-action=add][data-list=hosts]'); await pg.locator('[data-bind^="hosts."][data-bind$=".name"]').last().fill('Host X'); await pg.locator('[data-bind^="hosts."][data-bind$=".name"]').last().press('Tab');
   ok('Host hinzufügen', await ev(() => P().hosts.some(h => h.name === 'Host X')));
   await pg.fill('[data-addcat=categories]', 'interview'); await pg.press('[data-addcat=categories]', 'Enter'); ok('Kategorie hinzufügen', await ev(() => P().categories.includes('INTERVIEW')));
   await pg.click('[data-action=delCat][data-v=INTERVIEW]'); await confirm(); ok('Kategorie entfernen', !(await ev(() => P().categories.includes('INTERVIEW'))));

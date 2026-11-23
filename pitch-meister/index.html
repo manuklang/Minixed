@@ -196,6 +196,19 @@ td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
 .history{max-height:360px;overflow:auto}
 .history td{font-size:13px}
 .done td{color:var(--faint);text-decoration:line-through}
+.shots{margin-top:14px;padding:12px 14px;border:1px dashed color-mix(in srgb,var(--brand2) 50%,transparent);border-radius:var(--radius);background:var(--brandSoft)}
+.shots ul{margin:8px 0 0;padding-left:18px}.shots li{margin:2px 0;font-size:13.5px}
+.blk{display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;padding:1px 8px;border-radius:6px;color:#fff;white-space:nowrap;letter-spacing:.01em}
+.warnbox{border:1px solid color-mix(in srgb,var(--warn) 45%,transparent);background:var(--warnSoft);color:var(--text);border-radius:var(--radius);padding:10px 14px;font-size:13.5px}
+.okbox{border:1px solid color-mix(in srgb,var(--ok) 40%,transparent);background:var(--okSoft);border-radius:var(--radius);padding:10px 14px;font-size:13.5px}
+.claim{display:inline-flex;align-items:center;gap:5px;font-size:11.5px;font-weight:500;white-space:nowrap}
+.claim i{width:8px;height:8px;border-radius:50%;display:inline-block}
+.rowgrid{display:grid;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.rowgrid:last-child{border-bottom:0}
+.rowgrid select,.rowgrid input{padding:5px 8px;font-size:13px}
+.pchip{cursor:pointer;padding:2px 9px;user-select:none;position:relative}
+.pchip input{position:absolute;opacity:0;width:0;height:0}
+.pchip.on{color:#fff}
 .daychip{cursor:pointer;padding:3px 9px;position:relative;user-select:none}
 .daychip input{position:absolute;opacity:0;width:0;height:0}
 .daychip.on{background:var(--brandSoft);border-color:var(--brand2);color:var(--brand)}
@@ -438,6 +451,18 @@ const COMPANY = { name: 'Genius Studios', claim: 'Film · Audio · Broadcast', s
 const EMBED = !!window.PM_EMBED; // im claude.ai-Artifact: kein Druck, keine Downloads
 const DEFAULT_CATS = ['LIVE','B-ROLL','FEATURE SEGMENT','DEMO','TESTIMONIAL','ANIMATION','OFFER / CTA'];
 const DEFAULT_RCATS = ['VORSPEISE','HAUPTGANG','FISCH','FLEISCH','VEGETARISCH','DESSERT','SNACK'];
+const BLOCKS = [['hook', 'Hook / Opening', '#0065fc'], ['problem', 'Problem / Pain Point', '#dc2751'], ['demo', 'Produkt-Demo', '#2fb67c'], ['testimonial', 'Testimonial / Social Proof', '#8b6cf0'], ['benefits', 'Benefits / RTBs', '#17b3c9'], ['offer', 'Angebot', '#f0a830'], ['cta', 'CTA', '#ff7a45'], ['close', 'Close', '#8a93a6']];
+const blockOf = k => BLOCKS.find(b => b[0] === k);
+const blockChip = k => { const b = blockOf(k); return b ? `<span class="blk" style="background:${b[2]}">${esc(b[1])}</span>` : ''; };
+const HOOK_TYPES = ['Neuheit', 'Problem / Schmerzpunkt', 'Frage', 'Neugier', 'Preisanker', 'Dringlichkeit', 'Nur Angebot', 'FOMO', 'Exklusivität', 'Geständnis', 'Social Proof', 'Gewinnspiel', 'Vorher / Nachher'];
+const CUT_FORMATS = ['Demo', 'Testimonial', 'Vorher / Nachher', 'Unboxing', 'Reaction', 'Split-Screen', 'Wir vs. die anderen', 'Founder / Experte', 'Expert Explainer', 'Street Interview', 'How-to', 'Offer-Banner', 'Montage', 'Cinematic B-Roll', 'POV', 'Listicle', 'Text / Headline'];
+const CUT_LENGTHS = ['6 s', '10 s', '15 s', '20 s', '30 s', '60 s', '90 s', '120 s'];
+const RATIOS = ['16:9', '9:16', '1:1', '4:5'];
+const CUT_STATUS = [['plan', 'geplant'], ['shot', 'gedreht'], ['cut', 'geschnitten'], ['done', 'geliefert']];
+const CLAIM = [['open', 'offen', '#8a8a8a'], ['review', 'in Prüfung', '#f0a830'], ['ok', 'freigegeben', '#2fb67c'], ['no', 'abgelehnt', '#dc2751']];
+const claimOf = k => CLAIM.find(c => c[0] === (k || 'open')) || CLAIM[0];
+const claimTag = k => { const c = claimOf(k); return `<span class="claim"><i style="background:${c[2]}"></i>${c[1]}</span>`; };
+const SHOTS_STD = ['Mind. 3 alternative Openings / Hooks drehen', 'Testimonials: mehrere Personen und Takes', 'Hochformat 9:16 absichern (Safe Area beachten)', 'Produkt-Close-ups und Unboxing-Shot', 'Vorher/Nachher-Einstellung', 'Reaction-Shots von Host und Publikum', 'Angebot/CTA zusätzlich als Kurzversion (6–15 s)'];
 const PALETTE = ['#0065fc','#dc2751','#2fb67c','#f0a830','#8b6cf0','#17b3c9','#ff7a45','#8a93a6','#e85fa8','#9ccc4b'];
 const USER_COLORS = ['#2d5aa8','#2f8f5b','#c0392b','#8e44ad','#d35400','#16a2b8','#c2185b','#5d6d7e'];
 
@@ -461,7 +486,7 @@ let ui = { view: S.lastView || 'projects', sceneId: null, segFilter: 'all', scen
 let saveTimer = null;
 
 function load() { try { const d = JSON.parse(localStorage.getItem(KEY)); return d && d.projects ? migrate(d) : null; } catch (e) { return null; } }
-function migrate(d) { d.users = d.users || []; d.projects.forEach(p => { p.categories ||= [...DEFAULT_CATS]; p.recipeCategories ||= [...DEFAULT_RCATS]; ['hosts','history','salesPoints','segments','scenes','animations','brolls','post','notes'].forEach(k => p[k] ||= []); p.setDesign ||= {images: [], specs: '', colors: []}; p.offer ||= {overview: '', price: '', items: []}; p.dispo ||= newDispo(); p.dispo.days ||= []; p.dispo.team ||= []; p.dispo.location ||= { name: '', address: '', link: '' }; p.moodboard ||= []; p.dispo.team.forEach(m => { if (m.phone === undefined) { const c = String(m.contact || ''); m.email = (c.match(/[\w.+-]+@[\w-]+\.[\w.-]+/) || [''])[0]; m.phone = c.replace(m.email, '').replace(/[,;\/]\s*$/, '').trim(); delete m.contact; } }); }); return d; }
+function migrate(d) { d.users = d.users || []; d.projects.forEach(p => { p.categories ||= [...DEFAULT_CATS]; p.recipeCategories ||= [...DEFAULT_RCATS]; ['hosts','history','salesPoints','segments','scenes','animations','brolls','post','notes'].forEach(k => p[k] ||= []); p.setDesign ||= {images: [], specs: '', colors: []}; p.offer ||= {overview: '', price: '', items: []}; p.dispo ||= newDispo(); p.dispo.days ||= []; p.dispo.team ||= []; p.dispo.location ||= { name: '', address: '', link: '' }; p.moodboard ||= []; p.personas ||= []; p.scenes.forEach(sc => { sc.block ??= ''; sc.hooks ||= []; sc.cutdowns ||= []; }); p.salesPoints.forEach(sp => { sp.claim ||= 'open'; sp.evidence ??= ''; sp.personaIds ||= []; }); p.dispo.team.forEach(m => { if (m.phone === undefined) { const c = String(m.contact || ''); m.email = (c.match(/[\w.+-]+@[\w-]+\.[\w.-]+/) || [''])[0]; m.phone = c.replace(m.email, '').replace(/[,;\/]\s*$/, '').trim(); delete m.contact; } }); }); return d; }
 function newDispo() { return { title: 'Disposition Infomercial', company: COMPANY.name, location: { name: COMPANY.name, address: COMPANY.street + '\n' + COMPANY.city, link: '' }, days: [], team: [], parking: '', parkingImage: null }; }
 function save(now) {
   clearTimeout(saveTimer);
@@ -514,8 +539,8 @@ function log(msg, key = msg) {
 /* path binding: "scenes.<id>.name" -> arrays resolved by id */
 function resolve(obj, keys) { for (const k of keys) { if (obj == null) return undefined; obj = Array.isArray(obj) ? obj.find(x => x.id === k) : obj[k]; } return obj; }
 function setPath(root, path, val) { const keys = path.split('.'); const last = keys.pop(); const o = resolve(root, keys); if (o) o[last] = val; return o; }
-const SECTION = { title:'Projekttitel', duration:'Showdauer', studio:'Studio', studioContact:'Studio-Kontakt', shootingDate:'Drehtermin', strategy:'Strategisches Konzept', hosts:'Host', setDesign:'Set-Design', offer:'Angebot', salesPoints:'Sales-Point', segments:'Segment', scenes:'Szene', animations:'Animation', brolls:'B-Roll', post:'Post-Shooting', notes:'Notiz', moodboard:'Moodboard-Element' };
-const FIELD = { name:'Name', duration:'Dauer', description:'Beschreibung', textVO:'Text/VO', recipe:'Rezept', ingredients:'Zutaten', recipeOn:'Rezept an/aus', recipeCategory:'Rezeptkategorie', segmentId:'Segment', text:'Text', itemId:'Produkt', contact:'Kontakt', role:'Rolle', specs:'Spezifikationen', overview:'Übersicht', price:'Preis', size:'Größe', spec:'Spezifikation', title:'Titel', link:'Link', caption:'Bildunterschrift', status:'Status', done:'erledigt', mediaUrl:'Clip-Link', priority:'Priorität', sceneId:'Szene', hex:'Farbe', note:'Notiz', tag:'Gruppe', thumb:'Vorschaubild', url:'Link' };
+const SECTION = { title:'Projekttitel', duration:'Showdauer', studio:'Studio', studioContact:'Studio-Kontakt', shootingDate:'Drehtermin', strategy:'Strategisches Konzept', hosts:'Host', setDesign:'Set-Design', offer:'Angebot', salesPoints:'Sales-Point', segments:'Segment', scenes:'Szene', animations:'Animation', brolls:'B-Roll', post:'Post-Shooting', notes:'Notiz', moodboard:'Moodboard-Element', personas:'Zielgruppe' };
+const FIELD = { name:'Name', duration:'Dauer', textVO:'Text/VO', recipe:'Rezept', ingredients:'Zutaten', recipeOn:'Rezept an/aus', recipeCategory:'Rezeptkategorie', segmentId:'Segment', text:'Text', itemId:'Produkt', contact:'Kontakt', role:'Rolle', specs:'Spezifikationen', overview:'Übersicht', price:'Preis', size:'Größe', spec:'Spezifikation', title:'Titel', link:'Link', caption:'Bildunterschrift', status:'Status', done:'erledigt', mediaUrl:'Clip-Link', priority:'Priorität', sceneId:'Szene', hex:'Farbe', note:'Notiz', tag:'Gruppe', thumb:'Vorschaubild', url:'Link', hooks:'Hooks', cutdowns:'Cutdowns', block:'Baustein', claim:'Claim-Status', evidence:'Beleg', personaIds:'Zielgruppen', description:'Beschreibung', color:'Farbe' };
 function describe(path) {
   const keys = path.split('.'); const p = P();
   if (keys[0] === 'dispo') { const dy = keys[1] === 'days' && keys[2] ? p.dispo.days.find(x => x.id === keys[2]) : null; return 'Dispo' + (dy ? ` „${dy.label || dayLong(dy)}“` : keys[1] === 'team' ? ': Team' : '') + ' geändert'; }
@@ -549,9 +574,9 @@ function newProject(title = 'Neues Projekt') {
   const seg = { id: uid(), name: 'Opener' };
   return { id: uid(), title, duration: 1710, studio: 'Genius Studios, Limburg', studioContact: COMPANY.phone, shootingDate: '', userIds: S?.currentUser ? [S.currentUser] : [], strategy: '', hosts: [], history: [], created: Date.now(), updated: Date.now(),
     setDesign: { images: [], specs: '', colors: [] }, offer: { overview: '', price: '', items: [] }, salesPoints: [], segments: [seg], scenes: [], animations: [], brolls: [], post: [], notes: [],
-    categories: [...DEFAULT_CATS], recipeCategories: [...DEFAULT_RCATS], dispo: newDispo(), moodboard: [] };
+    categories: [...DEFAULT_CATS], recipeCategories: [...DEFAULT_RCATS], dispo: newDispo(), moodboard: [], personas: [] };
 }
-function newScene(segId, name = 'Neue Szene') { return { id: uid(), segmentId: segId, name, duration: 60, categories: [], recipeOn: false, recipeCategory: '', recipe: '', ingredients: '', media: null, mediaUrl: '', itemIds: [], description: '', textVO: '', salesPointIds: [], comments: [] }; }
+function newScene(segId, name = 'Neue Szene') { return { id: uid(), segmentId: segId, name, duration: 60, categories: [], recipeOn: false, recipeCategory: '', recipe: '', ingredients: '', media: null, mediaUrl: '', itemIds: [], description: '', textVO: '', salesPointIds: [], comments: [], block: '', hooks: [], cutdowns: [] }; }
 function seed() {
   const d = { users: [], currentUser: null, projects: [], activeProjectId: null };
   const p = newProject('Gemüseschneider „Fusion“ – Infomercial (Demo)');
@@ -565,7 +590,7 @@ function seed() {
   const it = (name, size, description) => ({ id: uid(), name, size, spec: '', description, image: null });
   const items = [it('Messereinsatz 5×5', '5 × 5 mm', 'Für feine Würfel, z. B. Zwiebeln, Schalotten'), it('Messereinsatz 10×10', '10 × 10 mm', 'Für Gemüsewürfel, Obstsalat'), it('Messereinsatz 20×20', '20 × 20 mm', 'Für grobe Stücke, Kartoffeln'), it('Spiralschneider', '', 'Gemüsespaghetti aus Zucchini, Karotten'), it('Auffangbehälter 1,5 l', '1,5 l', 'Mit Frischhaltedeckel'), it('Pfanne 24 cm', 'Ø 24 cm', 'Requisite für Kochdemo')];
   p.offer.items = items;
-  const sp = (text, itemId = null) => ({ id: uid(), text, itemId });
+  const sp = (text, itemId = null) => ({ id: uid(), text, itemId, claim: 'open', evidence: '', personaIds: [] });
   p.salesPoints = [sp('Schneidet in Sekunden – spart bis zu 70 % Zeit'), sp('Spülmaschinenfest'), sp('Rostfreie Edelstahlklingen'), sp('Platzsparend verstaubar'),
     sp('Perfekte Würfel ohne Tränen', items[0].id), sp('Gleichmäßige Stücke für gleichmäßiges Garen', items[1].id), sp('Schafft sogar Kartoffeln mühelos', items[2].id), sp('Gesunde Gemüsenudeln statt Pasta', items[3].id), sp('Direkt schneiden, aufbewahren, servieren', items[4].id)];
   const [s1, s2, s3] = [{ id: uid(), name: 'Opener & Problem' }, { id: uid(), name: 'Demo & Rezepte' }, { id: uid(), name: 'Angebot & Abschluss' }];
@@ -586,6 +611,23 @@ function seed() {
     sc(s3, 'Angebot / Preis', 90, ['OFFER / CTA','FEATURE SEGMENT'], { itemIds: items.slice(0, 5).map(i => i.id), salesPointIds: [SP(0), SP(1), SP(2)], textVO: 'VO: Bestellen Sie jetzt! Das Komplettset für nur 3 × 19,95 € …' }),
     sc(s3, 'Call to Action', 45, ['OFFER / CTA'], { textVO: 'Rufen Sie jetzt an – die Leitungen sind freigeschaltet!' })
   ];
+  // Zielgruppen, Bausteine, Hooks, Cutdowns, Claims (Demo)
+  const [pa, pb, pc] = [{ id: uid(), name: 'Berufstätige mit wenig Zeit', description: '30–50 J., kochen abends schnell, wollen Zeit sparen', color: '#0065fc' }, { id: uid(), name: 'Gesundheitsbewusste', description: 'Frisch kochen, viel Gemüse, Low-Carb', color: '#2fb67c' }, { id: uid(), name: 'Ältere Menschen', description: '60+, Wert auf einfache Handhabung und Sicherheit', color: '#f0a830' }];
+  p.personas = [pa, pb, pc];
+  ['hook', 'problem', 'testimonial', 'demo', 'benefits', 'demo', 'demo', 'demo', 'benefits', 'benefits', 'offer', 'cta'].forEach((k, i) => { if (p.scenes[i]) p.scenes[i].block = k; });
+  const H = (type, text, persona = '') => ({ id: uid(), type, text, personaId: persona });
+  p.scenes[0].hooks = [H('Problem / Schmerzpunkt', 'Schon wieder Tränen beim Zwiebelschneiden?', pa.id), H('Frage', 'Wie lange brauchen Sie für eine Zwiebel? Wir brauchen 3 Sekunden.', pa.id), H('Neuheit', 'Das neue Fusion-Set: 5 Schneidarten, ein Handgriff.', pb.id)];
+  const C = (format, length, ratio, persona = '', status = 'plan', note = '') => ({ id: uid(), format, length, ratio, status, personaId: persona, note });
+  p.scenes[0].cutdowns = [C('Text / Headline', '6 s', '9:16', pa.id, 'plan', 'Hook-Test mit 3 Varianten')];
+  p.scenes[2].cutdowns = [C('Testimonial', '15 s', '9:16', pc.id)];
+  p.scenes[3].cutdowns = [C('Demo', '15 s', '9:16', pa.id), C('Demo', '30 s', '16:9', pa.id, 'plan', 'CTV / YouTube')];
+  p.scenes[7].cutdowns = [C('Vorher / Nachher', '15 s', '4:5', pb.id)];
+  p.scenes[10].cutdowns = [C('Offer-Banner', '10 s', '1:1', '', 'plan', 'Preis einblenden')];
+  Object.assign(p.salesPoints[0], { claim: 'review', evidence: 'Zeitmessung im Studio, Prüfbericht beim Hersteller angefragt', personaIds: [pa.id] });
+  Object.assign(p.salesPoints[1], { claim: 'ok', evidence: 'Herstellerangabe, Prüfzeichen auf Verpackung', personaIds: [pc.id] });
+  Object.assign(p.salesPoints[2], { claim: 'ok', evidence: 'Materialdatenblatt 1.4116', personaIds: [] });
+  Object.assign(p.salesPoints[3], { personaIds: [pc.id] });
+  Object.assign(p.salesPoints[7], { personaIds: [pb.id] });
   p.animations = [{ id: uid(), name: 'Klingentechnik Zeitlupe', description: '3D-Klinge schneidet Tomate, Hervorhebung der Edelstahlkante.', preview: null, sceneIds: [p.scenes[4].id] }];
   p.brolls = [{ id: uid(), name: 'Gemüse fällt in Behälter (Slow-Mo)', description: '120 fps, Top-Shot', sceneId: p.scenes[3].id, done: false }, { id: uid(), name: 'Familie am Esstisch', description: 'Warme Lichtstimmung', sceneId: '', done: false }];
   p.post = [{ id: uid(), text: 'Pick-up: Close-up Behälterdeckel einrasten', sceneId: p.scenes[9].id, priority: 'hoch', done: false }];
@@ -596,7 +638,7 @@ function seed() {
   const d0 = day('2027-02-15', 'Aufbautag', 'Aufbau und Vorbereitung + Probe für Kamera', [['vor 9:00', 'Ankunft im Büro'], ['09:00', 'Wochenproduktionsmeeting'], ['09:30', 'Abfahrt ab Büro'], ['10:00', 'Ankunft Team im Studio'], ['16:00', 'Ende Aufbau']], {
     notes: 'Fahrgemeinschaften:\nProducer + Best Girl – eigenes Auto\nDOP – Sprinter mit Kran\n\nRückfahrt: Sprinter (DOP, Best Boy), Rest mit eigenen Autos',
     checklist: ['Ausladen', 'Set aufbauen', 'Kran aufbauen', 'Set ausrichten inkl. Hintergrund', 'Kameras einstellen / einrichten, Signale', 'Einleuchten', 'Soundcheck', 'Outfitcheck (ohne Host)'].map(t => ({ id: uid(), text: t, done: false })) });
-  const d1 = day('2027-02-16', 'Drehtag 1', 'Drehtag 1', [['08:00', 'Ankunft Team Büro'], ['08:30', 'Ankunft Team im Studio\nAnkunft Kamera 2'], ['09:00', 'Ankunft Hosts + Maske'], ['10:00', 'Szene 1.2 („Host-Intro & Produktreveal“)', '(1 h)', S_(1)], ['11:00', 'Szene 2.1 („Zwiebeln 5×5“)', '(1,5 h)', S_(3)], ['12:30', 'Mittagspause (muss jmd. abholen)', '30 Min'], ['13:00', 'Szene 2.3 („Obstsalat 10×10“)', '(1,5 h)', S_(5)], ['14:30', 'Szene 2.4 („Lachs-Tatar“)', '(1,5 h)', S_(6)], ['16:00', 'Re-Set für morgen']]);
+  const d1 = day('2027-02-16', 'Drehtag 1', 'Drehtag 1', [['08:00', 'Ankunft Team Büro'], ['08:30', 'Ankunft Team im Studio\nAnkunft Kamera 2'], ['09:00', 'Ankunft Hosts + Maske'], ['09:30', 'Szene 1.1 („Cold Open – Küchenchaos“) inkl. Hook-Varianten', '(30 Min)', S_(0)], ['10:00', 'Szene 1.2 („Host-Intro & Produktreveal“)', '(1 h)', S_(1)], ['11:00', 'Szene 2.1 („Zwiebeln 5×5“)', '(1,5 h)', S_(3)], ['12:30', 'Mittagspause (muss jmd. abholen)', '30 Min'], ['13:00', 'Szene 2.3 („Obstsalat 10×10“)', '(1,5 h)', S_(5)], ['14:30', 'Szene 2.4 („Lachs-Tatar“)', '(1,5 h)', S_(6)], ['16:00', 'Re-Set für morgen']]);
   const d2 = day('2027-02-17', 'Drehtag 2', 'Drehtag 2', [['07:30', 'Ankunft Team Büro'], ['08:00', 'Ankunft Team im Studio'], ['09:00', 'Szene 2.5 („Zucchini-Spaghetti“)', '(1 h)', S_(7)], ['10:00', 'Szene 1.3 („Testimonial Hausfrau“)', '(ca. 2 h)', S_(2)], ['12:30', 'Mittagspause', '45 Min'], ['13:15', 'PITCHES: Szene 3.2 („Angebot / Preis“)\nSzene 3.3 („Call to Action“)', '(1 h)', S_(10)], ['14:15', 'Ggf. B-Rolls: Beauty-Shots Produkt', '(30 Min)']]);
   const tm = (name, position, group, days, contact = '') => ({ id: uid(), name, position, group, dayIds: days.map(x => x.id), phone: contact, email: '' });
   p.dispo = { title: 'Disposition Infomercial', company: COMPANY.name, location: { name: COMPANY.name, address: COMPANY.street + '\n' + COMPANY.city, link: '' },
@@ -627,6 +669,7 @@ const IC = {
   post: '<path d="M10 6h11M10 12h11M10 18h11M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17"/>',
   notes: '<path d="M9 18h6M10 22h4M12 2a7 7 0 0 0-4 12.7V17h8v-2.3A7 7 0 0 0 12 2z"/>',
   dispo: '<rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4M7 14h4M7 17h7"/>',
+  cuts: '<path d="M6 4v16M18 4v16M3 8h6M15 8h6M3 16h6M15 16h6"/><rect x="9" y="6" width="6" height="12" rx="1"/>',
   mood: '<rect x="3" y="3" width="8" height="10" rx="1.5"/><rect x="13" y="3" width="8" height="6" rx="1.5"/><rect x="13" y="11" width="8" height="10" rx="1.5"/><rect x="3" y="15" width="8" height="6" rx="1.5"/>',
   analysis: '<path d="M3 3v18h18"/><path d="M8 16v-3M13 16V9M18 16V6"/>',
   export: '<path d="M12 3v12m-5-5 5 5 5-5M4 21h16"/>'
@@ -634,7 +677,7 @@ const IC = {
 const icon = k => `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round">${IC[k]}</svg>`;
 const NAV = [
   ['Projekt', [['projects','Projekte'],['details','Projekt-Details'],['set','Set-Design'],['offer','Angebot'],['sp','Sales-Points']]],
-  ['Produktion', [['storyboard','Storyboard'],['dispo','Dispo'],['mood','Moodboard'],['anim','Animationen'],['broll','B-Rolls'],['post','Post-Shooting'],['notes','Notizen & Inspiration']]],
+  ['Produktion', [['storyboard','Storyboard'],['cuts','Cutdowns'],['dispo','Dispo'],['mood','Moodboard'],['anim','Animationen'],['broll','B-Rolls'],['post','Post-Shooting'],['notes','Notizen & Inspiration']]],
   ['Auswertung', [['analysis','Analyse'],['export','Export & Druck']]]
 ];
 
@@ -670,7 +713,7 @@ function render() {
   const fa = document.activeElement, fb = fa?.dataset?.bind, fs = fa && 'selectionStart' in fa ? fa.selectionStart : null;
   const scroll = $('main')?.scrollTop || 0;
 
-  const counts = p ? { sp: p.salesPoints.length, storyboard: p.scenes.length, anim: p.animations.length, broll: p.brolls.length, post: p.post.filter(x => !x.done).length, notes: p.notes.length, offer: p.offer.items.length, dispo: p.dispo.days.length, mood: p.moodboard.length } : {};
+  const counts = p ? { sp: p.salesPoints.length, storyboard: p.scenes.length, anim: p.animations.length, broll: p.brolls.length, post: p.post.filter(x => !x.done).length, notes: p.notes.length, offer: p.offer.items.length, dispo: p.dispo.days.length, mood: p.moodboard.length, cuts: p.scenes.reduce((n, x) => n + x.cutdowns.length, 0) } : {};
   app.innerHTML = `
   <header class="top">
     <div class="logo"><img class="logo-l" src="${LOGO}" alt="Genius Studios"><img class="logo-d" src="${LOGO_DARK}" alt="Genius Studios"><span class="sep"></span><span class="app"><b>PITCH-MEISTER</b> <span>2.0</span></span></div>
@@ -744,6 +787,11 @@ function vDetails(p) {
       <div class="row" style="justify-content:space-between;margin-bottom:8px"><h2 style="margin:0">Hosts &amp; Kontakt</h2><button class="btn sm" data-action="add" data-list="hosts">+ Host</button></div>
       ${p.hosts.length ? p.hosts.map(h => `<div class="listrow" style="grid-template-columns:1fr 1fr 1fr auto">${inp(`hosts.${h.id}.name`, h.name, 'placeholder="Name"')}${inp(`hosts.${h.id}.role`, h.role, 'placeholder="Rolle"')}${inp(`hosts.${h.id}.contact`, h.contact, 'placeholder="Kontakt / Agentur"')}${del('remove', { list: 'hosts', id: h.id })}</div>`).join('') : '<div class="empty small">Noch keine Hosts.</div>'}
     </div>
+    <div class="card" style="grid-column:1/-1">
+      <div class="row" style="justify-content:space-between;margin-bottom:4px"><h2 style="margin:0">Zielgruppen / Personas</h2><button class="btn sm" data-action="add" data-list="personas">+ Zielgruppe</button></div>
+      <div class="small muted" style="margin-bottom:6px">Erst die Zielgruppe, dann die Creative-Varianten: Sales-Points, Hooks und Cutdowns lassen sich Zielgruppen zuordnen, die Analyse zeigt die Abdeckung.</div>
+      ${p.personas.length ? p.personas.map(x => `<div class="rowgrid" style="grid-template-columns:44px minmax(0,1fr) minmax(0,2fr) auto"><input type="color" data-bind="personas.${x.id}.color" value="${esc(x.color)}" data-rerender aria-label="Farbe">${inp(`personas.${x.id}.name`, x.name, 'placeholder="Name der Zielgruppe" data-rerender')}${inp(`personas.${x.id}.description`, x.description, 'placeholder="Beschreibung: Alter, Situation, Motivation …"')}${del('remove', { list: 'personas', id: x.id })}</div>`).join('') : '<div class="empty small">Noch keine Zielgruppen angelegt.</div>'}
+    </div>
     <div class="card stack">
       <h2>Kategorien</h2>
       <div class="field"><span>Szenen-Kategorien (LIVE / B-ROLL / TESTIMONIAL …)</span>${chipEditor('categories', catColor)}</div>
@@ -795,16 +843,21 @@ function vOffer(p) {
 /* ---------- Sales points ---------- */
 function vSP(p) {
   const meta = sceneMeta(p);
-  const row = sp => { const used = p.scenes.filter(s => s.salesPointIds.includes(sp.id)); return `<div class="listrow" style="grid-template-columns:2fr 1fr 1.2fr auto;align-items:center">
-    ${inp(`salesPoints.${sp.id}.text`, sp.text, 'placeholder="Sales-Point"')}
+  const row = sp => { const used = p.scenes.filter(s => s.salesPointIds.includes(sp.id)); return `<div class="listrow" style="grid-template-columns:2fr 1fr 150px 1fr auto;align-items:center">
+    ${inp(`salesPoints.${sp.id}.text`, sp.text, 'placeholder="Sales-Point / Claim"')}
     ${sel(`salesPoints.${sp.id}.itemId`, sp.itemId || '', [['', '— Generell —'], ...p.offer.items.map(i => [i.id, i.name])], 'data-rerender')}
-    <div class="small">${used.length ? used.map(s => `<a href="#" data-action="openScene" data-id="${s.id}">${meta[s.id]?.no}</a>`).join(', ') : '<span class="neg">nicht verwendet</span>'}</div>
-    ${del('delSP', { id: sp.id })}</div>`; };
+    ${sel(`salesPoints.${sp.id}.claim`, sp.claim, CLAIM.map(c => [c[0], '● ' + c[1]]), `aria-label="Claim-Status" style="color:${claimOf(sp.claim)[2]};font-weight:500"`)}
+    <div class="small">${used.length ? used.map(s => `<a href="#" data-action="openScene" data-id="${s.id}">${meta[s.id]?.no}</a>`).join(', ') : '<span class="neg">nicht verwendet</span>'}${used.length && sp.claim !== 'ok' ? ' <span class="neg">· nicht freigegeben</span>' : ''}</div>
+    ${del('delSP', { id: sp.id })}
+    <div style="grid-column:1/-1;display:grid;grid-template-columns:minmax(0,2fr) minmax(0,1fr);gap:10px;align-items:center">${inp(`salesPoints.${sp.id}.evidence`, sp.evidence, 'placeholder="Beleg / Quelle für die Freigabe (Studie, Prüfbericht, Herstellerangabe …)" aria-label="Beleg"')}
+      <div class="row" style="gap:4px">${p.personas.length ? p.personas.map(x => { const on = (sp.personaIds || []).includes(x.id); return `<label class="chip pchip ${on ? 'on' : ''}" style="${on ? `background:${esc(x.color)};border-color:${esc(x.color)}` : ''}" title="Zielgruppe zuordnen"><input type="checkbox" data-action="toggle" data-list="salesPoints.${sp.id}.personaIds" data-val="${x.id}" ${on ? 'checked' : ''}>${esc(x.name)}</label>`; }).join('') : '<span class="small faint">Zielgruppen unter Projekt-Details anlegen</span>'}</div></div></div>`; };
+  const nOk = p.salesPoints.filter(x => x.claim === 'ok').length, nUsedOpen = p.salesPoints.filter(x => x.claim !== 'ok' && p.scenes.some(s => s.salesPointIds.includes(x.id))).length;
   const general = p.salesPoints.filter(s => !s.itemId || !p.offer.items.some(i => i.id === s.itemId));
-  return `<div class="pagehead"><div><h1>Sales-Points</h1><div class="sub">Generelle Sales-Points und mit Bestandteilen verknüpfte – Zuordnung zu Szenen im Storyboard</div></div>
+  return `<div class="pagehead"><div><h1>Sales-Points</h1><div class="sub">Generelle und produktbezogene Sales-Points mit Claim-Freigabe, Beleg und Zielgruppen</div></div>
     <div class="actions"><button class="btn pri" data-action="add" data-list="salesPoints">+ Sales-Point</button></div></div>
+  <div class="${nUsedOpen ? 'warnbox' : 'okbox'}" style="margin-bottom:16px"><b style="font-weight:600">Claim-Freigabe:</b> ${nOk} von ${p.salesPoints.length} Sales-Points freigegeben.${nUsedOpen ? ` ${nUsedOpen} nicht freigegebene Claim(s) werden bereits in Szenen verwendet – vor dem Dreh rechtlich prüfen lassen.` : ' Alle im Storyboard verwendeten Claims sind freigegeben.'}</div>
   <div class="card" style="margin-bottom:16px"><h2>Generelle Sales-Points</h2>
-    <div class="listrow small muted" style="grid-template-columns:2fr 1fr 1.2fr auto;padding-top:0"><span>Text</span><span>Verknüpftes Produkt</span><span>Verwendet in Szene</span><span></span></div>
+    <div class="listrow small muted" style="grid-template-columns:2fr 1fr 150px 1fr auto;padding-top:0"><span>Text / Claim</span><span>Verknüpftes Produkt</span><span>Claim-Status</span><span>Verwendet in Szene</span><span></span></div>
     ${general.length ? general.map(row).join('') : '<div class="empty small">Keine generellen Sales-Points.</div>'}</div>
   ${p.offer.items.map(it => { const l = p.salesPoints.filter(s => s.itemId === it.id); return `<div class="card" style="margin-bottom:16px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">${esc(it.name)}</h2><button class="btn sm" data-action="add" data-list="salesPoints" data-item="${it.id}">+ Sales-Point</button></div>
     ${l.length ? l.map(row).join('') : '<div class="small faint" style="padding:10px 0">Noch keine Sales-Points für dieses Produkt.</div>'}</div>`; }).join('')}`;
@@ -821,6 +874,32 @@ function timeline(p, scenes) {
     <div class="tl-lab"><b style="font-weight:500">${esc(g.seg.name)}</b> · ${fmtDur(t)} · ${pct(t, total)} %</div></div>`; }).join('')}</div>
   <div class="legend">${usedCats.map(c => `<span><i style="background:${c === '—' ? 'var(--line2)' : catColor(p, c)}"></i>${esc(c === '—' ? 'ohne Kategorie' : c)}</span>`).join('')}<span class="faint">Farbe = erste Kategorie der Szene</span></div>`;
 }
+function blockTimeline(p, scenes) {
+  const total = sum(scenes.map(s => s.duration)) || 1, meta = sceneMeta(p);
+  return `<div class="tl-bar" style="height:26px">${scenes.map(s => { const b = blockOf(s.block); return `<div style="flex:${Math.max(+s.duration || 0, 1)};background:${b ? b[2] : 'var(--line2)'}" title="${esc(meta[s.id]?.no + ' ' + s.name + ' · ' + (b ? b[1] : 'kein Baustein') + ' · ' + fmtDur(s.duration))}" data-action="openScene" data-id="${s.id}"></div>`; }).join('')}</div>`;
+}
+function dramaturgy(p, scenes) {
+  const used = new Set(scenes.map(s => s.block).filter(Boolean)), missing = BLOCKS.filter(b => !used.has(b[0])), none = scenes.filter(s => !s.block);
+  const total = sum(scenes.map(s => s.duration));
+  return `${blockTimeline(p, scenes)}
+    <div class="legend">${BLOCKS.map(b => { const t = sum(scenes.filter(s => s.block === b[0]).map(s => s.duration)); return `<span><i style="background:${b[2]}"></i>${esc(b[1])} ${t ? fmtDur(t) + ' · ' + pct(t, total) + ' %' : '–'}</span>`; }).join('')}</div>
+    <div class="${missing.length || none.length ? 'warnbox' : 'okbox'}" style="margin-top:12px">${missing.length ? `<b style="font-weight:600">Fehlende Bausteine:</b> ${missing.map(b => esc(b[1])).join(', ')}.` : 'Alle dramaturgischen Bausteine sind vorhanden.'}${none.length ? ` ${none.length} Szene(n) ohne Baustein-Zuordnung.` : ''}</div>`;
+}
+function shotsFor(p, d) {
+  const meta = sceneMeta(p), out = [];
+  [...new Set(d.entries.map(e => e.sceneId).filter(Boolean))].forEach(id => { const s = p.scenes.find(x => x.id === id); if (!s) return; const no = meta[id]?.no;
+    if ((s.hooks || []).length) out.push(`Szene ${no}: ${(s.hooks || []).length} Hook-Variante(n) drehen (${[...new Set(s.hooks.map(h => h.type))].join(', ')})`);
+    const cuts = s.cutdowns.filter(c => c.status === 'plan'), vert = cuts.filter(c => c.ratio === '9:16' || c.ratio === '4:5'), other = cuts.filter(c => !vert.includes(c));
+    if (vert.length) out.push(`Szene ${no}: Hochformat absichern für ${vert.map(c => `${c.format} ${c.length} ${c.ratio}`).join(', ')}`);
+    if (other.length) out.push(`Szene ${no}: Material für ${other.map(c => `${c.format} ${c.length} ${c.ratio}`).join(', ')}`);
+    if (s.block === 'testimonial') out.push(`Szene ${no}: mehrere Testimonial-Takes bzw. Personen`);
+  });
+  return out;
+}
+function personaCoverage(p) {
+  return p.personas.map(x => { const sps = p.salesPoints.filter(sp => (sp.personaIds || []).includes(x.id)), hooks = p.scenes.flatMap(s => s.hooks).filter(h => h.personaId === x.id), cuts = p.scenes.flatMap(s => s.cutdowns).filter(c => c.personaId === x.id), sc = p.scenes.filter(s => s.salesPointIds.some(id => sps.some(sp => sp.id === id)));
+    return { ...x, sps: sps.length, hooks: hooks.length, cuts: cuts.length, time: sum(sc.map(s => s.duration)), scenes: sc.length }; });
+}
 function vStoryboard(p) {
   const scene = ui.sceneId && p.scenes.find(s => s.id === ui.sceneId);
   if (scene) return vScene(p, scene);
@@ -836,12 +915,13 @@ function vStoryboard(p) {
     <div class="kpi"><div class="l">Ø Szenenlänge</div><div class="v">${fmtDur(p.scenes.length ? total / p.scenes.length : 0)}</div></div>
   </div>
   <div class="card" style="margin-bottom:16px"><h2>Zeitliche Verteilung</h2>${p.scenes.length ? timeline(p, ordered(p)) : '<div class="small faint">Noch keine Szenen.</div>'}</div>
+  ${p.scenes.length ? `<div class="card" style="margin-bottom:16px"><h2>Dramaturgie-Check</h2>${dramaturgy(p, ordered(p))}</div>` : ''}
   <div class="card" style="margin-bottom:16px"><h2>Segment-Übersicht</h2><div class="tbl-wrap"><table>
-    <thead><tr><th>#</th><th>Segment</th><th class="num">Szenen</th><th class="num">Start</th><th class="num">Dauer</th><th class="num">Anteil</th><th>Kategorien</th><th></th></tr></thead>
+    <thead><tr><th>#</th><th>Segment</th><th class="num">Szenen</th><th class="num">Start</th><th class="num">Dauer</th><th class="num">Anteil</th><th>Bausteine</th><th>Kategorien</th><th></th></tr></thead>
     <tbody>${p.segments.map((seg, i) => { const l = p.scenes.filter(s => s.segmentId === seg.id), t = sum(l.map(s => s.duration)); const st = start; start += t; const cats = [...new Set(l.flatMap(s => s.categories))];
-      return `<tr><td>${i + 1}</td><td>${esc(seg.name)}</td><td class="num">${l.length}</td><td class="num">${fmtDur(st)}</td><td class="num">${fmtDur(t)}</td><td class="num">${pct(t, total)} %</td><td>${catChips(p, cats)}</td>
+      return `<tr><td>${i + 1}</td><td>${esc(seg.name)}</td><td class="num">${l.length}</td><td class="num">${fmtDur(st)}</td><td class="num">${fmtDur(t)}</td><td class="num">${pct(t, total)} %</td><td><div class="row" style="gap:3px">${[...new Set(l.map(s => s.block).filter(Boolean))].map(blockChip).join('')}</div></td><td>${catChips(p, cats)}</td>
       <td style="white-space:nowrap"><button class="btn sm ghost" data-action="moveSeg" data-id="${seg.id}" data-d="-1" ${i === 0 ? 'disabled' : ''} aria-label="nach oben">↑</button><button class="btn sm ghost" data-action="moveSeg" data-id="${seg.id}" data-d="1" ${i === p.segments.length - 1 ? 'disabled' : ''} aria-label="nach unten">↓</button>${del('delSegment', { id: seg.id }, 'Segment löschen')}</td></tr>`; }).join('')}
-    <tr><td></td><td><b style="font-weight:500">Total</b></td><td class="num">${p.scenes.length}</td><td></td><td class="num"><b style="font-weight:500">${fmtDur(total)}</b></td><td class="num">100 %</td><td></td><td></td></tr></tbody></table></div></div>
+    <tr><td></td><td><b style="font-weight:500">Total</b></td><td class="num">${p.scenes.length}</td><td></td><td class="num"><b style="font-weight:500">${fmtDur(total)}</b></td><td class="num">100 %</td><td></td><td></td><td></td></tr></tbody></table></div></div>
   <h2>Szenenboard</h2>
   <div class="board">${p.segments.map((seg, si) => { const l = p.scenes.filter(s => s.segmentId === seg.id);
     return `<div class="col" data-drop-seg="${seg.id}">
@@ -849,8 +929,9 @@ function vStoryboard(p) {
       ${l.map(s => `<div class="scard" draggable="true" data-drag-scene="${s.id}" data-action="openScene" data-id="${s.id}">
         <div class="thumb">${sceneThumb(s)}<span class="num">${meta[s.id].no}</span><span class="dur">${fmtDur(s.duration)}</span></div>
         <div class="body"><div class="name">${esc(s.name)}</div>
+          ${s.block ? `<div>${blockChip(s.block)}</div>` : ''}
           <div class="row" style="gap:4px">${catChips(p, s.categories)}${s.recipeOn ? `<span class="chip" style="border-color:${rcatColor(p, s.recipeCategory)}">🍳 ${esc(s.recipeCategory || 'Rezept')}</span>` : ''}</div>
-          <div class="small faint">${s.itemIds.length} Produkt(e) · ${s.salesPointIds.length} Sales-Point(s)${s.comments.length ? ' · 💬 ' + s.comments.length : ''} · ab ${fmtDur(meta[s.id].start)}</div></div></div>`).join('')}
+          <div class="small faint">${s.itemIds.length} Produkt(e) · ${s.salesPointIds.length} Sales-Point(s)${(s.hooks || []).length ? ' · ' + (s.hooks || []).length + ' Hooks' : ''}${(s.cutdowns || []).length ? ' · ' + (s.cutdowns || []).length + ' Cutdowns' : ''}${s.comments.length ? ' · 💬 ' + s.comments.length : ''} · ab ${fmtDur(meta[s.id].start)}</div></div></div>`).join('')}
       <button class="addscene" data-action="addScene" data-seg="${seg.id}">+ Szene</button></div>`; }).join('')}</div>`;
 }
 
@@ -862,9 +943,10 @@ function vScene(p, s) {
   const spRelevant = p.salesPoints.filter(sp => sp.itemId && itemSet.has(sp.itemId));
   const spGeneral = p.salesPoints.filter(sp => !sp.itemId || !p.offer.items.some(i => i.id === sp.itemId));
   const spOther = p.salesPoints.filter(sp => !spRelevant.includes(sp) && !spGeneral.includes(sp));
-  const spList = (title, list) => list.length ? `<div class="grouphead">${title}</div>` + list.map(sp => `<label class="${s.salesPointIds.includes(sp.id) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('salesPointIds')}" data-val="${sp.id}" ${s.salesPointIds.includes(sp.id) ? 'checked' : ''}><span>${esc(sp.text)}${sp.itemId ? ` <span class="faint small">· ${esc(p.offer.items.find(i => i.id === sp.itemId)?.name || '')}</span>` : ''}</span></label>`).join('') : '';
+  const spList = (title, list) => list.length ? `<div class="grouphead">${title}</div>` + list.map(sp => `<label class="${s.salesPointIds.includes(sp.id) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('salesPointIds')}" data-val="${sp.id}" ${s.salesPointIds.includes(sp.id) ? 'checked' : ''}><span>${esc(sp.text)}${sp.itemId ? ` <span class="faint small">· ${esc(p.offer.items.find(i => i.id === sp.itemId)?.name || '')}</span>` : ''}${sp.claim !== 'ok' ? ` <span class="small" style="color:${claimOf(sp.claim)[2]}">● Claim ${claimOf(sp.claim)[1]}</span>` : ''}</span></label>`).join('') : '';
   const anims = p.animations;
-  const tabs = [['desc', 'Beschreibung'], ['sp', 'Sales-Points in Szene', s.salesPointIds.length], ['vo', 'Text / VO']];
+  const tabs = [['desc', 'Beschreibung'], ['sp', 'Sales-Points in Szene', s.salesPointIds.length], ['vo', 'Text / VO'], ['hooks', 'Hook-Varianten', (s.hooks || []).length]];
+  const pOpts = [['', '— alle Zielgruppen —'], ...p.personas.map(x => [x.id, x.name])];
   return `<div class="pagehead"><div>
       <button class="btn sm ghost" data-action="closeScene" style="margin:0 0 6px -10px">← Szenenboard</button>
       <h1>Szene ${m.no}</h1><div class="sub">${esc(m.seg.name)} · Timecode ${fmtDur(m.start)} – ${fmtDur(m.start + (+s.duration || 0))}</div></div>
@@ -886,6 +968,7 @@ function vScene(p, s) {
         <div class="checklist">${p.offer.items.length ? p.offer.items.map(it => `<label class="${itemSet.has(it.id) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('itemIds')}" data-val="${it.id}" ${itemSet.has(it.id) ? 'checked' : ''}><span>${esc(it.name)}${it.size ? ` <span class="faint small">${esc(it.size)}</span>` : ''}</span></label>`).join('') : '<div class="small faint" style="padding:10px">Keine Produkte – unter „Angebot“ anlegen.</div>'}</div></div>
     </div>
     <div class="card stack c3">
+      ${field('Dramaturgischer Baustein', sel(b('block'), s.block, [['', '— wählen —'], ...BLOCKS.map(x => [x[0], x[1]])], 'data-rerender'))}
       <div class="field"><span>Kategorie</span>
         <div class="checklist">${p.categories.map(c => `<label class="${s.categories.includes(c) ? 'on' : ''}"><input type="checkbox" data-action="toggle" data-list="${b('categories')}" data-val="${esc(c)}" ${s.categories.includes(c) ? 'checked' : ''}><span class="chip"><span class="dot" style="background:${catColor(p, c)}"></span>${esc(c)}</span></label>`).join('')}</div></div>
       <label class="toggle"><input type="checkbox" data-bind="${b('recipeOn')}" data-rerender ${s.recipeOn ? 'checked' : ''}> Rezept in dieser Szene</label>
@@ -898,6 +981,7 @@ function vScene(p, s) {
       <div class="tabs">${tabs.map(([k, l, n]) => `<button class="${ui.sceneTab === k ? 'on' : ''}" data-action="tab" data-k="sceneTab" data-v="${k}">${l}${n ? `<span class="badge">${n}</span>` : ''}</button>`).join('')}</div>
       ${ui.sceneTab === 'desc' ? ta(b('description'), s.description, 'style="min-height:220px" placeholder="Was passiert in der Szene? Kamera, Handlung, Requisiten …"') : ''}
       ${ui.sceneTab === 'vo' ? ta(b('textVO'), s.textVO, 'style="min-height:220px" placeholder="Moderationstext / Voice-Over"') : ''}
+      ${ui.sceneTab === 'hooks' ? `<div class="small muted" style="margin-bottom:6px">Mehrere Openings pro Szene: am Set alle drehen, im Schnitt und digital gegeneinander testen.</div>${s.hooks.map(h => `<div class="rowgrid" style="grid-template-columns:170px 170px minmax(0,1fr) auto">${sel(`${b('hooks')}.${h.id}.type`, h.type, HOOK_TYPES.map(t => [t, t]), 'aria-label="Hook-Typ"')}${sel(`${b('hooks')}.${h.id}.personaId`, h.personaId, pOpts, 'aria-label="Zielgruppe"')}${ta(`${b('hooks')}.${h.id}.text`, h.text, 'rows="2" style="min-height:40px" placeholder="Hook-Text / erster Satz"')}${del('remove', { list: b('hooks'), kind: 'hooks', id: h.id, quiet: 1 })}</div>`).join('') || '<div class="empty small">Noch keine Hook-Varianten.</div>'}<div style="margin-top:10px"><button class="btn sm" data-action="add" data-list="${b('hooks')}" data-kind="hooks">+ Hook-Variante</button></div>` : ''}
       ${ui.sceneTab === 'sp' ? (p.salesPoints.length ? `<div class="checklist" style="max-height:320px">${spList('Passend zu Produkten in der Szene', spRelevant)}${spList('Generelle Sales-Points', spGeneral)}${spList('Weitere Produkte', spOther)}</div>` : '<div class="empty small">Keine Sales-Points – unter „Sales-Points“ anlegen.</div>') : ''}
     </div>
     <div class="card">
@@ -906,10 +990,32 @@ function vScene(p, s) {
       : `<h3>Rezept</h3><div class="empty small">Kein Rezept in dieser Szene.<br>Schalte „Rezept in dieser Szene“ ein, um Rezept &amp; Zutaten zu erfassen.</div>`}
     </div>
   </div>
+  <div class="card" style="margin-top:16px"><div class="row" style="justify-content:space-between"><h2 style="margin:0">Digital-Verwertung · Cutdowns <span class="faint small">(${(s.cutdowns || []).length})</span></h2><button class="btn sm" data-action="add" data-list="${b('cutdowns')}" data-kind="cutdowns">+ Cutdown</button></div>
+    <div class="small muted" style="margin:4px 0 6px">Welche Kurzversionen werden aus dieser Szene geschnitten? Hochformat-Cutdowns landen automatisch als Hinweis in der Dispo.</div>
+    ${(s.cutdowns || []).length ? `<div class="tbl-wrap">${s.cutdowns.map(c => { const cb = `${b('cutdowns')}.${c.id}`; return `<div class="rowgrid" style="grid-template-columns:minmax(130px,1.2fr) 90px 90px minmax(120px,1fr) 120px minmax(120px,1.3fr) auto">${sel(cb + '.format', c.format, CUT_FORMATS.map(t => [t, t]), 'aria-label="Format"')}${sel(cb + '.length', c.length, CUT_LENGTHS.map(t => [t, t]), 'aria-label="Länge"')}${sel(cb + '.ratio', c.ratio, RATIOS.map(t => [t, t]), 'aria-label="Seitenverhältnis"')}${sel(cb + '.personaId', c.personaId, pOpts, 'aria-label="Zielgruppe"')}${sel(cb + '.status', c.status, CUT_STATUS, 'aria-label="Status"')}${inp(cb + '.note', c.note, 'placeholder="Notiz für den Schnitt"')}${del('remove', { list: b('cutdowns'), kind: 'cutdowns', id: c.id, quiet: 1 })}</div>`; }).join('')}</div>` : '<div class="empty small">Noch keine Cutdowns geplant.</div>'}
+  </div>
   <div class="card" style="margin-top:16px"><h2>Kommentare <span class="faint small">(${s.comments.length})</span></h2>
     ${s.comments.map(c => { const u = userById(c.user); return `<div class="comment">${avatar(u)}<div style="flex:1"><div class="meta">${esc(u?.name || '–')} · ${fmtDate(c.ts)}</div><div style="white-space:pre-wrap">${esc(c.text)}</div></div>${c.user === S.currentUser ? del('delComment', { scene: s.id, id: c.id }) : ''}</div>`; }).join('')}
     <div class="row" style="margin-top:10px;align-items:flex-end"><textarea id="commentDraft" style="flex:1;min-height:60px" placeholder="Kommentar schreiben …"></textarea><button class="btn pri" data-action="addComment" data-id="${s.id}">Senden</button></div>
   </div>`;
+}
+
+/* ---------- Cutdowns ---------- */
+function allCuts(p) { const meta = sceneMeta(p); return ordered(p).flatMap(s => s.cutdowns.map(c => ({ ...c, scene: s, no: meta[s.id].no, start: meta[s.id].start }))); }
+function vCuts(p) {
+  const all = allCuts(p), st = ui.cutStatus || 'all', ra = ui.cutRatio || 'all';
+  const list = all.filter(c => (st === 'all' || c.status === st) && (ra === 'all' || c.ratio === ra));
+  const pn = id => p.personas.find(x => x.id === id)?.name || '';
+  return `<div class="pagehead"><div><h1>Cutdowns</h1><div class="sub">Digital-Verwertung des Langform-Materials: Kurzversionen pro Szene planen, Status verfolgen, Schnittliste exportieren</div></div>
+    <div class="actions"><button class="btn" data-action="csvCuts">${DLICON} Schnittliste CSV</button><button class="btn" data-action="cutsExport">Export-Vorschau</button></div></div>
+  <div class="kpis">
+    <div class="kpi"><div class="l">Cutdowns gesamt</div><div class="v">${all.length}</div><div class="d faint">aus ${new Set(all.map(c => c.scene.id)).size} Szenen</div></div>
+    ${CUT_STATUS.map(([k, l]) => `<div class="kpi"><div class="l">${l}</div><div class="v">${all.filter(c => c.status === k).length}</div></div>`).join('')}
+  </div>
+  <div class="moodbar"><div class="filters">${[['all', 'Alle Status'], ...CUT_STATUS].map(([k, l]) => `<button class="${st === k ? 'on' : ''}" data-action="cutFilter" data-k="cutStatus" data-v="${k}">${l}</button>`).join('')}</div>
+    <div class="filters">${['all', ...RATIOS].map(k => `<button class="${ra === k ? 'on' : ''}" data-action="cutFilter" data-k="cutRatio" data-v="${k}">${k === 'all' ? 'Alle Formate' : k} ${k === 'all' ? '' : all.filter(c => c.ratio === k).length}</button>`).join('')}</div></div>
+  <div class="card tbl-wrap">${list.length ? `<table><thead><tr><th>Szene</th><th>Baustein</th><th>Format</th><th>Länge</th><th>Seitenv.</th><th>Zielgruppe</th><th>Quelle</th><th style="width:140px">Status</th><th>Notiz</th></tr></thead><tbody>
+    ${list.map(c => `<tr><td><a href="#" data-action="openScene" data-id="${c.scene.id}">${c.no} ${esc(c.scene.name)}</a></td><td>${blockChip(c.scene.block)}</td><td>${esc(c.format)}</td><td>${esc(c.length)}</td><td>${esc(c.ratio)}</td><td class="small">${esc(pn(c.personaId) || '–')}</td><td class="small faint">${fmtDur(c.start)}–${fmtDur(c.start + (+c.scene.duration || 0))}</td><td>${sel(`scenes.${c.scene.id}.cutdowns.${c.id}.status`, c.status, CUT_STATUS, 'aria-label="Status"')}</td><td class="small">${esc(c.note)}</td></tr>`).join('')}</tbody></table>` : `<div class="empty">${all.length ? 'Keine Cutdowns für diesen Filter.' : 'Noch keine Cutdowns. In einer Szene unter „Digital-Verwertung“ anlegen.'}</div>`}</div>`;
 }
 
 /* ---------- Animations ---------- */
@@ -1002,6 +1108,13 @@ function analysisHTML(p, segId, print = false) {
     ${card('Verteilung der Rezept-Kategorien', bars(st.recipes, 'time', st.recipeTotal.time, 'Keine Rezepte im Auswahlbereich') + `<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Kategorie</th><th class="num">Anz.</th><th class="num">Zeit</th><th>Szenen</th></tr></thead><tbody>${st.recipes.filter(r => r.count).map(r => `<tr><td>${esc(r.name)}</td><td class="num">${r.count}</td><td class="num">${fmtDur(r.time)}</td><td class="small">${sceneRefs(r.scenes)}</td></tr>`).join('') || '<tr><td colspan="4" class="faint">–</td></tr>'}</tbody></table></div>`)}
     ${card('Wo und wie oft wird welches Produkt benutzt', bars(st.items, 'count', 0, 'Keine Produkte verwendet') + `<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Produkt</th><th class="num">Szenen</th><th class="num">Zeit im Bild</th><th>Wo</th></tr></thead><tbody>${st.items.map(r => `<tr><td>${esc(r.name)}</td><td class="num">${r.count}</td><td class="num">${fmtDur(r.time)}</td><td class="small">${sceneRefs(r.scenes) || '<span class="neg">nicht verwendet</span>'}</td></tr>`).join('')}</tbody></table></div>`)}
   </div>
+  <div class="grid g2" style="margin-top:16px">
+    ${card('Dramaturgie – Zeit pro Baustein', dramaturgy(p, st.sc) + `<div style="margin-top:14px">${bars(BLOCKS.map(b => ({ name: b[1], color: b[2], count: st.sc.filter(s => s.block === b[0]).length, time: sum(st.sc.filter(s => s.block === b[0]).map(s => s.duration)) })), 'time', st.total, 'Noch keine Bausteine zugeordnet')}</div>`)}
+    ${card('Hook-Varianten nach Typ', (() => { const hs = st.sc.flatMap(s => s.hooks); return bars(HOOK_TYPES.map((t, i) => ({ name: t, color: PALETTE[i % PALETTE.length], count: hs.filter(h => h.type === t).length, time: 0 })), 'count', hs.length, 'Noch keine Hook-Varianten') + `<div class="small faint" style="margin-top:8px">${hs.length} Hook-Varianten in ${st.sc.filter(s => (s.hooks || []).length).length} Szene(n).</div>`; })())}
+    ${card('Claim-Freigabe', (() => { const used = p.salesPoints.filter(sp => st.sc.some(s => s.salesPointIds.includes(sp.id))); const open = used.filter(sp => sp.claim !== 'ok');
+      return bars(CLAIM.map(c => ({ name: c[1], color: c[2], count: p.salesPoints.filter(sp => (sp.claim || 'open') === c[0]).length, time: 0 })), 'count', p.salesPoints.length) + (open.length ? `<div class="tbl-wrap" style="margin-top:12px"><table><thead><tr><th>Nicht freigegebener Claim</th><th>Status</th><th>In Szenen</th></tr></thead><tbody>${open.map(sp => `<tr><td>${esc(sp.text)}</td><td>${claimTag(sp.claim)}</td><td class="small">${sceneRefs(st.sc.filter(s => s.salesPointIds.includes(sp.id)))}</td></tr>`).join('')}</tbody></table></div>` : '<div class="okbox" style="margin-top:12px">Alle verwendeten Claims sind freigegeben.</div>'); })())}
+    ${card('Zielgruppen-Abdeckung', (() => { const cov = personaCoverage(p); return cov.length ? `<div class="tbl-wrap"><table><thead><tr><th>Zielgruppe</th><th class="num">Sales-Points</th><th class="num">Hooks</th><th class="num">Cutdowns</th><th class="num">Szenen-Zeit</th></tr></thead><tbody>${cov.map(x => `<tr><td><span class="chip"><span class="dot" style="background:${esc(x.color)}"></span>${esc(x.name)}</span>${!x.sps && !x.hooks && !x.cuts ? ' <span class="neg small">nicht abgedeckt</span>' : ''}</td><td class="num">${x.sps}</td><td class="num">${x.hooks}</td><td class="num">${x.cuts}</td><td class="num">${fmtDur(x.time)}</td></tr>`).join('')}</tbody></table></div><div class="small faint" style="margin-top:8px">Szenen-Zeit = Laufzeit der Szenen, die Sales-Points dieser Zielgruppe enthalten.</div>` : '<div class="small faint">Noch keine Zielgruppen angelegt (Projekt-Details).</div>'; })())}
+  </div>
   <div style="margin-top:16px">${card('Wo sind welche Sales-Points verteilt', `<div class="tbl-wrap"><table><thead><tr><th>Sales-Point</th><th>Produkt</th><th class="num">Anz.</th><th class="num">Zeit</th><th>Szenen</th></tr></thead><tbody>${st.sps.sort((a, b) => b.count - a.count).map(r => `<tr><td>${esc(r.name)}</td><td class="small">${esc(r.item)}</td><td class="num">${r.count}</td><td class="num">${fmtDur(r.time)}</td><td class="small">${r.count ? sceneRefs(r.scenes) : '<span class="neg">nicht verwendet</span>'}</td></tr>`).join('')}</tbody></table></div>`)}</div>
   <div style="margin-top:16px">${card('Zeitliche Aufschlüsselung – wie setzt sich welches Segment zusammen', `<div class="tbl-wrap"><table><thead><tr><th>Nr.</th><th>Szene</th><th>Segment</th><th>Kategorien</th><th class="num">Start</th><th class="num">Dauer</th><th class="num">Anteil</th></tr></thead><tbody>${st.sc.map(s => `<tr><td>${meta[s.id].no}</td><td>${esc(s.name)}</td><td class="small">${esc(meta[s.id].seg.name)}</td><td>${catChips(p, s.categories)}</td><td class="num">${fmtDur(meta[s.id].start)}</td><td class="num">${fmtDur(s.duration)}</td><td class="num">${pct(s.duration, st.total)} %</td></tr>`).join('')}</tbody></table></div>`)}</div>`;
 }
@@ -1020,6 +1133,8 @@ const LAYOUTS = [
   ['stage', 'Stage-Crew', 'Ablaufplan: Timecode, Szene, Kategorie, Produkte/Requisiten, Set-Spezifikationen.'],
   ['shopping', 'Einkaufsliste', 'Alle Zutaten aus den Rezepten zusammengefasst, mit Szenen-Referenz.'],
   ['sp', 'Sales-Points pro Szene', 'Welche Sales-Points in welcher Szene vorkommen + ungenutzte Sales-Points.'],
+  ['cutdowns', 'Cutdown-Schnittliste', 'Alle geplanten Kurzversionen mit Quelle (Timecode), Format, Länge, Seitenverhältnis, Zielgruppe und Status – für den Schnitt.'],
+  ['claims', 'Claim-Freigabeliste', 'Alle Sales-Points mit Freigabe-Status, Beleg und Verwendung in Szenen – für die rechtliche Prüfung.'],
   ['lists', 'B-Rolls & Post-Shooting', 'Offene B-Rolls und Nachdreh-Liste.'],
   ['analysis', 'Analyse', 'Alle Auswertungen (Total) als Report.']
 ];
@@ -1037,6 +1152,8 @@ function exportHTML(p, layout, withImg) {
       return `<div class="sc ${im ? '' : 'noimg'}">${im ? `<div>${im}</div>` : ''}<div><div class="h">${meta[s.id].no} ${esc(s.name)} <span style="font-weight:400;color:#666">· ${fmtDur(meta[s.id].start)} · ${fmtDur(s.duration)} · ${esc(s.categories.join(', '))}</span></div>
       ${s.description ? `<div class="k">Beschreibung</div><div class="pre">${esc(s.description)}</div>` : ''}
       ${s.textVO ? `<div class="k">Text / VO</div><div class="pre">${esc(s.textVO)}</div>` : ''}
+      ${s.block ? `<div class="k">Baustein</div><div>${esc(blockOf(s.block)?.[1] || '')}</div>` : ''}
+      ${(s.hooks || []).length ? `<div class="k">Hook-Varianten</div>${s.hooks.map(h => `<div>• ${esc(h.type)}: ${esc(h.text)}</div>`).join('')}` : ''}
       ${s.itemIds.length ? `<div class="k">Produkte</div><div>${esc(items(s))}</div>` : ''}
       ${sps(s).length ? `<div class="k">Sales-Points</div><div>${sps(s).map(esc).join(' · ')}</div>` : ''}
       ${s.recipeOn ? `<div class="k">Rezept (${esc(s.recipeCategory || '–')})</div><div class="pre">${esc(s.recipe)}</div>` : ''}
@@ -1055,6 +1172,12 @@ function exportHTML(p, layout, withImg) {
     body = `<table><thead><tr><th>Nr.</th><th>Szene</th><th>Dauer</th><th>Sales-Points</th></tr></thead><tbody>${ord.map(s => `<tr><td>${meta[s.id].no}</td><td>${esc(s.name)}</td><td>${fmtDur(s.duration)}</td><td>${sps(s).map(esc).join('<br>') || '–'}</td></tr>`).join('')}</tbody></table>`;
     const unused = p.salesPoints.filter(sp => !p.scenes.some(s => s.salesPointIds.includes(sp.id)));
     body += `<h2>Nicht verwendete Sales-Points</h2>${unused.length ? '<ul>' + unused.map(u => `<li>${esc(u.text)}</li>`).join('') + '</ul>' : '<p>Alle Sales-Points sind im Storyboard verwendet.</p>'}`;
+  } else if (layout === 'cutdowns') {
+    const cs = allCuts(p), pn = id => p.personas.find(x => x.id === id)?.name || '–';
+    body = cs.length ? `<table><thead><tr><th>Szene</th><th>Quelle (TC)</th><th>Baustein</th><th>Format</th><th>Länge</th><th>Seitenv.</th><th>Zielgruppe</th><th>Status</th><th>Notiz</th></tr></thead><tbody>${cs.map(c => `<tr><td>${c.no} ${esc(c.scene.name)}</td><td>${fmtDur(c.start)}–${fmtDur(c.start + (+c.scene.duration || 0))}</td><td>${esc(blockOf(c.scene.block)?.[1] || '–')}</td><td>${esc(c.format)}</td><td>${esc(c.length)}</td><td>${esc(c.ratio)}</td><td>${esc(pn(c.personaId))}</td><td>${esc(CUT_STATUS.find(x => x[0] === c.status)?.[1] || '')}</td><td>${esc(c.note)}</td></tr>`).join('')}</tbody></table>` : '<p>Keine Cutdowns geplant.</p>';
+    const hs = ord.filter(s => (s.hooks || []).length); if (hs.length) body += `<h2>Hook-Varianten</h2><table><thead><tr><th>Szene</th><th>Typ</th><th>Zielgruppe</th><th>Hook</th></tr></thead><tbody>${hs.flatMap(s => s.hooks.map(h => `<tr><td>${meta[s.id].no} ${esc(s.name)}</td><td>${esc(h.type)}</td><td>${esc(pn(h.personaId))}</td><td class="pre">${esc(h.text)}</td></tr>`)).join('')}</tbody></table>`;
+  } else if (layout === 'claims') {
+    body = `<table><thead><tr><th>Sales-Point / Claim</th><th>Produkt</th><th>Status</th><th>Beleg / Quelle</th><th>Verwendet in</th></tr></thead><tbody>${p.salesPoints.map(sp => { const u = ord.filter(s => s.salesPointIds.includes(sp.id)); return `<tr><td>${esc(sp.text)}</td><td>${esc(p.offer.items.find(i => i.id === sp.itemId)?.name || 'Generell')}</td><td>${esc(claimOf(sp.claim)[1])}</td><td>${esc(sp.evidence || '–')}</td><td>${u.map(s => `${meta[s.id].no} (${fmtDur(meta[s.id].start)})`).join(', ') || '–'}</td></tr>`; }).join('')}</tbody></table>`;
   } else if (layout === 'lists') {
     const sn = id => id && meta[id] ? meta[id].no + ' ' + (p.scenes.find(s => s.id === id)?.name || '') : '–';
     body = `<h2>B-Rolls</h2><table><thead><tr><th>✓</th><th>B-Roll</th><th>Beschreibung</th><th>Szene</th></tr></thead><tbody>${p.brolls.map(r => `<tr><td>${r.done ? '✓' : '☐'}</td><td>${esc(r.name)}</td><td>${esc(r.description)}</td><td>${esc(sn(r.sceneId))}</td></tr>`).join('') || '<tr><td colspan="4">–</td></tr>'}</tbody></table>
@@ -1114,6 +1237,7 @@ function vDispo(p) {
         <div class="note">${inp(`${eb}.note`, e.note, 'placeholder="(1 h)" aria-label="Bemerkung"')}</div>
         ${del('remove', { list: `${base}.entries`, kind: 'entries', id: e.id, quiet: 1 })}</div>`; }).join('')}
       <div class="row" style="margin-top:10px"><button class="btn sm" data-action="add" data-list="${base}.entries" data-kind="entries">+ Ablauf-Eintrag</button></div>
+      ${(() => { const sh = shotsFor(p, d); return `<div class="shots"><div class="row" style="justify-content:space-between"><b style="font-weight:600">Shots on Goal · Varianten am Set</b><button class="btn sm" data-action="shotsStd" data-id="${d.id}">Standard-Varianten in Checkliste</button></div>${sh.length ? `<ul>${sh.map(x => `<li>${esc(x)}</li>`).join('')}</ul>` : '<div class="small muted" style="margin-top:6px">Verknüpfte Szenen mit Hook-Varianten oder geplanten Cutdowns erscheinen hier automatisch.</div>'}</div>`; })()}
       <div class="grid g2" style="margin-top:16px">
         ${field('Hinweise (Fahrgemeinschaften, Abholung, Catering …)', ta(`${base}.notes`, d.notes, 'style="min-height:120px"'))}
         <div class="field"><span>Checkliste / Vorbereitung</span>${d.checklist.map(c => `<div class="chk ${c.done ? 'done' : ''}"><input type="checkbox" data-bind="${base}.checklist.${c.id}.done" ${c.done ? 'checked' : ''} aria-label="erledigt">${inp(`${base}.checklist.${c.id}.text`, c.text, 'placeholder="Aufgabe"')}${del('remove', { list: `${base}.checklist`, kind: 'checklist', id: c.id, quiet: 1 })}</div>`).join('')}<div><button class="btn sm" data-action="add" data-list="${base}.checklist" data-kind="checklist">+ Punkt</button></div></div>
@@ -1162,6 +1286,7 @@ function dispoHTML(p, only = null) {
   ${days.map(d => { const people = D.team.filter(m => m.dayIds.includes(d.id) && m.name).map(m => m.name); return `<div class="dayblock"><div><span class="dayt">ABLAUF ${esc(dayLong(d))}</span> <b>→ ${esc(d.title || d.label)}</b></div>
     ${people.length ? `<div class="gray" style="margin:4pt 0 6pt">(${esc(people.join(', '))})</div>` : ''}
     <table class="ablauf"><thead><tr><th style="width:80pt">UHRZEIT</th><th>TO DO</th><th style="width:110pt">BEMERKUNG</th></tr></thead><tbody>${d.entries.map(e => { const sc = e.sceneId && meta[e.sceneId]; return `<tr><td><b>${esc(e.time)}</b></td><td class="pre">${esc(e.todo)}${sc ? ` <span style="color:#2d5aa8">– Szene ${sc.no}</span>` : ''}</td><td class="gray">${esc(e.note)}</td></tr>`; }).join('') || '<tr><td colspan="3">–</td></tr>'}</tbody></table>
+    ${(() => { const sh = shotsFor(p, d); return sh.length ? `<div style="margin-top:6pt"><b>Shots on Goal – Varianten am Set:</b><ul style="margin:2pt 0">${sh.map(x => `<li>${esc(x)}</li>`).join('')}</ul></div>` : ''; })()}
     ${d.notes ? `<div class="pre" style="margin-top:6pt;font-style:italic">${esc(d.notes)}</div>` : ''}
     ${d.checklist.length ? `<div style="margin-top:6pt"><b>Vorbereitung:</b><ul style="margin:2pt 0;padding-left:6pt;list-style:none">${d.checklist.map(c => `<li>${c.done ? '☑' : '☐'} ${esc(c.text)}</li>`).join('')}</ul></div>` : ''}</div>`; }).join('')}
   ${D.parking || D.parkingImage ? `<div class="dayblock"><b><u>Parken:</u></b><div class="pre">${esc(D.parking)}</div>${msrc(D.parkingImage) ? `<img src="${esc(msrc(D.parkingImage))}" style="max-width:260pt;margin-top:6pt" alt="">` : ''}</div>` : ''}`;
@@ -1184,6 +1309,7 @@ function dayText(p, d, short = false) {
   const L = [`ABLAUF ${dayLong(d)} → ${d.title || d.label}`];
   if (people.length && !short) L.push(`(${people.map(m => m.name).join(', ')})`);
   d.entries.forEach(e => { const sc = e.sceneId && meta[e.sceneId]; L.push(`${(e.time || '').padEnd(9)} ${String(e.todo || '').replace(/\n/g, '\n          ')}${sc ? ' – Szene ' + sc.no : ''}${e.note ? '  ' + e.note : ''}`); });
+  const sh = shotsFor(p, d); if (sh.length) L.push('', 'Shots on Goal (Varianten am Set):', ...sh.map(x => '– ' + x));
   if (d.notes) L.push('', d.notes);
   if (d.checklist.length) L.push('', 'Vorbereitung:', ...d.checklist.map(c => '– ' + c.text));
   return L.join('\n');
@@ -1382,7 +1508,7 @@ function vMood(p) {
     </div></div>`; }).join('')}</div><datalist id="moodTags">${tags.map(t => `<option value="${esc(t)}">`).join('')}</datalist>` : `<div class="empty">${p.moodboard.length ? 'Keine Elemente für diesen Filter.' : 'Noch leer. Lade Bilder, Videos oder Audio hoch oder füge einen Link ein.'}</div>`}`;
 }
 
-const VIEWS = { dispo: vDispo, mood: vMood, projects: vProjects, details: vDetails, set: vSet, offer: vOffer, sp: vSP, storyboard: vStoryboard, anim: vAnim, broll: vBroll, post: vPost, notes: vNotes, analysis: vAnalysis, export: vExport };
+const VIEWS = { cuts: vCuts, dispo: vDispo, mood: vMood, projects: vProjects, details: vDetails, set: vSet, offer: vOffer, sp: vSP, storyboard: vStoryboard, anim: vAnim, broll: vBroll, post: vPost, notes: vNotes, analysis: vAnalysis, export: vExport };
 
 /* ============================================================
    ACTIONS
@@ -1417,6 +1543,9 @@ function doPrint(html) { $('#print').innerHTML = html; setTimeout(() => window.p
 function commit(msg, key) { log(msg, key); save(); render(); }
 
 const FACTORY = {
+  personas: () => ({ id: uid(), name: 'Neue Zielgruppe', description: '', color: PALETTE[P().personas.length % PALETTE.length] }),
+  hooks: () => ({ id: uid(), type: 'Neugier', text: '', personaId: '' }),
+  cutdowns: () => ({ id: uid(), format: 'Demo', length: '15 s', ratio: '9:16', status: 'plan', personaId: '', note: '' }),
   'dispo.team': d => ({ id: uid(), name: '', position: '', group: d.group || 'intern', dayIds: P().dispo.days.map(x => x.id), phone: '', email: '' }),
   'dispo.days': () => { const ds = P().dispo.days; const last = [...ds].sort((a, b) => (a.date || '').localeCompare(b.date || '')).pop(); let date = ''; if (last?.date) { const t = new Date(last.date + 'T12:00'); t.setDate(t.getDate() + 1); date = t.toISOString().slice(0, 10); } else date = P().shootingDate || ''; return { id: uid(), date, label: 'Drehtag ' + (ds.filter(x => /dreh/i.test(x.label)).length + 1), title: '', notes: '', checklist: [], entries: [] }; },
   entries: () => ({ id: uid(), time: '', todo: '', note: '', sceneId: '' }),
@@ -1424,13 +1553,13 @@ const FACTORY = {
   hosts: () => ({ id: uid(), name: '', role: '', contact: '' }),
   'setDesign.colors': () => ({ id: uid(), name: 'Neue Farbe', hex: '#888888' }),
   'offer.items': () => ({ id: uid(), name: 'Neues Produkt', size: '', spec: '', description: '', image: null }),
-  salesPoints: d => ({ id: uid(), text: '', itemId: d.item || null }),
+  salesPoints: d => ({ id: uid(), text: '', itemId: d.item || null, claim: 'open', evidence: '', personaIds: [] }),
   animations: () => ({ id: uid(), name: 'Neue Animation', description: '', preview: null, sceneIds: [] }),
   brolls: () => ({ id: uid(), name: '', description: '', sceneId: '', done: false }),
   post: () => ({ id: uid(), text: '', sceneId: '', priority: 'mittel', done: false }),
   notes: () => ({ id: uid(), title: 'Neue Notiz', link: '', text: '', image: null })
 };
-const LISTNAME = { 'dispo.team': 'Team-Mitglied', 'dispo.days': 'Tag', entries: 'Ablauf-Eintrag', checklist: 'Checklisten-Punkt', moodboard: 'Moodboard-Element', hosts: 'Host', 'setDesign.colors': 'Farbe', 'setDesign.images': 'Set-Bild', 'offer.items': 'Produkt', salesPoints: 'Sales-Point', animations: 'Animation', brolls: 'B-Roll', post: 'Post-Shooting-Eintrag', notes: 'Notiz' };
+const LISTNAME = { personas: 'Zielgruppe', hooks: 'Hook-Variante', cutdowns: 'Cutdown', 'dispo.team': 'Team-Mitglied', 'dispo.days': 'Tag', entries: 'Ablauf-Eintrag', checklist: 'Checklisten-Punkt', moodboard: 'Moodboard-Element', hosts: 'Host', 'setDesign.colors': 'Farbe', 'setDesign.images': 'Set-Bild', 'offer.items': 'Produkt', salesPoints: 'Sales-Point', animations: 'Animation', brolls: 'B-Roll', post: 'Post-Shooting-Eintrag', notes: 'Notiz' };
 
 const A = {
   nav: async d => { ui.view = d.v; ui.sceneId = null; S.lastView = d.v; save(); render(); $('main').scrollTop = 0; },
@@ -1457,6 +1586,13 @@ const A = {
   sortDay: async d => { const dy = P().dispo.days.find(x => x.id === d.id); const key = t => { const m = String(t || '').match(/(\d{1,2})[:.](\d{2})/); return m ? +m[1] * 60 + +m[2] - (/vor/i.test(t) ? .5 : 0) : 9999; }; dy.entries.sort((a, b) => key(a.time) - key(b.time)); commit(`Dispo „${dy.label}“: Ablauf sortiert`); },
   allDays: async d => { const D = P().dispo; const m = D.team.find(x => x.id === d.id); m.dayIds = m.dayIds.length === D.days.length ? [] : D.days.map(x => x.id); commit('Dispo: Team geändert', 'dispo.team'); },
   dispoPreview: async () => { ui.exportLayout = 'dispo'; A.nav({ v: 'export' }); },
+  shotsStd: async d => { const dy = P().dispo.days.find(x => x.id === d.id); const have = new Set(dy.checklist.map(c => c.text)); const add = SHOTS_STD.filter(t => !have.has(t)); add.forEach(t => dy.checklist.push({ id: uid(), text: t, done: false })); commit(`Dispo „${dy.label}“: ${add.length} Standard-Varianten übernommen`); toast(add.length ? add.length + ' Punkte in die Checkliste übernommen.' : 'Alle Standard-Varianten sind schon in der Checkliste.'); },
+  cutFilter: async d => { ui[d.k] = d.v; render(); },
+  cutsExport: async () => { ui.exportLayout = 'cutdowns'; A.nav({ v: 'export' }); },
+  csvCuts: async () => { const p = P(), q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"', pn = id => p.personas.find(x => x.id === id)?.name || '';
+    const rows = [['Szene', 'Szenenname', 'Quelle von', 'Quelle bis', 'Baustein', 'Format', 'Länge', 'Seitenverhältnis', 'Zielgruppe', 'Status', 'Notiz']];
+    allCuts(p).forEach(c => rows.push([c.no, c.scene.name, fmtDur(c.start), fmtDur(c.start + (+c.scene.duration || 0)), blockOf(c.scene.block)?.[1] || '', c.format, c.length, c.ratio, pn(c.personaId), CUT_STATUS.find(x => x[0] === c.status)?.[1] || '', c.note]));
+    download(slug(p.title) + '-cutdowns.csv', '\ufeff' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv;charset=utf-8'); },
   mailDispo: async d => openMailSheet(d.id || null),
   calDispo: async d => openCalSheet(d.day || null),
   pdfDispo: async (d, el) => { const old = el.innerHTML; el.disabled = true; el.textContent = 'PDF wird erstellt …'; try { await saveFile(pdfName(P()), await dispoPdfBlob(P()), 'application/pdf'); } catch (e) { toast('PDF konnte nicht erstellt werden: ' + (e.message || e) + (EMBED ? '' : ' – alternativ „Drucken“ → „Als PDF sichern“.')); } finally { el.disabled = false; el.innerHTML = old; } },
@@ -1465,7 +1601,7 @@ const A = {
   moodUpload: async () => fileInput('image/*,video/*,audio/*', true, addMoodFiles),
   addMoodLink: async () => { const el = $('#moodUrl'); const ok = addMoodLink(el.value); if (ok) el.value = ''; },
   clearThumb: async d => { const it = P().moodboard.find(x => x.id === d.id); it.thumb = null; commit(`Moodboard „${it.title}“: Vorschaubild entfernt`); },
-  toggle: async (d, el) => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.indexOf(d.val); i >= 0 ? arr.splice(i, 1) : arr.push(d.val); if (d.list === 'userIds') return commit('Benutzerzuordnung geändert', d.list); commit(describe(d.list.replace(/\.[^.]+$/, '') + '.' + ({ itemIds: 'Produkte', salesPointIds: 'Sales-Points', categories: 'Kategorien', sceneIds: 'Szenen', userIds: 'Benutzer' }[d.list.split('.').pop()] || 'Liste')), d.list); },
+  toggle: async (d, el) => { const p = P(); const arr = resolve(p, d.list.split('.')); const i = arr.indexOf(d.val); i >= 0 ? arr.splice(i, 1) : arr.push(d.val); if (d.list === 'userIds') return commit('Benutzerzuordnung geändert', d.list); commit(describe(d.list.replace(/\.[^.]+$/, '') + '.' + ({ itemIds: 'Produkte', salesPointIds: 'Sales-Points', categories: 'Kategorien', sceneIds: 'Szenen', userIds: 'Benutzer', personaIds: 'Zielgruppen' }[d.list.split('.').pop()] || 'Liste')), d.list); },
   toggleAnim: async d => { const a = P().animations.find(x => x.id === d.anim); const i = a.sceneIds.indexOf(d.scene); i >= 0 ? a.sceneIds.splice(i, 1) : a.sceneIds.push(d.scene); commit(`Animation „${a.name}“ verknüpft`); },
   delCat: async d => { const p = P(); if (!await ask(`Kategorie „${d.v}“ entfernen? Sie wird auch aus allen Szenen entfernt.`)) return; p[d.key] = p[d.key].filter(c => c !== d.v); p.scenes.forEach(s => { s.categories = s.categories.filter(c => c !== d.v); if (s.recipeCategory === d.v && d.key === 'recipeCategories') s.recipeCategory = ''; }); commit(`Kategorie „${d.v}“ entfernt`); },
   delItem: async d => { const p = P(); const it = p.offer.items.find(i => i.id === d.id); if (!await ask(`Produkt „${it.name}“ löschen? Verknüpfungen in Szenen werden entfernt.`)) return; p.offer.items = p.offer.items.filter(i => i.id !== d.id); p.scenes.forEach(s => s.itemIds = s.itemIds.filter(x => x !== d.id)); p.salesPoints.forEach(sp => { if (sp.itemId === d.id) sp.itemId = null; }); commit(`Produkt „${it.name}“ gelöscht`); },
@@ -1487,8 +1623,8 @@ const A = {
   printAnalysis: async () => doPrint(`<div class="pr"><h1>${esc(P().title)}</h1><div class="prmeta">Analyse · ${esc(ui.segFilter === 'all' ? 'Total' : P().segments.find(s => s.id === ui.segFilter)?.name)} · Stand ${fmtDate(Date.now())}</div>${analysisHTML(P(), ui.segFilter, true)}</div>`),
   print: async () => doPrint(exportHTML(P(), ui.exportLayout, ui.exportImages)),
   csv: async () => { const p = P(), meta = sceneMeta(p); const q = v => '"' + String(v ?? '').replace(/"/g, '""') + '"';
-    const rows = [['Nr', 'Start', 'Dauer', 'Segment', 'Szene', 'Kategorien', 'Produkte', 'Sales-Points', 'Rezept', 'Rezeptkategorie', 'Zutaten', 'Beschreibung', 'Text/VO']];
-    ordered(p).forEach(s => rows.push([meta[s.id].no, fmtDur(meta[s.id].start), fmtDur(s.duration), meta[s.id].seg.name, s.name, s.categories.join(', '), s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', '), s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean).join(' | '), s.recipeOn ? s.recipe : '', s.recipeOn ? s.recipeCategory : '', s.recipeOn ? s.ingredients : '', s.description, s.textVO]));
+    const rows = [['Nr', 'Start', 'Dauer', 'Segment', 'Szene', 'Baustein', 'Kategorien', 'Produkte', 'Sales-Points', 'Rezept', 'Rezeptkategorie', 'Zutaten', 'Beschreibung', 'Text/VO']];
+    ordered(p).forEach(s => rows.push([meta[s.id].no, fmtDur(meta[s.id].start), fmtDur(s.duration), meta[s.id].seg.name, s.name, blockOf(s.block)?.[1] || '', s.categories.join(', '), s.itemIds.map(id => p.offer.items.find(i => i.id === id)?.name).filter(Boolean).join(', '), s.salesPointIds.map(id => p.salesPoints.find(x => x.id === id)?.text).filter(Boolean).join(' | '), s.recipeOn ? s.recipe : '', s.recipeOn ? s.recipeCategory : '', s.recipeOn ? s.ingredients : '', s.description, s.textVO]));
     download(slug(p.title) + '-szenen.csv', '﻿' + rows.map(r => r.map(q).join(';')).join('\r\n'), 'text/csv;charset=utf-8'); },
   exportJSON: async () => { const p = await inlineMedia(P()); download(slug(p.title) + '.pitchmeister.json', JSON.stringify({ format: 'pitchmeister-project', version: 1, project: p, users: S.users }, null, 2), 'application/json'); },
   backupAll: async () => { const d = await inlineMedia(S); download('pitchmeister-backup-' + new Date().toISOString().slice(0, 10) + '.json', JSON.stringify({ format: 'pitchmeister-backup', version: 1, ...d }, null, 2), 'application/json'); },

@@ -21,6 +21,12 @@ Für den Zugriff im Team die Datei auf einen beliebigen Webserver legen.
 | **Storyboard** | Segment-Übersicht mit Timings und Kategorien, Zeitleiste, Szenenboard mit Drag & Drop |
 | **Szenen-Seite** | Bezeichnung, Dauer, Segment, Bild/Clip, Produkte in der Szene, Kategorien, Rezept an/aus mit Kategorie, Beschreibung, Sales-Points, Text/VO, Rezept und Zutaten, Animationen, Kommentare |
 | **Dispo** | Pro Projekt: Titel, Location mit Karten-Link, Termine (Aufbau- und Drehtage), Team intern/extern mit Position, Einsatztagen und Kontakt; pro Tag Ablauf mit Uhrzeit, To Do, Bemerkung und verknüpfter Storyboard-Szene, Hinweise (Fahrgemeinschaften usw.) und Checkliste; Anfahrt & Parken mit Lageplan; eigenes Druck-/PDF-Layout. Crew mit Telefon und E-Mail; **Crew-Briefing per Mail** an das ganze Team (optional BCC) oder persönlich pro Person (nur die eigenen Einsatztage); **PDF-Download** der Dispo (ganz oder persönlich); **Kalender**: Google- und Outlook-Links pro Tag sowie `.ics`-Datei für Apple Kalender/Outlook |
+| **Dramaturgie** | Pro Szene ein Baustein (Hook/Opening, Problem, Produkt-Demo, Testimonial, Benefits/RTBs, Angebot, CTA, Close); Dramaturgie-Check im Storyboard mit fehlenden Bausteinen, Zeit pro Baustein in der Analyse |
+| **Hook-Varianten** | Mehrere Openings pro Szene mit Hook-Typ (Neuheit, Preisanker, Dringlichkeit, FOMO …) und Zielgruppe; Auswertung nach Typ |
+| **Cutdowns** | Digital-Verwertung pro Szene (Format, Länge, Seitenverhältnis, Zielgruppe, Status); Übersicht mit Filtern, Schnittliste als CSV und Export-Layout |
+| **Shots on Goal** | Dispo zeigt pro Drehtag automatisch, welche Hook-Varianten und Hochformat-Absicherungen gedreht werden müssen; Standard-Varianten per Klick in die Checkliste; auch im Crew-Briefing und PDF |
+| **Claim-Freigabe** | Sales-Points mit Status (offen / in Prüfung / freigegeben / abgelehnt) und Beleg; Warnung bei nicht freigegebenen Claims in Szenen; Claim-Freigabeliste als Export |
+| **Zielgruppen** | Personas in den Projekt-Details; Zuordnung zu Sales-Points, Hooks und Cutdowns; Abdeckung in der Analyse |
 | **Moodboard** | Bilder, Videos und Audio hochladen (auch per Drag & Drop oder Einfügen) oder verlinken; Links werden erkannt (YouTube mit Vorschaubild, Vimeo, Spotify, MP3/MP4, Bilder, Websites); eigenes Vorschaubild für Links; Gruppen und Filter |
 | **Animationen** | Vorschau (Bild/Video), Beschreibung, mit Szenen verknüpft |
 | **B-Rolls** | Erweiterbare Liste mit Status und Szenenbezug |
