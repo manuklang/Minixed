@@ -10,10 +10,14 @@ Eine Webseite mit Eingabemasken für das *Produkt- & Kampagnen-Master-Briefing*.
 - Eingaben werden automatisch im Browser gespeichert (localStorage).
 - **Entwurf sichern** / **Entwurf öffnen** (.json): zum Weitergeben im Team.
 - **Beispiel laden** füllt alle Felder mit fiktiven Beispieldaten.
+- Jedes Briefing hat eine automatisch vergebene **Projekt-ID** (z. B. `GS-2026-7K4Q9M`), sichtbar oben, im PDF und in der Übergabe.
+- Sind alle Felder ausgefüllt, erscheint **An Pitch-Meister senden**. Es erzeugt eine versiegelte Übergabe-Datei. Danach ist das Briefing schreibgeschützt.
+  Details und Einbau in den Pitch-Meister: [UEBERGABE.md](UEBERGABE.md), Modul: `pitchmeister-import.js`.
 
 ## Design
 - CI nach genius-studios.de: Anthrazit `#282834`, Schwarz, Weiß, Blau `#3483EB` / `#1665CD`, Rot `#DC2751`; Montserrat (Überschriften) und Hind (Text).
 - Liquid-Glass-Optik nur auf der Bedienebene (Kopfleiste, Navigation, Buttons, Hinweise), die Formularflächen sind bewusst massiv und gut lesbar.
+- Responsiv von 320 px bis Desktop: Unter 960 px stecken die Nebenaktionen und die Abschnitts-Navigation in einem **Menü**, die Kopfleiste bleibt einzeilig.
 - Das PDF bettet Logo und Schriften ein (Titelband in Anthrazit, Logo in der Kopfzeile, Firmenfußzeile).
 
 ## Bearbeiten

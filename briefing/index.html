@@ -71,10 +71,10 @@ h1,h2,h3{font-family:var(--f-display);margin:0;text-wrap:balance}
 nav.index{position:sticky;top:calc(env(safe-area-inset-top,0px) + 104px);align-self:start;border-radius:20px;padding:14px 10px;display:flex;flex-direction:column;gap:2px}
 nav.index>*{position:relative;z-index:1}
 .navhead{font-family:var(--f-display);font-weight:700;font-size:10.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);padding:2px 12px 10px}
-nav.index a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;color:#e9e9f1;text-decoration:none;font-size:14.5px;transition:background .2s}
-nav.index a:hover{background:rgba(255,255,255,.08)}
-nav.index .cnt{font-family:var(--f-display);font-weight:600;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:var(--pill);padding:3px 8px;background:rgba(255,255,255,.06)}
-nav.index .cnt.full{color:#06210f;background:var(--ok)}
+nav.index a,.mnav a{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 12px;border-radius:12px;color:#e9e9f1;text-decoration:none;font-size:14.5px;transition:background .2s}
+nav.index a:hover,.mnav a:hover{background:rgba(255,255,255,.08)}
+nav.index .cnt,.mnav .cnt{font-family:var(--f-display);font-weight:600;font-size:11px;color:var(--muted);font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:var(--pill);padding:3px 8px;background:rgba(255,255,255,.06)}
+nav.index .cnt.full,.mnav .cnt.full{color:#06210f;background:var(--ok)}
 .navprog{margin:12px 12px 4px;height:4px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden}
 .navprog b{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--blue),#7db5ff);border-radius:4px;transition:width .4s}
 main{display:flex;flex-direction:column;gap:26px;min-width:0}
@@ -124,6 +124,49 @@ input::placeholder,textarea::placeholder{color:#6f6f80}
 .sum{font-size:14px;color:var(--muted);font-variant-numeric:tabular-nums;display:flex;flex-wrap:wrap;align-items:center;gap:10px}
 .sum b{color:#fff;font-family:var(--f-display);font-weight:700}
 
+/* Projekt-ID, Übergabe */
+.statusrow{display:flex;flex-wrap:wrap;align-items:center;gap:10px 18px}
+.idchip{display:inline-flex;align-items:center;gap:8px;font-family:var(--f-display);font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:var(--pill);padding:4px 4px 4px 14px;background:rgba(255,255,255,.04)}
+.idchip b{font-weight:700;color:#fff;letter-spacing:.06em;font-variant-numeric:tabular-nums;text-transform:none}
+.banner.final{background:rgba(61,190,122,.1);border-color:rgba(61,190,122,.5)}
+.bbtns{display:flex;flex-wrap:wrap;gap:8px}
+.send-card{border-radius:22px;padding:24px 26px;display:flex;flex-wrap:wrap;gap:16px 24px;align-items:center;justify-content:space-between;border:1px solid var(--line);background:var(--sheet)}
+.send-card>div{min-width:0;flex:1 1 320px}
+.send-card.ready{border-color:rgba(61,190,122,.55);background:linear-gradient(135deg,rgba(61,190,122,.14),rgba(52,131,235,.10)),var(--sheet)}
+.send-card.final{border-color:rgba(52,131,235,.55)}
+.send-card .kicker{font-family:var(--f-display);font-weight:700;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--blue)}
+.send-card.ready .kicker{color:var(--ok)}
+.send-card h2{font-size:clamp(19px,2.4vw,24px);font-weight:900;margin-top:4px}
+.send-card p{margin:6px 0 0;color:var(--muted);max-width:62ch;overflow-wrap:anywhere}
+.btn.send{background:linear-gradient(180deg,rgba(86,212,146,.95),rgba(26,138,80,.95));border-color:rgba(170,240,200,.6);box-shadow:inset 0 1px 0 rgba(255,255,255,.5),inset 0 -2px 6px rgba(0,0,0,.15),0 6px 22px rgba(61,190,122,.4);color:#03180b}
+.btn.send:hover{background:linear-gradient(180deg,rgba(104,224,160,.97),rgba(32,150,88,.97))}
+.locked input[type=text],.locked textarea,.locked select{background:transparent;border-color:rgba(255,255,255,.06);color:#ececf3;resize:none;opacity:1}
+.locked .btn.add,.locked .btn.icon,.locked .sum .btn{display:none}
+.modal{position:fixed;inset:0;z-index:50;display:grid;place-items:center;padding:16px;background:rgba(4,4,8,.6)}
+.mbox{width:min(500px,100%);border-radius:26px;padding:26px;display:flex;flex-direction:column;gap:14px;background:linear-gradient(180deg,rgba(64,64,84,.78),rgba(22,22,30,.86))}
+.mbox>*{position:relative;z-index:1}
+.mbox h2{font-size:21px;font-weight:900;line-height:1.2}
+.mbox p{margin:0;color:#d6d6e0;font-size:15px}
+.mbox dl{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 16px;margin:0;font-size:15px;padding:12px 14px;border-radius:14px;background:rgba(0,0,0,.25)}
+.mbox dt{color:var(--muted)} .mbox dd{margin:0;font-weight:600;overflow-wrap:anywhere}
+.mbox .btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:4px}
+.menu-btn{display:none}
+.menu-btn svg{width:18px;height:18px}
+.more{display:flex;flex-wrap:wrap;gap:8px}
+.mnav{display:none}
+@media (min-width:960px) and (max-width:1120px){
+  .logo span{display:none}
+  .actions .btn{padding:11px 14px}
+}
+@media (max-width:400px){
+  .idchip{letter-spacing:.03em;padding-left:10px;gap:6px}
+  .idchip .btn{padding:7px 9px;font-size:12px;flex:none}
+  .idchip{font-size:11px}
+  .idchip b{letter-spacing:.02em}
+  .actions .btn{padding:10px 12px}
+  .logo img{height:28px}
+}
+
 /* Footer */
 footer.site{max-width:1220px;margin:0 auto;padding-block:30px 40px;display:flex;flex-wrap:wrap;gap:18px 36px;align-items:center;border-top:1px solid var(--line);color:var(--muted);font-size:14px}
 footer.site img{height:46px;width:auto}
@@ -134,16 +177,31 @@ footer.site .claim{margin-left:auto;font-family:var(--f-display);font-weight:600
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(22px + env(safe-area-inset-bottom,0px));padding:12px 20px;border-radius:var(--pill);font-size:15px;z-index:40;max-width:calc(100% - 32px);background:linear-gradient(180deg,rgba(60,60,76,.7),rgba(30,30,40,.7))}
 .toast span{position:relative;z-index:1}
 
-@media (max-width:960px){
-  .shell{grid-template-columns:minmax(0,1fr)}
+@media (max-width:959px){
+  .shell{grid-template-columns:minmax(0,1fr);padding-block:26px 32px}
   nav.index{display:none}
   .logo span{display:none}
+  .bar-in{flex-wrap:nowrap;padding:8px 8px 8px 16px;border-radius:20px}
+  .actions{position:static;flex-wrap:nowrap}
+  .menu-btn{display:inline-flex}
+  .more{display:none;position:absolute;z-index:2;top:calc(100% + 8px);left:0;right:0;flex-direction:column;align-items:stretch;gap:8px;padding:14px;border-radius:20px;
+    background:linear-gradient(180deg,rgba(52,52,68,.92),rgba(20,20,28,.94));-webkit-backdrop-filter:blur(26px) saturate(170%);backdrop-filter:blur(26px) saturate(170%);
+    border:1px solid var(--glass-edge);box-shadow:var(--glass-shadow);max-height:calc(100vh - 110px);max-height:calc(100dvh - 110px);overflow:auto}
+  .more.open{display:flex}
+  .more .btn{justify-content:flex-start}
+  .mnav{display:flex;flex-direction:column;gap:2px;border-top:1px solid var(--line);padding-top:10px;margin-top:2px}
+  .mnav .navhead{padding:4px 12px 6px}
+  section.sec{scroll-margin-top:90px}
 }
 @media (max-width:640px){
-  .bar-in{padding:10px;border-radius:18px}
-  .logo img{height:32px}
-  .actions{width:100%}
-  .actions .btn{flex:1 1 auto;padding:11px 12px}
+  .bar-in{padding:7px 7px 7px 12px;border-radius:18px}
+  .logo img{height:30px}
+  .actions .btn{padding:11px 14px}
+  input[type=text],textarea,select{font-size:16px}
+  .btn.icon{width:42px;height:42px}
+  .hero p{font-size:16px}
+  .send-card{padding:20px}
+  .send-card .btn,.banner .btn{flex:1 1 auto}
   .grid2{grid-template-columns:minmax(0,1fr)}
   .row{grid-template-columns:minmax(0,1fr)}
   .row .field.span2,.row .field.span3{grid-column:auto!important}
@@ -169,11 +227,15 @@ footer.site .claim{margin-left:auto;font-family:var(--f-display);font-weight:600
   <div class="bar-in glass">
     <a class="logo" href="https://genius-studios.de" target="_blank" rel="noopener"><img id="logo-top" alt="Genius Studios" width="560" height="247"><span>Master-<br>Briefing</span></a>
     <div class="actions">
-      <button type="button" class="btn" id="btn-example">Beispiel laden</button>
-      <button type="button" class="btn" id="btn-export">Entwurf sichern</button>
-      <label class="btn" for="file-import" tabindex="0" id="lbl-import">Entwurf öffnen</label>
-      <input type="file" id="file-import" accept=".json,application/json" hidden>
-      <button type="button" class="btn" id="btn-reset">Leeren</button>
+      <div class="more" id="more">
+        <button type="button" class="btn" id="btn-example">Beispiel laden</button>
+        <button type="button" class="btn" id="btn-export">Entwurf sichern</button>
+        <label class="btn" for="file-import" tabindex="0" id="lbl-import">Entwurf öffnen</label>
+        <input type="file" id="file-import" accept=".json,application/json" hidden>
+        <button type="button" class="btn" id="btn-reset">Leeren</button>
+        <nav class="mnav" id="mnav" aria-label="Abschnitte"><div class="navhead">Abschnitte</div></nav>
+      </div>
+      <button type="button" class="btn menu-btn" id="btn-menu" aria-expanded="false" aria-controls="more"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>Menü</button>
       <button type="button" class="btn primary" id="btn-pdf">PDF erstellen</button>
     </div>
   </div>
@@ -187,13 +249,22 @@ footer.site .claim{margin-left:auto;font-family:var(--f-display);font-weight:600
         <div class="eyebrow">DRTV · Infomercial · Kampagne</div>
         <h1><span class="outline">Master</span>Briefing</h1>
         <p>Das Produkt- &amp; Kampagnen-Briefing für Ihre nächste Infomercial-Produktion mit Genius Studios. Felder ausfüllen, dann „PDF erstellen“. Ihre Eingaben bleiben in diesem Browser gespeichert. Zum Weitergeben den Entwurf sichern und beim Team wieder öffnen. Die grauen Texte in den Feldern sind Beispiele.</p>
-        <div class="status" id="status">Noch nichts ausgefüllt</div>
+        <div class="statusrow">
+          <div class="status" id="status">Noch nichts ausgefüllt</div>
+          <span class="idchip" title="Darüber ordnet der Pitch-Meister das Briefing seinem Projekt zu">Projekt-ID <b id="pid">–</b><button type="button" class="btn small" id="btn-copyid">Kopieren</button></span>
+          <button type="button" class="btn send small" id="btn-send-top" hidden>An Pitch-Meister senden</button>
+        </div>
       </div>
       <div class="banner" id="example-banner" hidden>
         <span>Beispieldaten „Invictus X7“ geladen. Alle Werte sind fiktiv.</span>
         <button type="button" class="btn small" id="btn-clear-example">Beispiel entfernen</button>
       </div>
+      <div class="banner final" id="final-banner" hidden>
+        <span id="final-text"></span>
+        <span class="bbtns"><button type="button" class="btn small" id="btn-resave">Übergabe-Datei erneut speichern</button><button type="button" class="btn small" id="btn-copy-new">Kopie mit neuer ID bearbeiten</button></span>
+      </div>
       <form id="form" novalidate></form>
+      <section class="send-card" id="send-card" aria-live="polite"></section>
     </main>
   </div>
   <footer class="site">
@@ -202,6 +273,14 @@ footer.site .claim{margin-left:auto;font-family:var(--f-display);font-weight:600
     <span class="claim">Film · Audio · Broadcast</span>
   </footer>
 </div>
+</div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-h">
+  <div class="mbox glass">
+    <h2 id="modal-h">Briefing final an den Pitch-Meister übergeben?</h2>
+    <dl><dt>Produkt</dt><dd id="m-prod"></dd><dt>Projekt-ID</dt><dd id="m-id"></dd></dl>
+    <p>Sie erhalten eine versiegelte Übergabe-Datei. Lesen Sie sie im Pitch-Meister unter „Projekte → Briefing importieren“ ein. Dort ist das Briefing dann final und nicht mehr veränderbar. Hier wird es ebenfalls schreibgeschützt.</p>
+    <div class="btns"><button type="button" class="btn" id="m-cancel">Abbrechen</button><button type="button" class="btn send" id="m-ok">Final übergeben</button></div>
+  </div>
 </div>
 <div class="toast glass" id="toast" hidden><span></span></div>
 
@@ -364,7 +443,16 @@ const EXAMPLE = {
 const STORE = "drtv-briefing-v1";
 let state = blank();
 let isExample = false;
-function blank(){ const s = {f:{}, t:{}}; eachTable(tb => { s.t[tb.k] = Array.from({length:tb.min}, () => emptyRow(tb)); }); return s; }
+function blank(){ const s = {f:{}, t:{}, meta:{id:newId(), created:new Date().toISOString()}}; eachTable(tb => { s.t[tb.k] = Array.from({length:tb.min}, () => emptyRow(tb)); }); return s; }
+/* Projekt-ID: GS-<Jahr>-<6 Zeichen>, ohne verwechselbare Zeichen (0/O, 1/I/L) */
+const ID_RE = /^GS-\d{4}-[2-9A-HJKMNP-Z]{6}$/;
+function newId(){
+  const abc = "23456789ABCDEFGHJKMNPQRSTUVWXYZ", r = new Uint8Array(6);
+  try{ crypto.getRandomValues(r); }catch(e){ for(let i = 0; i < 6; i++) r[i] = Math.floor(Math.random() * 256); }
+  let x = ""; r.forEach(b => x += abc[b % abc.length]);
+  return "GS-" + new Date().getFullYear() + "-" + x;
+}
+const isFinal = () => !!(state && state.meta && state.meta.finalizedAt);
 function emptyRow(tb){ const r = {}; tb.cols.forEach(c => r[c.k] = ""); return r; }
 function eachTable(fn){ SCHEMA.forEach(sec => sec.items.forEach(it => { if(it.t === "table") fn(it, sec); })); }
 function load(){ try{ const raw = localStorage.getItem(STORE); if(raw){ const d = JSON.parse(raw); state = normalize(d.state || d); isExample = !!d.example; } }catch(e){} }
@@ -378,6 +466,13 @@ function normalize(d){
       if(rows) s.t[tb.k] = rows.map(r => { const o = emptyRow(tb); tb.cols.forEach(c => { if(r && typeof r[c.k] === "string") o[c.k] = r[c.k]; }); return o; });
       if(!s.t[tb.k].length) s.t[tb.k] = [emptyRow(tb)];
     });
+    const m = d.meta;
+    if(m && typeof m === "object" && typeof m.id === "string" && ID_RE.test(m.id)){
+      s.meta = {id:m.id, created:typeof m.created === "string" ? m.created : s.meta.created};
+      if(typeof m.finalizedAt === "string" && m.handover && m.handover.format === HANDOVER_FORMAT){
+        s.meta.finalizedAt = m.finalizedAt; s.meta.checksum = String(m.checksum || ""); s.meta.handover = m.handover;
+      }
+    }
   }
   return s;
 }
@@ -451,6 +546,7 @@ function rerenderTable(tb){ document.getElementById("rep-" + tb.k).replaceWith(t
 function render(){
   form.textContent = "";
   nav.querySelectorAll("a").forEach(a => a.remove());
+  const mnav = document.getElementById("mnav"); mnav.querySelectorAll("a").forEach(a => a.remove());
   const prog = document.getElementById("navprog");
   SCHEMA.forEach(sec => {
     const s = el("section", {class:"sec", id:"sec-" + sec.id, "aria-labelledby":"h-" + sec.id});
@@ -466,9 +562,19 @@ function render(){
       else if(it.t === "sum") s.appendChild(el("div", {class:"sum", id:"sumline"}));
     });
     form.appendChild(s);
-    nav.insertBefore(el("a", {href:"#sec-" + sec.id}, [el("span", {text:(sec.num === "00" ? "" : Number(sec.num) + ". ") + shortTitle(sec.title)}), el("span", {class:"cnt", id:"cnt-" + sec.id})]), prog);
+    const label = (sec.num === "00" ? "" : Number(sec.num) + ". ") + shortTitle(sec.title);
+    nav.insertBefore(el("a", {href:"#sec-" + sec.id}, [el("span", {text:label}), el("span", {class:"cnt", "data-cnt":sec.id})]), prog);
+    mnav.appendChild(el("a", {href:"#sec-" + sec.id}, [el("span", {text:label}), el("span", {class:"cnt", "data-cnt":sec.id})]));
   });
-  document.getElementById("example-banner").hidden = !isExample;
+  const fin = isFinal();
+  form.classList.toggle("locked", fin);
+  if(fin) form.querySelectorAll("input,textarea,select").forEach(c => { if(c.tagName === "SELECT") c.disabled = true; else c.readOnly = true; });
+  document.getElementById("pid").textContent = state.meta.id;
+  document.getElementById("example-banner").hidden = !isExample || fin;
+  document.getElementById("btn-example").hidden = fin;
+  const fb = document.getElementById("final-banner"); fb.hidden = !fin;
+  if(fin) document.getElementById("final-text").textContent = "Final an den Pitch-Meister übergeben am " + fmtDateTime(state.meta.finalizedAt) + ". Dieses Briefing ist schreibgeschützt.";
+  lastCardKey = "";
   updateStatus();
 }
 function shortTitle(t){ return t.split(/[,(]/)[0].replace(/ &.*$/, "").trim(); }
@@ -494,7 +600,7 @@ const fmtEuro = n => n.toLocaleString("de-DE", {minimumFractionDigits:2, maximum
 function updateStatus(){
   let D = 0, T = 0;
   SCHEMA.forEach(sec => { const [d, t] = secCount(sec); D += d; T += t;
-    const c = document.getElementById("cnt-" + sec.id); if(c){ c.textContent = d + "/" + t; c.classList.toggle("full", d === t); } });
+    document.querySelectorAll('[data-cnt="' + sec.id + '"]').forEach(c => { c.textContent = d + "/" + t; c.classList.toggle("full", d === t); }); });
   const st = document.getElementById("status");
   st.textContent = D ? D + " von " + T + " Feldern ausgefüllt" : "Noch nichts ausgefüllt";
   st.classList.toggle("on", D === T);
@@ -504,13 +610,51 @@ function updateStatus(){
     let sum = 0, n = 0;
     ["basis", "boni"].forEach(k => state.t[k].forEach(r => { const v = parseEuro(r.wert); if(v != null){ sum += v; n++; } }));
     sl.textContent = "";
-    if(n){
+    if(n && !isFinal()){
       sl.append("Summe der eingetragenen Einzelwerte: ", el("b", {text:fmtEuro(sum)}));
       sl.appendChild(el("button", {type:"button", class:"btn small", text:"Als Gesamtwert übernehmen", onclick:() => {
         state.f.gesamtwert = fmtEuro(sum); document.getElementById("f-gesamtwert").value = state.f.gesamtwert; changed(); toast("Gesamtwert übernommen."); }}));
-    } else sl.textContent = "Tragen Sie Einzelwerte ein, um die Summe für den Preisanker zu sehen.";
+    } else if(n) sl.append("Summe der eingetragenen Einzelwerte: ", el("b", {text:fmtEuro(sum)}));
+    else sl.textContent = "Tragen Sie Einzelwerte ein, um die Summe für den Preisanker zu sehen.";
+  }
+  const complete = D === T, fin = isFinal();
+  document.getElementById("btn-send-top").hidden = !complete || fin;
+  renderSendCard(D, T, complete, fin);
+}
+/* erstes offenes Feld (für „Zum nächsten offenen Feld“) */
+function firstMissing(){
+  for(const sec of SCHEMA) for(const it of sec.items){
+    const fs = it.t === "grid" || it.t === "group" ? it.fields : (it.t === "field" || it.t === "list") ? [it] : [];
+    for(const f of fs) if(!filled(state.f[f.k])) return "f-" + f.k;
+    if(it.t === "table" && !state.t[it.k].some(rowFilled)) return "t-" + it.k + "-0-" + it.cols[0].k;
+  }
+  return null;
+}
+let lastCardKey = "";
+function renderSendCard(D, T, complete, fin){
+  const key = [D, T, complete, fin, state.meta.id].join("|");
+  if(key === lastCardKey) return; lastCardKey = key;
+  const card = document.getElementById("send-card");
+  card.textContent = ""; card.className = "send-card" + (fin ? " final" : complete ? " ready" : "");
+  if(fin){
+    card.append(el("div", null, [el("div", {class:"kicker", text:"Final übergeben"}), el("h2", {text:"Beim Pitch-Meister als final gesetzt"}),
+      el("p", {text:"Projekt-ID " + state.meta.id + " · übergeben am " + fmtDateTime(state.meta.finalizedAt) + " · Prüfsumme " + String(state.meta.checksum).slice(0, 16) + "…"})]),
+      el("button", {type:"button", class:"btn", text:"Übergabe-Datei erneut speichern", onclick:resaveHandover}));
+  } else if(complete){
+    card.append(el("div", null, [el("div", {class:"kicker", text:"Alle Felder ausgefüllt"}), el("h2", {text:"Bereit für den Pitch-Meister"}),
+      el("p", {text:"Das Briefing ist vollständig. Nach dem Senden ist es im Pitch-Meister final und hier schreibgeschützt."})]),
+      el("button", {type:"button", class:"btn send", text:"An Pitch-Meister senden", onclick:openSend}));
+  } else {
+    const open = T - D;
+    card.append(el("div", null, [el("div", {class:"kicker", text:"Übergabe an den Pitch-Meister"}), el("h2", {text:"Noch " + open + (open === 1 ? " Angabe" : " Angaben") + " offen"}),
+      el("p", {text:"Sobald alle Felder und Tabellen ausgefüllt sind, erscheint hier der Button „An Pitch-Meister senden“."})]),
+      el("button", {type:"button", class:"btn", text:"Zum nächsten offenen Feld", onclick:() => {
+        const id = firstMissing(); const f = id && document.getElementById(id); if(!f) return;
+        f.scrollIntoView({block:"center", behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"}); setTimeout(() => f.focus({preventScroll:true}), 350);
+      }}));
   }
 }
+function fmtDateTime(iso){ const d = new Date(iso); return isNaN(d) ? String(iso) : d.toLocaleDateString("de-DE", {day:"2-digit", month:"2-digit", year:"numeric"}) + ", " + d.toLocaleTimeString("de-DE", {hour:"2-digit", minute:"2-digit"}) + " Uhr"; }
 let saveTimer;
 function changed(){ updateStatus(); clearTimeout(saveTimer); saveTimer = setTimeout(persist, 300); }
 
@@ -594,15 +738,16 @@ function buildDoc(){
   // Cover band (drawn by background on page 1)
   content.push({margin:[0, -18, 0, 0], columns:[
     {width:"*", stack:[
-      {text:"PRODUKT- & KAMPAGNEN-MASTER-BRIEFING", style:"eyebrow"},
+      {text:"PRODUKT- & KAMPAGNEN-MASTER-BRIEFING" + (isFinal() ? "  ·  FINAL" : ""), style:"eyebrow"},
       {text:name, style:"title"},
       {text:[v("kategorie") || "", v("kategorie") && v("status") ? "  ·  " : "", v("status") || ""], style:"coverSub"}
     ]},
     A.logoWhite ? {width:120, image:A.logoWhite, fit:[120, 54], margin:[0, 6, 0, 0]} : {width:1, text:""}
   ]});
   content.push({text:"", margin:[0, 66, 0, 0]});
-  const meta = [["Dokument-Kürzel / Zitierquelle", "kuerzel"], ["Hauptzielgruppe", "zielgruppe"], ["Erstellt am", null]];
-  content.push({table:{widths:[150, "*"], body:meta.map(([l, k]) => [{text:l.toUpperCase(), style:"label", margin:[0, 2, 0, 0]}, k ? val(state.f[k], "metaV") : {text:today(), style:"metaV"}])},
+  const meta = [["Projekt-ID", {text:state.meta.id, style:"metaV", color:C.blue}], ["Dokument-Kürzel / Zitierquelle", "kuerzel"], ["Hauptzielgruppe", "zielgruppe"], ["Erstellt am", {text:today(), style:"metaV"}]];
+  if(isFinal()) meta.push(["Status", {text:"FINAL · an den Pitch-Meister übergeben am " + fmtDateTime(state.meta.finalizedAt), style:"metaV", color:C.ok}]);
+  content.push({table:{widths:[150, "*"], body:meta.map(([l, k]) => [{text:l.toUpperCase(), style:"label", margin:[0, 2, 0, 0]}, typeof k === "string" ? val(state.f[k], "metaV") : k])},
     layout:{hLineWidth:(i, n) => i === 0 ? 0 : 0.4, vLineWidth:() => 0, hLineColor:() => C.line, paddingTop:() => 6, paddingBottom:() => 6, paddingLeft:() => 0, paddingRight:() => 6}});
 
   // 01
@@ -744,7 +889,7 @@ async function makePdf(){
     let blob;
     try{ blob = await createBlob(buildDoc()); }
     catch(e){ if(!brandFonts) throw e; brandFonts = false; blob = await createBlob(buildDoc()); }
-    const r = await saveFile("Master-Briefing_" + slug(v("produkt")) + ".pdf", blob);
+    const r = await saveFile("Master-Briefing_" + slug(v("produkt")) + "_" + state.meta.id + ".pdf", blob);
     if(r === "saved") toast("PDF erstellt.");
   }catch(e){ console.error(e); toast("Das PDF konnte nicht erstellt werden: " + (e && e.message || e)); }
   finally{ btn.disabled = false; btn.textContent = "PDF erstellen"; }
@@ -777,6 +922,115 @@ document.getElementById("file-import").addEventListener("change", e => {
   };
   rd.readAsText(file);
 });
+
+/* ---------- Übergabe an den Pitch-Meister ---------- */
+const HANDOVER_FORMAT = "gs-briefing-handover";
+function sha256js(str){
+  const b = new TextEncoder().encode(str), K = [], H = [];
+  const frac = x => ((x - Math.floor(x)) * 4294967296) | 0;
+  for(let n = 2, c = 0; c < 64; n++){ let p = true; for(let d = 2; d * d <= n; d++) if(n % d === 0){ p = false; break; } if(p){ if(c < 8) H[c] = frac(Math.pow(n, 1 / 2)); K[c++] = frac(Math.pow(n, 1 / 3)); } }
+  const l = b.length, bl = ((l + 9 + 63) >> 6) << 6, m = new Uint8Array(bl); m.set(b); m[l] = 0x80;
+  const dv = new DataView(m.buffer); dv.setUint32(bl - 4, (l * 8) >>> 0); dv.setUint32(bl - 8, Math.floor(l / 536870912));
+  const w = new Int32Array(64);
+  for(let o = 0; o < bl; o += 64){
+    for(let i = 0; i < 16; i++) w[i] = dv.getInt32(o + i * 4);
+    for(let i = 16; i < 64; i++){ const a = w[i - 15], d = w[i - 2];
+      w[i] = (w[i - 16] + ((a >>> 7 | a << 25) ^ (a >>> 18 | a << 14) ^ (a >>> 3)) + w[i - 7] + ((d >>> 17 | d << 15) ^ (d >>> 19 | d << 13) ^ (d >>> 10))) | 0; }
+    let [a, bb, c, d, e, f, g, h] = H;
+    for(let i = 0; i < 64; i++){
+      const t1 = (h + ((e >>> 6 | e << 26) ^ (e >>> 11 | e << 21) ^ (e >>> 25 | e << 7)) + ((e & f) ^ (~e & g)) + K[i] + w[i]) | 0;
+      const t2 = (((a >>> 2 | a << 30) ^ (a >>> 13 | a << 19) ^ (a >>> 22 | a << 10)) + ((a & bb) ^ (a & c) ^ (bb & c))) | 0;
+      h = g; g = f; f = e; e = (d + t1) | 0; d = c; c = bb; bb = a; a = (t1 + t2) | 0;
+    }
+    [a, bb, c, d, e, f, g, h].forEach((x, i) => H[i] = (H[i] + x) | 0);
+  }
+  return H.map(x => (x >>> 0).toString(16).padStart(8, "0")).join("");
+}
+async function sha256Hex(str){
+  try{ if(window.crypto && crypto.subtle){ const h = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(str)); return Array.from(new Uint8Array(h), x => x.toString(16).padStart(2, "0")).join(""); } }catch(e){}
+  return sha256js(str);
+}
+/* lesbare Darstellung für den Pitch-Meister (Abschnitte in Briefing-Reihenfolge) */
+function buildView(){
+  const T = x => typeof x === "string" ? x.trim() : "";
+  return SCHEMA.map(sec => {
+    const items = [];
+    if(sec.note) items.push({type:"note", text:sec.note});
+    sec.items.forEach(it => {
+      if(it.t === "grid") it.fields.forEach(f => items.push({type:"field", label:f.label, value:T(state.f[f.k])}));
+      else if(it.t === "field") items.push({type:"field", label:it.label, value:T(state.f[it.k])});
+      else if(it.t === "list") items.push({type:"list", label:it.label, values:(state.f[it.k] || "").split(/\n+/).map(x => x.trim()).filter(Boolean)});
+      else if(it.t === "sub") items.push({type:"heading", text:it.title});
+      else if(it.t === "group"){ items.push({type:"heading", text:it.title}); it.fields.forEach(f => items.push({type:"field", label:f.label, value:T(state.f[f.k])})); }
+      else if(it.t === "table") items.push({type:"table", label:it.label || "", columns:it.cols.map(c => c.label), rows:state.t[it.k].filter(rowFilled).map(r => it.cols.map(c => T(r[c.k])))});
+    });
+    return {num:sec.num, title:sec.title, items};
+  });
+}
+function buildData(){
+  const f = {}, t = {};
+  SCHEMA.forEach(sec => sec.items.forEach(it => {
+    const fs = it.t === "grid" || it.t === "group" ? it.fields : (it.t === "field" || it.t === "list") ? [it] : [];
+    fs.forEach(x => f[x.k] = (state.f[x.k] || "").trim());
+    if(it.t === "table") t[it.k] = state.t[it.k].filter(rowFilled).map(r => { const o = {}; it.cols.forEach(c => o[c.k] = (r[c.k] || "").trim()); return o; });
+  }));
+  return {f, t};
+}
+async function buildHandover(finalizedAt){
+  const payload = {schema:"gs-master-briefing", schemaVersion:1, projectId:state.meta.id, produkt:(state.f.produkt || "").trim(), finalizedAt, data:buildData(), view:buildView()};
+  const hex = await sha256Hex(JSON.stringify(payload));
+  return {format:HANDOVER_FORMAT, version:1, checksum:"sha256:" + hex, payload};
+}
+const handoverName = () => "Uebergabe_Pitch-Meister_" + state.meta.id + "_" + slug(state.f.produkt) + ".json";
+const modal = document.getElementById("modal");
+let modalReturn = null;
+function openSend(){
+  if(isFinal()) return;
+  document.getElementById("m-prod").textContent = (state.f.produkt || "").trim();
+  document.getElementById("m-id").textContent = state.meta.id;
+  modalReturn = document.activeElement; modal.hidden = false; document.getElementById("m-cancel").focus();
+}
+function closeModal(){ modal.hidden = true; if(modalReturn && modalReturn.focus) modalReturn.focus(); }
+document.getElementById("m-cancel").addEventListener("click", closeModal);
+modal.addEventListener("click", e => { if(e.target === modal) closeModal(); });
+document.getElementById("m-ok").addEventListener("click", async () => {
+  const ok = document.getElementById("m-ok"); ok.disabled = true;
+  try{
+    const finalizedAt = new Date().toISOString();
+    const pkg = await buildHandover(finalizedAt);
+    const blob = new Blob([JSON.stringify(pkg, null, 2)], {type:"application/json"});
+    const r = await saveFile(handoverName(), blob);
+    if(r !== "saved"){ toast("Übergabe abgebrochen. Das Briefing bleibt bearbeitbar."); return; }
+    state.meta.finalizedAt = finalizedAt; state.meta.checksum = pkg.checksum; state.meta.handover = pkg; isExample = false;
+    persist(); closeModal(); render(); window.scrollTo({top:0});
+    toast("Übergabe-Datei gespeichert. Jetzt im Pitch-Meister unter „Projekte → Briefing importieren“ einlesen.");
+  }catch(e){ console.error(e); toast("Die Übergabe-Datei konnte nicht erstellt werden: " + (e && e.message || e)); }
+  finally{ ok.disabled = false; }
+});
+async function resaveHandover(){
+  if(!isFinal() || !state.meta.handover) return;
+  const r = await saveFile(handoverName(), new Blob([JSON.stringify(state.meta.handover, null, 2)], {type:"application/json"}));
+  if(r === "saved") toast("Übergabe-Datei gespeichert.");
+}
+document.getElementById("btn-send-top").addEventListener("click", openSend);
+document.getElementById("btn-resave").addEventListener("click", resaveHandover);
+document.getElementById("btn-copy-new").addEventListener("click", () => {
+  const copy = normalize({f:state.f, t:state.t}); state = copy; isExample = false; persist(); render(); window.scrollTo({top:0});
+  toast("Kopie mit neuer Projekt-ID " + state.meta.id + " angelegt.");
+});
+document.getElementById("btn-copyid").addEventListener("click", async () => {
+  try{ await navigator.clipboard.writeText(state.meta.id); toast("Projekt-ID kopiert."); }
+  catch(e){ const r = document.createRange(); r.selectNodeContents(document.getElementById("pid")); const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); toast("Projekt-ID markiert. Jetzt mit Strg/⌘+C kopieren."); }
+});
+
+/* ---------- Menü (schmale Bildschirme) ---------- */
+const more = document.getElementById("more"), menuBtn = document.getElementById("btn-menu");
+function setMenu(o){ more.classList.toggle("open", o); menuBtn.setAttribute("aria-expanded", String(o)); }
+menuBtn.addEventListener("click", e => { e.stopPropagation(); setMenu(!more.classList.contains("open")); });
+document.addEventListener("click", e => { if(more.classList.contains("open") && !more.contains(e.target) && !menuBtn.contains(e.target)) setMenu(false); });
+more.addEventListener("click", e => { const t = e.target.closest("a,button,label"); if(t && t.id !== "btn-reset") setMenu(false); });
+document.addEventListener("keydown", e => { if(e.key !== "Escape") return; if(!modal.hidden) closeModal(); else if(more.classList.contains("open")){ setMenu(false); menuBtn.focus(); } });
+matchMedia("(min-width: 960px)").addEventListener("change", () => setMenu(false));
 
 load(); render();
 })();
