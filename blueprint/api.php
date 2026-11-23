@@ -40,16 +40,29 @@ try {
 	switch ($action) {
 
 		case 'list':
-			$list = array_map(function ($d) {
+			$schema = bp_schema()['fields'];
+			$list = array_map(function ($d) use ($schema) {
+				$missingRequired = 0;
+				foreach ($schema as $fid => $def) {
+					if (!empty($def['required']) && bp_is_empty($def, $d['fields'][$fid]['value'] ?? null)) $missingRequired++;
+				}
+				$contributors = [];
+				foreach ($d['contributors'] ?? [] as $name => $c) $contributors[$name] = ['last' => $c['last'] ?? null];
 				return [
 					'id' => $d['id'],
 					'titel' => $d['fields']['titel']['value'] ?? '',
 					'artikel' => $d['fields']['artikel']['value'] ?? '',
+					'artnr' => $d['fields']['artnr']['value'] ?? '',
 					'status' => $d['status'] ?? 'draft',
+					'approval' => $d['approval'] ?? null,
 					'updatedAt' => $d['updatedAt'] ?? null,
+					'updatedBy' => $d['updatedBy'] ?? '',
+					'contributors' => (object) $contributors,
+					'percent' => bp_progress($d)['percent'],
+					'missingRequired' => $missingRequired,
 				];
 			}, bp_list());
-			bp_out(['items' => $list]);
+			bp_out(['items' => $list, 'users' => (object) bp_users()]);
 
 		case 'get':
 			$doc = bp_load((string) ($in['id'] ?? ''));

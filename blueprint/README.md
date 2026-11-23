@@ -1,16 +1,16 @@
-# Blueprint · Produktionsvorbereitung
+# Blueprint · Produktionsvorbereitung (Genius Studios)
 
-Web-Version des Genius-Master-Templates „Blueprint“ (Word-Vorlage) – zum gemeinsamen Befüllen, Freigeben und Ablegen als PDF.
+Web-Version des Master-Templates „Blueprint“ (Word-Vorlage) – zum gemeinsamen Befüllen, Freigeben und Ablegen als PDF. Oberfläche im Look der Genius-Studios-Apps (Master-Briefing, Pitch-Meister): dunkles shadcn/ui-Design, Geist-Schrift, Lucide-Icons, Genius-Studios-Logo und -Footer.
 
 ## Funktionen
 
-- **Übersicht (`index.php`)**: Index aller Blueprints mit Status (in Bearbeitung / freigegeben), Beteiligten, Fortschritt, Stand, Suche, Filter, Duplizieren (als Vorlage) und Löschen (nur Entwürfe, Sicherung in `data/_papierkorb`).
-- **Editor (`edit.php`)**: das Dokument im Layout des Master-Templates (Kopf mit Projekttitel und Genius-Logo, Autor/Stand/Artikel/Art.-Nr., Produktbild + Artikel Info, Orderscreen-Angebote mit automatischer Ersparnis, Key Question, Produktübersicht, Fragen Moderator, Einspieler mit MAZen/Grafiken/Vorher-Nachher, Studio, EDIT/Nachbearbeitung, Notizen).
+- **Übersicht**: Kennzahlen, Index aller Blueprints mit Status (in Bearbeitung / freigegeben), Fortschritt, offenen Pflichtbereichen, Beteiligten und Stand; Suche, Filter, Duplizieren (als Vorlage) und Löschen (nur Entwürfe, Sicherung in `data/_papierkorb`).
+- **Editor**: Abschnittsnavigation mit Zählern (grün = vollständig, gelb = Pflicht offen), Kennzahlen mit Sprung zum nächsten offenen Pflichtbereich, Abschnittskarten für Stammdaten, Produkt, Angebote (automatische Ersparnis), Key Question, Produktübersicht, Fragen Moderator, Einspieler (MAZen/Grafiken/Vorher-Nachher), Studio, EDIT/Nachbearbeitung, Notizen und eine Freigabe-Karte am Ende.
 - **Namens-Markierung**: Jede Person gibt einmal Namen und Farbe an (gespeichert im Browser). Jeder Bereich, jedes Angebot, jede MAZ und Grafik bekommt beim Speichern den Namen, Datum/Uhrzeit und die Farbe der Person. Die Markierungen lassen sich ein- und ausblenden. Der **Verlauf** zeigt, wer wann was geändert hat.
-- **Mehrere Personen gleichzeitig**: Jeder Bereich wird einzeln gespeichert (automatisch nach kurzer Pause). Alle 8 Sekunden werden Änderungen anderer übernommen. Ändern zwei Personen gleichzeitig denselben Bereich, erscheint ein Hinweis mit der Wahl „Version von X laden“ oder „Meine Version speichern“.
+- **Mehrere Personen gleichzeitig**: Jeder Bereich wird einzeln gespeichert (automatisch nach kurzer Pause). Alle 5 Sekunden werden Änderungen anderer übernommen. Ändern zwei Personen gleichzeitig denselben Bereich, erscheint ein Hinweis mit der Wahl „Version von X laden“ oder „Meine Version speichern“.
 - **Medien**: Bilder, Videos, PDFs und andere Dateien per Drag & Drop oder Klick hochladen – direkt in die Bereiche oder in einzelne MAZen, Grafiken und Angebote. Videos sind abspielbar.
 - **Text-Formatierung**: fett, kursiv, unterstrichen, Listen, Pfeil, gelber Textmarker, Links. Text aus Word lässt sich einfügen (Formatierung wird bereinigt).
-- **Freigabe**: Der Button „Freigeben“ prüft die Pflichtbereiche, erzeugt ein PDF im Layout des Master-Templates (Kopfzeile mit Titel und Logo, „Seite | n“, Freigabe-Vermerk, Videos als Standbild mit Play-Symbol), legt es auf dem Server ab und **sperrt die Eingabe** – auch serverseitig. Die Freigabe kann mit Begründung (optional mit PIN) aufgehoben werden; bei erneuter Freigabe entsteht Version 2, 3 … Alle PDF-Versionen bleiben im Verlauf abrufbar.
+- **Freigabe**: Der Button „Freigeben“ prüft die Pflichtbereiche, erzeugt ein PDF im Tabellen-Layout des Master-Templates (Kopfzeile mit Titel und Genius-Studios-Logo, Fußzeile mit Adresse, „Seite | n“, Freigabe-Vermerk, Videos als Standbild mit Play-Symbol), legt es auf dem Server ab und **sperrt die Eingabe** – auch serverseitig. Die Freigabe kann mit Begründung (optional mit PIN) aufgehoben werden; bei erneuter Freigabe entsteht Version 2, 3 … Alle PDF-Versionen bleiben im Verlauf abrufbar.
 - **PDF-Vorschau** jederzeit möglich, ohne freizugeben.
 
 ## Installation
@@ -34,14 +34,18 @@ Zum lokalen Ausprobieren: `php -S localhost:8000` im Repository-Ordner starten u
 
 | Datei | Zweck |
 |---|---|
-| `schema.json` | Bereiche und Felder des Templates – hier lassen sich Felder ergänzen oder umbenennen |
-| `index.php` | Übersicht |
-| `edit.php` | Editor / Ansicht |
-| `api.php` | Speichern, Upload, Freigabe, Aufheben, Löschen |
+| `index.php` | App-Seite: Übersicht und Editor (Umschaltung über `#bp-<id>`) |
+| `edit.php` | alte Editor-Adresse, leitet auf `index.php#bp-<id>` weiter |
+| `assets/app.js`, `assets/app.css` | Oberfläche, Speichern, Abgleich, PDF-Erzeugung |
+| `assets/logo-white.png`, `assets/logo-dark.png` | Genius-Studios-Logo (hell für die App, dunkel fürs PDF) |
+| `schema.json` | Felder des Templates (IDs müssen zu `assets/app.js` passen) |
+| `api.php` | Liste, Laden, Speichern, Upload, Freigabe, Aufheben, Löschen |
 | `file.php` | liefert Medien und PDFs aus (mit Range-Support zum Spulen in Videos) |
 | `lib.php` | Speicherung (JSON-Dateien mit Dateisperre), Bereinigung der Eingaben |
-| `assets/` | Styles, Skripte, Logo; `vendor/html2pdf.bundle.min.js` (MIT) für die PDF-Erzeugung |
+| `assets/vendor/html2pdf.bundle.min.js` | PDF-Erzeugung im Browser (MIT) |
 | `data/<id>/` | `blueprint.json`, `media/` (Uploads), `pdf/` (freigegebene Versionen) – nicht im Git |
+
+Die Schrift Geist wird von Google Fonts geladen; ohne Internetzugang greift eine Systemschrift.
 
 ### Hinweise
 
