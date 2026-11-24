@@ -205,6 +205,43 @@ input::placeholder,textarea::placeholder{color:#737373}
 .mbox dt{color:var(--muted-foreground)} .mbox dd{margin:0;font-weight:500;overflow-wrap:anywhere}
 .mbox .btns{display:flex;flex-wrap:wrap;gap:8px;justify-content:flex-end;margin-top:4px}
 
+/* Archiv (Card + Table) */
+.archive{max-width:1280px;margin:0 auto 56px;border:1px solid var(--border);border-radius:var(--radius-xl);background:var(--card);padding:24px;display:flex;flex-direction:column;gap:18px;scroll-margin-top:90px}
+.arch-head{display:flex;flex-wrap:wrap;gap:14px 20px;align-items:flex-end;justify-content:space-between}
+.arch-head .t{display:flex;gap:14px;align-items:center;min-width:0}
+.arch-head h2{font-size:20px;letter-spacing:-.02em}
+.arch-head p{margin:2px 0 0;color:var(--muted-foreground);max-width:70ch}
+.arch-head .eyebrow{font:500 12px var(--font-mono);color:var(--muted-foreground)}
+.arch-q{position:relative;flex:0 1 320px;min-width:200px}
+.arch-q svg{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--muted-foreground)}
+.arch-q input{padding-left:34px}
+.arch-mode{display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;padding:1px 9px;border-radius:999px;border:1px solid var(--border);background:var(--muted);color:#D4D4D4;margin-left:8px;vertical-align:2px}
+.arch-tw{overflow-x:auto;border:1px solid var(--border);border-radius:var(--radius)}
+table.arch{width:100%;border-collapse:collapse;font-size:14px;min-width:720px}
+table.arch th{height:40px;padding:0 14px;text-align:left;font-weight:500;color:var(--muted-foreground);border-bottom:1px solid var(--border);white-space:nowrap}
+table.arch td{padding:12px 14px;border-bottom:1px solid var(--border);vertical-align:middle}
+table.arch tr:last-child td{border-bottom:0}
+table.arch tbody tr:hover{background:rgba(255,255,255,.025)}
+table.arch .prod{font-weight:500}
+table.arch .muted{color:var(--muted-foreground);font-size:13px}
+table.arch .mono{font:500 13px var(--font-mono);white-space:nowrap}
+table.arch .docs{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.arch-empty{border:1px dashed var(--input);border-radius:var(--radius);padding:32px 20px;text-align:center;color:var(--muted-foreground);display:flex;flex-direction:column;align-items:center;gap:10px}
+.arch-empty .tile{margin-bottom:2px}
+.arch-empty b{color:var(--foreground);font-weight:500;font-size:15px}
+@media (max-width:760px){
+  .archive{padding:18px}
+  .arch-tw{border:0;overflow:visible}
+  table.arch{min-width:0}
+  table.arch thead{display:none}
+  table.arch,table.arch tbody,table.arch tr,table.arch td{display:block;width:100%}
+  table.arch tr{border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;margin-bottom:10px;background:var(--background)}
+  table.arch td{border:0;padding:3px 0}
+  table.arch td[data-l]::before{content:attr(data-l);display:block;font:400 12px/1.5 var(--font-sans);color:var(--muted-foreground)}
+  table.arch .docs{justify-content:flex-start;padding-top:8px}
+  .arch-q{flex:1 1 100%}
+}
+
 /* Footer */
 footer.site{max-width:1280px;margin:0 auto;padding-block:28px 40px;display:flex;flex-wrap:wrap;gap:16px 32px;align-items:center;border-top:1px solid var(--border);color:var(--muted-foreground)}
 footer.site img{height:40px;width:auto}
@@ -258,7 +295,7 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
 <header class="bar wrap">
   <div class="bar-in">
     <a class="logo" href="https://genius-studios.de" target="_blank" rel="noopener"><img id="logo-top" alt="Genius Studios" width="560" height="247"><span>Master-Briefing</span></a>
-    <nav class="links" aria-label="Seite"><a href="#app">Briefing</a><a href="#send-card">Übergabe</a><a href="https://genius-studios.de" target="_blank" rel="noopener">Genius Studios</a></nav>
+    <nav class="links" aria-label="Seite"><a href="#app">Briefing</a><a href="#send-card">Übergabe</a><a href="#archiv">Archiv</a><a href="https://genius-studios.de" target="_blank" rel="noopener">Genius Studios</a></nav>
     <div class="actions">
       <button type="button" class="btn ghost menu-btn" id="btn-menu" aria-expanded="false" aria-controls="more" aria-haspopup="menu"><i data-icon="ellipsis"></i>Aktionen</button>
       <button type="button" class="btn primary" id="btn-pdf"><i data-icon="filedown"></i><span>PDF<span class="lbl-long"> erstellen</span></span></button>
@@ -268,6 +305,7 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
         <button type="button" class="btn" id="btn-export" role="menuitem"><i data-icon="download"></i>Entwurf sichern</button>
         <label class="btn" for="file-import" tabindex="0" id="lbl-import" role="menuitem"><i data-icon="upload"></i>Entwurf öffnen</label>
         <input type="file" id="file-import" accept=".json,application/json" hidden>
+        <a class="btn" href="#archiv" role="menuitem"><i data-icon="archive"></i>Archiv</a>
         <div class="msep"></div>
         <button type="button" class="btn" id="btn-reset" role="menuitem"><i data-icon="trash"></i>Leeren</button>
         <nav class="mnav" id="mnav" aria-label="Abschnitte"><div class="msep"></div><div class="mlabel">Abschnitte</div></nav>
@@ -310,13 +348,20 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
         </div>
         <div class="banner final" id="final-banner" hidden>
           <span><i data-icon="lock"></i><span id="final-text"></span></span>
-          <span class="bbtns"><button type="button" class="btn small" id="btn-resave"><i data-icon="download"></i>Übergabe-Datei erneut speichern</button><button type="button" class="btn small" id="btn-copy-new"><i data-icon="copy"></i>Kopie mit neuer ID bearbeiten</button></span>
+          <span class="bbtns"><button type="button" class="btn small" id="btn-archive-now" hidden><i data-icon="archive"></i>Ins Archiv aufnehmen</button><button type="button" class="btn small" id="btn-resave"><i data-icon="download"></i>Übergabe-Datei erneut speichern</button><button type="button" class="btn small" id="btn-copy-new"><i data-icon="copy"></i>Kopie mit neuer ID bearbeiten</button></span>
         </div>
         <form id="form" novalidate></form>
         <section class="send-card" id="send-card" aria-live="polite"></section>
       </main>
     </div>
   </div>
+  <section class="archive" id="archiv" aria-labelledby="arch-h">
+    <div class="arch-head">
+      <div class="t"><span class="tile"><i data-icon="archive"></i></span><div><div class="eyebrow">Archiv</div><h2 id="arch-h">Finale Briefings<span class="arch-mode" id="arch-mode" hidden></span></h2><p id="arch-note">Alle an den Pitch-Meister übergebenen Briefings mit Links zum finalen PDF und zur Übergabe-Datei.</p></div></div>
+      <label class="arch-q"><i data-icon="search"></i><input type="text" id="arch-q" placeholder="Produkt oder Projekt-ID suchen" aria-label="Archiv durchsuchen" autocomplete="off"></label>
+    </div>
+    <div id="arch-body"><div class="arch-empty"><span>Archiv wird geladen …</span></div></div>
+  </section>
   <footer class="site">
     <img id="logo-foot" alt="Genius Studios" width="560" height="247">
     <address>Genius Studios · Im Dachsstück 8 · 65549 Limburg/Lahn<br>Telefon +49 (0) 64 31 – 9 8882222 · <a href="https://genius-studios.de" target="_blank" rel="noopener">genius-studios.de</a></address>
@@ -369,7 +414,11 @@ const ICONS = {
   listchecks:'<path d="m3 17 2 2 4-4"/><path d="m3 7 2 2 4-4"/><path d="M13 6h8"/><path d="M13 12h8"/><path d="M13 18h8"/>',
   hash:'<path d="M4 9h16"/><path d="M4 15h16"/><path d="M10 3 8 21"/><path d="m16 3-2 18"/>',
   flag:'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><path d="M4 22v-7"/>',
-  alert:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>'
+  alert:'<circle cx="12" cy="12" r="10"/><path d="M12 8v4"/><path d="M12 16h.01"/>',
+  archive:'<rect width="20" height="5" x="2" y="3" rx="1"/><path d="M4 8v11a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8"/><path d="M10 12h4"/>',
+  search:'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  external:'<path d="M15 3h6v6"/><path d="M10 14 21 3"/><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/>',
+  filejson:'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 12a1 1 0 0 0-1 1v1a1 1 0 0 1-1 1 1 1 0 0 1 1 1v1a1 1 0 0 0 1 1"/><path d="M14 18a1 1 0 0 0 1-1v-1a1 1 0 0 1 1-1 1 1 0 0 1-1-1v-1a1 1 0 0 0-1-1"/>'
 };
 const SEC_ICON = {stamm:"filetext", kern:"target", specs:"shield", demos:"clapper", angebot:"tag", voc:"quote", kampagnen:"chart"};
 function icon(name){ const t = document.createElement("template"); t.innerHTML = '<svg class="i" viewBox="0 0 24 24" aria-hidden="true">' + (ICONS[name] || "") + "</svg>"; return t.content.firstChild; }
@@ -656,6 +705,7 @@ function render(){
   document.getElementById("hero-example").hidden = fin;
   document.getElementById("main-title").textContent = filled(state.f.produkt) ? "Briefing · " + state.f.produkt.trim() : "Neues Briefing";
   const fb = document.getElementById("final-banner"); fb.hidden = !fin;
+  updateArchiveButton();
   if(fin) document.getElementById("final-text").textContent = "Final an den Pitch-Meister übergeben am " + fmtDateTime(state.meta.finalizedAt) + ". Dieses Briefing ist schreibgeschützt.";
   lastCardKey = "";
   updateStatus();
@@ -1099,6 +1149,7 @@ document.getElementById("m-ok").addEventListener("click", async () => {
     state.meta.finalizedAt = finalizedAt; state.meta.checksum = pkg.checksum; state.meta.handover = pkg; isExample = false;
     persist(); closeModal(); render(); window.scrollTo({top:0});
     toast("Übergabe-Datei gespeichert. Jetzt im Pitch-Meister unter „Projekte → Briefing importieren“ einlesen.");
+    archiveCurrent(true);
   }catch(e){ console.error(e); toast("Die Übergabe-Datei konnte nicht erstellt werden: " + (e && e.message || e)); }
   finally{ ok.disabled = false; }
 });
@@ -1130,7 +1181,142 @@ matchMedia("(min-width: 960px)").addEventListener("change", () => setMenu(false)
 document.getElementById("hero-example").addEventListener("click", () => { document.getElementById("btn-example").click(); document.getElementById("app").scrollIntoView({behavior:"smooth"}); });
 document.getElementById("hero-start").addEventListener("click", jumpToMissing);
 
+/* ---------- Archiv: finale Briefings mit PDF ----------
+   Im claude.ai-Artifact: gemeinsames Team-Archiv (db-Collection „archive“, PDFs als Assets).
+   Als eigenständige Datei: lokales Archiv in IndexedDB (nur dieser Browser). */
+const IN_VIEWER = !!(window.claude && typeof window.claude.use === "function");
+const Arch = {mode:null, db:null, assets:null, user:null, rows:[], loaded:false, error:"", stale:false, names:{}, urls:[], busy:false};
+const ASSET_RE = /^[A-Za-z0-9_-]{8,64}$/;
+let archReadyResolve; const archReady = new Promise(r => archReadyResolve = r);
+const sstr = x => typeof x === "string" ? x : "";
+function cleanRow(id, d){
+  d = d || {};
+  return {projectId:ID_RE.test(sstr(d.projectId)) ? d.projectId : id, produkt:sstr(d.produkt), kategorie:sstr(d.kategorie), finalizedAt:sstr(d.finalizedAt),
+    checksum:sstr(d.checksum), pdfAsset:ASSET_RE.test(sstr(d.pdfAsset)) ? d.pdfAsset : "", handoverAsset:ASSET_RE.test(sstr(d.handoverAsset)) ? d.handoverAsset : "",
+    createdBy:sstr(d.createdBy), pdf:d.pdf instanceof Blob ? d.pdf : null, handover:d.handover instanceof Blob ? d.handover : null};
+}
+/* lokal (IndexedDB) */
+function idbOpen(){ return new Promise((res, rej) => { let r; try{ r = indexedDB.open("gs-briefing-archive", 1); }catch(e){ return rej(e); }
+  r.onupgradeneeded = () => r.result.createObjectStore("archive", {keyPath:"projectId"}); r.onsuccess = () => res(r.result); r.onerror = () => rej(r.error); }); }
+async function idbAll(){ const d = await idbOpen(); return new Promise((res, rej) => { const q = d.transaction("archive").objectStore("archive").getAll(); q.onsuccess = () => res(q.result || []); q.onerror = () => rej(q.error); }); }
+async function idbPut(rec){ const d = await idbOpen(); return new Promise((res, rej) => { const t = d.transaction("archive", "readwrite"); t.objectStore("archive").put(rec); t.oncomplete = res; t.onerror = () => rej(t.error); }); }
+async function loadLocal(){
+  try{ Arch.rows = (await idbAll()).map(r => cleanRow(r.projectId, r)).sort((a, b) => b.finalizedAt.localeCompare(a.finalizedAt)); Arch.error = ""; }
+  catch(e){ Arch.rows = []; Arch.error = "Das lokale Archiv ist in diesem Browser nicht verfügbar (z. B. privates Fenster)."; }
+  Arch.loaded = true; renderArchive(); updateArchiveButton();
+}
+async function initArchive(){
+  let db = null, assets = null, user = null;
+  if(IN_VIEWER){ [db, assets, user] = await Promise.all(["db", "assets", "user"].map(n => window.claude.use(n).catch(() => null))); }
+  Arch.assets = assets; Arch.user = user;
+  if(db){
+    Arch.mode = "cloud"; Arch.db = db;
+    let timer = setTimeout(() => { Arch.stale = true; renderArchive(); }, 10000);
+    try{
+      db.collection("archive").orderBy("finalizedAt", "desc").limit(500).onSnapshot(snap => {
+        if(!snap.metadata.fromCache){ clearTimeout(timer); Arch.stale = false; }
+        Arch.rows = snap.docs.map(d => cleanRow(d.id, d.data())); Arch.loaded = true; Arch.error = "";
+        resolveNames(); renderArchive(); updateArchiveButton(); archReadyResolve();
+      }, err => { clearTimeout(timer); Arch.loaded = true; Arch.error = err && err.code === "revoked" ? "Kein Zugriff mehr auf das Archiv." : "Das Archiv konnte nicht geladen werden."; renderArchive(); archReadyResolve(); });
+    }catch(e){ clearTimeout(timer); Arch.loaded = true; Arch.error = "Das Archiv konnte nicht geladen werden."; renderArchive(); archReadyResolve(); }
+  } else {
+    Arch.mode = "local"; await loadLocal(); archReadyResolve();
+  }
+}
+async function resolveNames(){
+  if(!Arch.user || typeof Arch.user.profiles !== "function") return;
+  const ids = [...new Set(Arch.rows.map(r => r.createdBy).filter(Boolean))]; if(!ids.length) return;
+  try{ const ps = await Arch.user.profiles(ids); ids.forEach(id => { const n = ps && ps[id] && ps[id].name; if(n) Arch.names[id] = n; }); renderArchive(); }catch(e){}
+}
+function updateArchiveButton(){
+  const b = document.getElementById("btn-archive-now"); if(!b) return;
+  b.hidden = !(isFinal() && Arch.loaded && !Arch.error && !Arch.rows.some(r => r.projectId === state.meta.id));
+}
+async function archiveCurrent(auto){
+  if(!isFinal() || Arch.busy) return;
+  await archReady;
+  if(Arch.error){ toast(Arch.error); return; }
+  Arch.busy = true; const btn = document.getElementById("btn-archive-now"); btn.disabled = true;
+  try{
+    if(!window.pdfMake) throw new Error("Der PDF-Baustein ist nicht geladen.");
+    setupFonts();
+    let pdf; try{ pdf = await createBlob(buildDoc()); }catch(e){ if(!brandFonts) throw e; brandFonts = false; pdf = await createBlob(buildDoc()); }
+    const handover = new Blob([JSON.stringify(state.meta.handover, null, 2)], {type:"application/json"});
+    const rec = {projectId:state.meta.id, produkt:(state.f.produkt || "").trim(), kategorie:(state.f.kategorie || "").trim(), finalizedAt:state.meta.finalizedAt, checksum:String(state.meta.checksum || "")};
+    if(Arch.mode === "cloud"){
+      let note = "";
+      if(Arch.assets){
+        try{ rec.pdfAsset = (await Arch.assets.upload(pdf, {type:"application/pdf"})).id; rec.handoverAsset = (await Arch.assets.upload(handover, {type:"application/json"})).id; }
+        catch(e){ note = e && e.code === "quota_or_state" ? " Der Speicher des Archivs ist voll, die PDF wurde nicht hochgeladen." : " Die PDF konnte nicht hochgeladen werden."; }
+      } else note = " Die PDF kann nur von Personen mit Bearbeitungsrecht hochgeladen werden.";
+      try{ rec.createdBy = Arch.user ? (await Arch.user.id()) || "" : ""; }catch(e){ rec.createdBy = ""; }
+      rec.archivedAt = new Date().toISOString();
+      await Arch.db.doc("archive/" + rec.projectId).set(rec);
+      toast("Im Archiv gespeichert." + note);
+    } else {
+      rec.pdf = pdf; rec.handover = handover; rec.archivedAt = new Date().toISOString();
+      await idbPut(rec); await loadLocal();
+      toast("Im lokalen Archiv gespeichert.");
+    }
+  }catch(e){
+    console.error(e);
+    const code = e && e.code;
+    toast(code === "invalid_argument" ? "Archivieren nicht möglich: Sie haben keine Schreibrechte für das Archiv." : code === "quota_exceeded" ? "Das Archiv ist voll." : "Archivieren fehlgeschlagen" + (e && e.message ? ": " + e.message : "."));
+    if(!auto) updateArchiveButton();
+  }finally{ Arch.busy = false; btn.disabled = false; updateArchiveButton(); }
+}
+async function saveArchived(row, kind){
+  try{
+    let blob = kind === "pdf" ? row.pdf : row.handover;
+    const asset = kind === "pdf" ? row.pdfAsset : row.handoverAsset;
+    if(!blob && asset){ const r = await fetch("/_blob/" + asset); if(!r.ok) throw new Error("Datei nicht gefunden"); blob = await r.blob(); }
+    if(!blob) throw new Error("keine Datei hinterlegt");
+    const name = (kind === "pdf" ? "Master-Briefing_" + slug(row.produkt) + "_" + row.projectId + "_FINAL.pdf" : "Uebergabe_Pitch-Meister_" + row.projectId + "_" + slug(row.produkt) + ".json");
+    const r = await saveFile(name, blob); if(r === "saved") toast("Gespeichert.");
+  }catch(e){ toast("Die Datei konnte nicht geladen werden: " + (e && e.message || e)); }
+}
+function renderArchive(){
+  const body = document.getElementById("arch-body"); if(!body) return;
+  Arch.urls.forEach(u => URL.revokeObjectURL(u)); Arch.urls = [];
+  const mode = document.getElementById("arch-mode");
+  mode.hidden = !Arch.mode; mode.textContent = Arch.mode === "cloud" ? "Team-Archiv" : "Nur dieser Browser";
+  document.getElementById("arch-note").textContent = Arch.mode === "cloud"
+    ? "Alle an den Pitch-Meister übergebenen Briefings, für alle mit Zugriff auf diese Seite. Mit Links zum finalen PDF und zur Übergabe-Datei."
+    : "Alle hier an den Pitch-Meister übergebenen Briefings mit finalem PDF und Übergabe-Datei. Gespeichert in diesem Browser.";
+  body.textContent = "";
+  if(!Arch.loaded){ body.appendChild(el("div", {class:"arch-empty"}, [el("span", {text:Arch.stale ? "Das Archiv ist gerade nicht erreichbar. Es lädt, sobald die Verbindung steht." : "Archiv wird geladen …"})])); return; }
+  if(Arch.error){ body.appendChild(el("div", {class:"arch-empty"}, [el("b", {text:Arch.error})])); return; }
+  const q = (document.getElementById("arch-q").value || "").trim().toLowerCase();
+  const rows = Arch.rows.filter(r => !q || (r.produkt + " " + r.projectId + " " + r.kategorie).toLowerCase().includes(q));
+  if(!Arch.rows.length){
+    body.appendChild(el("div", {class:"arch-empty"}, [el("span", {class:"tile"}, [icon("archive")]), el("b", {text:"Noch keine finalen Briefings"}),
+      el("span", {text:"Sobald Sie ein vollständiges Briefing an den Pitch-Meister senden, erscheint es hier mit Link zum finalen PDF."})])); return;
+  }
+  if(!rows.length){ body.appendChild(el("div", {class:"arch-empty"}, [el("b", {text:"Keine Treffer für „" + q + "“"})])); return; }
+  const tb = el("tbody");
+  rows.forEach(r => {
+    const docs = el("div", {class:"docs"});
+    const pdfHref = r.pdfAsset ? "/_blob/" + r.pdfAsset : (!IN_VIEWER && r.pdf ? (() => { const u = URL.createObjectURL(r.pdf); Arch.urls.push(u); return u; })() : "");
+    if(pdfHref) docs.appendChild(el("a", {class:"btn small primary", href:pdfHref, target:"_blank", rel:"noopener"}, [icon("external"), "PDF öffnen"]));
+    if(r.pdfAsset || r.pdf) docs.appendChild(el("button", {type:"button", class:"btn small", title:"Finales PDF speichern", onclick:() => saveArchived(r, "pdf")}, [icon("download"), "PDF"]));
+    else docs.appendChild(el("span", {class:"muted", text:"PDF nicht hochgeladen"}));
+    if(r.handoverAsset || r.handover) docs.appendChild(el("button", {type:"button", class:"btn small", title:"Übergabe-Datei speichern", onclick:() => saveArchived(r, "handover")}, [icon("filejson"), "Übergabe"]));
+    const who = r.createdBy && Arch.names[r.createdBy] ? " · " + Arch.names[r.createdBy] : "";
+    tb.appendChild(el("tr", null, [
+      el("td", {"data-l":"Produkt"}, [el("div", {class:"prod", text:r.produkt || "—"}), r.kategorie ? el("div", {class:"muted", text:r.kategorie}) : null]),
+      el("td", {"data-l":"Projekt-ID", class:"mono", text:r.projectId}),
+      el("td", {"data-l":"Final übergeben"}, [el("div", {text:r.finalizedAt ? fmtDateTime(r.finalizedAt) : "—"}), who ? el("div", {class:"muted", text:who.slice(3)}) : null]),
+      el("td", null, [docs])
+    ]));
+  });
+  const table = el("table", {class:"arch"}, [el("thead", null, [el("tr", null, ["Produkt", "Projekt-ID", "Final übergeben", ""].map((t, i) => el("th", {text:t, style:i === 3 ? "text-align:right" : null})))]), tb]);
+  body.appendChild(el("div", {class:"arch-tw"}, [table]));
+}
+document.getElementById("arch-q").addEventListener("input", renderArchive);
+document.getElementById("btn-archive-now").addEventListener("click", () => archiveCurrent(false));
+
 load(); render();
+initArchive();
 })();
 </script>
 </body>

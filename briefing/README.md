@@ -12,6 +12,8 @@ Eine Webseite mit Eingabemasken für das *Produkt- & Kampagnen-Master-Briefing*.
 - **Beispiel laden** füllt alle Felder mit fiktiven Beispieldaten.
 - Jedes Briefing hat eine automatisch vergebene **Projekt-ID** (z. B. `GS-2026-7K4Q9M`), sichtbar oben, im PDF und in der Übergabe.
 - Sind alle Felder ausgefüllt, erscheint **An Pitch-Meister senden**. Es erzeugt eine versiegelte Übergabe-Datei. Danach ist das Briefing schreibgeschützt.
+- **Archiv** (unten auf der Seite und im Menü): alle final übergebenen Briefings mit Link zum finalen PDF und zur Übergabe-Datei, durchsuchbar.
+  Als claude.ai-Artifact ein gemeinsames Team-Archiv (Datenbank der Seite, PDFs als Dateien der Seite), als eigenständige Datei ein lokales Archiv in diesem Browser (IndexedDB).
   Details und Einbau in den Pitch-Meister: [UEBERGABE.md](UEBERGABE.md), Modul: `pitchmeister-import.js`.
 
 ## Design
