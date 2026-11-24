@@ -316,11 +316,11 @@ h2{font-weight:600;font-size:15px;letter-spacing:-.01em}
 h3{font-weight:600;font-size:11px;letter-spacing:.14em;color:var(--muted)}
 .eyebrow{font-size:11.5px;font-weight:600;letter-spacing:.22em;text-transform:uppercase;color:var(--brand);margin-bottom:6px}
 /* App-Shell wie Solaris-Dashboard: Sidebar links, schmale Leiste oben */
-#app{grid-template-columns:256px 1fr;grid-template-rows:60px 1fr;gap:0;padding:0}
+#app{grid-template-columns:256px 1fr;grid-template-rows:76px 1fr;gap:0;padding:0}
 nav.side{grid-row:1/span 2;grid-column:1;background:var(--panel);border-right:1px solid var(--line);border-radius:0;padding:0 12px 12px;display:flex;flex-direction:column;box-shadow:none}
-.side-brand{display:flex;align-items:center;gap:10px;height:60px;padding:0 6px;margin:0 -12px 8px;padding-left:18px;border-bottom:1px solid var(--line);flex:none}
-.side-brand img{height:30px;width:auto;display:block}
-.side-brand .app{font-weight:600;font-size:13px;letter-spacing:.02em;line-height:1.15}
+.side-brand{display:flex;align-items:center;gap:10px;height:76px;padding:0 6px;margin:0 -12px 8px;padding-left:16px;border-bottom:1px solid var(--line);flex:none}
+.side-brand img{height:50px;width:auto;display:block}
+.side-brand .app{font-weight:600;font-size:12px;letter-spacing:.02em;line-height:1.2;white-space:nowrap}
 .side-brand .app span{display:block;font-size:11px;font-weight:500;color:var(--muted);letter-spacing:.06em}
 nav.side .grp{font-size:11px;font-weight:500;letter-spacing:.02em;text-transform:none;color:var(--faint);margin:14px 8px 4px}
 nav.side button{border-radius:var(--radius-md);color:var(--muted);font-weight:500;font-size:13.5px;padding:7px 8px;gap:10px}
@@ -400,6 +400,8 @@ td{border-color:var(--line)}
 .toast{background:var(--panel);color:var(--text);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow-lg);padding:12px 16px;font-size:13.5px}
 .login{background:radial-gradient(800px 420px at 50% -60px,var(--glow1),transparent 70%),var(--bg)}
 .login .box{background:var(--panel);border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow-lg);width:min(420px,100%);padding:32px}
+.login{overflow-y:auto;place-items:start center}
+.login .box{margin:auto 0}
 .login .brand{display:flex;flex-direction:column;align-items:center;gap:16px;margin-bottom:4px}
 .login .brand img{width:200px;max-width:70%}
 .login h1{font-size:22px;letter-spacing:-.02em;font-weight:600}
@@ -417,7 +419,7 @@ td{border-color:var(--line)}
 @media (max-width:860px){
   #app{grid-template-columns:1fr;grid-template-rows:auto auto 1fr;gap:0;padding:0}
   .side-foot,.side-brand{display:none}
-  header.top{grid-column:1;grid-row:1} header.top .logo{display:flex} .logo img{height:26px} .logo .app,.logo .sep{display:none}
+  header.top{grid-column:1;grid-row:1} header.top .logo{display:flex} .logo img{height:36px} .logo .app,.logo .sep{display:none}
   main{grid-column:1}
   header.top{padding:10px 16px;flex-wrap:wrap;gap:10px}
   .top .proj{order:3;flex-basis:100%;margin:0}
