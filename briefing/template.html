@@ -293,10 +293,10 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
 </head>
 <body>
 <div class="spot" aria-hidden="true"></div><div class="grid-bg" aria-hidden="true"></div>
-<div class="page">
+<div class="page" id="start">
 <header class="bar wrap">
   <div class="bar-in">
-    <a class="logo" href="https://genius-studios.de" target="_blank" rel="noopener"><img id="logo-top" alt="Genius Studios" width="560" height="247"></a>
+    <a class="logo" id="logo-link" href="#start" aria-label="Genius Studios Master-Briefing – zur Startseite"><img id="logo-top" alt="Genius Studios" width="560" height="247"></a>
     <nav class="links" aria-label="Seite"><a href="#app">Briefing</a><a href="#send-card">Übergabe</a><a href="#archiv">Archiv</a><a href="https://genius-studios.de" target="_blank" rel="noopener">Genius Studios</a></nav>
     <div class="actions">
       <button type="button" class="btn ghost menu-btn" id="btn-menu" aria-expanded="false" aria-controls="more" aria-haspopup="menu"><i data-icon="ellipsis"></i><span class="lbl-act">Aktionen</span></button>
@@ -1182,6 +1182,11 @@ matchMedia("(min-width: 960px)").addEventListener("change", () => setMenu(false)
 
 document.getElementById("hero-example").addEventListener("click", () => { document.getElementById("btn-example").click(); document.getElementById("app").scrollIntoView({behavior:"smooth"}); });
 document.getElementById("hero-start").addEventListener("click", jumpToMissing);
+document.getElementById("logo-link").addEventListener("click", e => {
+  e.preventDefault(); setMenu(false);
+  window.scrollTo({top:0, behavior:matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth"});
+  try{ if(location.hash) history.replaceState(null, "", location.pathname + location.search); }catch(err){}
+});
 
 /* ---------- Archiv: finale Briefings mit PDF ----------
    Im claude.ai-Artifact: gemeinsames Team-Archiv (db-Collection „archive“, PDFs als Assets).
