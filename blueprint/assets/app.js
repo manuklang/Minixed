@@ -59,6 +59,10 @@ function toggleTheme() {
   r.dataset.theme = dark ? 'light' : 'dark';
   try { localStorage.setItem('bp.theme', r.dataset.theme); } catch (e) { /* */ }
 }
+/* Logo/Leiste verkleinern sich beim Scrollen */
+const onScroll = () => document.body.classList.toggle('scrolled', window.scrollY > 40);
+window.addEventListener('scroll', onScroll, { passive: true });
+onScroll();
 const themeBtn = () => `<button type="button" class="btn icon theme-btn" id="theme-btn" title="Hell/Dunkel umschalten" aria-label="Design hell oder dunkel umschalten">${ico('moon', 'i-moon')}${ico('sun', 'i-sun')}</button>`;
 
 /* ============ Master-Template: Felder & Abschnitte (IDs wie schema.json) ============ */
