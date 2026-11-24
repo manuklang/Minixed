@@ -61,17 +61,16 @@ a{color:inherit}
 
 /* ---------- Navbar ---------- */
 .bar{position:sticky;top:calc(env(safe-area-inset-top,0px) + 14px);z-index:20;margin-top:14px}
-.bar-in{max-width:1024px;margin:0 auto;display:flex;align-items:center;gap:16px;height:52px;padding:0 8px 0 14px;border:1px solid var(--border);border-radius:var(--radius-xl);
+.bar-in{max-width:1024px;margin:0 auto;display:flex;align-items:center;gap:16px;height:64px;padding:0 12px 0 18px;border:1px solid var(--border);border-radius:var(--radius-xl);
   background:rgba(10,10,10,.6);-webkit-backdrop-filter:blur(14px) saturate(140%);backdrop-filter:blur(14px) saturate(140%)}
 .logo{display:flex;align-items:center;gap:12px;min-width:0;text-decoration:none}
-.logo img{height:32px;width:auto;display:block}
-.logo span{font-size:13px;font-weight:500;color:var(--muted-foreground);border-left:1px solid var(--border);padding-left:12px;white-space:nowrap}
+.logo img{height:46px;width:auto;display:block}
 .links{display:flex;gap:4px;margin:0 auto}
 .links a{padding:6px 12px;border-radius:999px;font-weight:500;text-decoration:none;color:var(--foreground)}
 .links a:hover{background:var(--accent)}
 .actions{display:flex;align-items:center;gap:8px;margin-left:auto;position:relative}
 /* Dropdown (shadcn DropdownMenu) */
-.more{display:none;position:absolute;right:0;top:calc(100% + 10px);z-index:40;width:260px;padding:4px;border-radius:var(--radius);border:1px solid var(--border);background:var(--popover);box-shadow:0 10px 38px -10px rgba(0,0,0,.7),0 10px 20px -15px rgba(0,0,0,.5);flex-direction:column;max-height:calc(100dvh - 110px);overflow:auto}
+.more{display:none;position:absolute;right:0;top:calc(100% + 14px);z-index:40;width:260px;padding:4px;border-radius:var(--radius);border:1px solid var(--border);background:var(--popover);box-shadow:0 10px 38px -10px rgba(0,0,0,.7),0 10px 20px -15px rgba(0,0,0,.5);flex-direction:column;max-height:calc(100dvh - 110px);overflow:auto}
 .more.open{display:flex}
 .mlabel{padding:6px 8px;font-size:12px;font-weight:500;color:var(--muted-foreground)}
 .more .btn,.mitem{width:100%;justify-content:flex-start;height:34px;padding:0 8px;border-radius:6px;border:0;background:transparent;font-size:14px;font-weight:400;gap:8px;color:var(--foreground)}
@@ -255,7 +254,6 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
 @media (max-width:1100px){ .kpis{grid-template-columns:repeat(2,minmax(0,1fr))} }
 @media (max-width:959px){
   .links{display:none}
-  .logo span{display:none}
   .frame-in{grid-template-columns:minmax(0,1fr)}
   aside.side{display:none}
   .mnav{display:flex}
@@ -265,8 +263,8 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
 }
 @media (max-width:640px){
   .bar{top:calc(env(safe-area-inset-top,0px) + 10px);margin-top:10px}
-  .bar-in{height:50px;padding:0 6px 0 12px}
-  .logo img{height:28px}
+  .bar-in{height:56px;padding:0 8px 0 12px;gap:10px}
+  .logo img{height:36px}
   main{padding:16px 14px 22px}
   .kpis{grid-template-columns:minmax(0,1fr);gap:10px}
   .grid2{grid-template-columns:minmax(0,1fr)}
@@ -282,6 +280,10 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
   footer.site .claim{margin-left:0}
   .frame-top span{display:none}
 }
+@media (max-width:480px){
+  .lbl-act{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+  #btn-menu{width:40px;padding:0}
+}
 @media (max-width:380px){
   .actions .btn{padding:0 12px}
   .actions #btn-pdf .lbl-long{display:none}
@@ -294,10 +296,10 @@ footer.site .claim{margin-left:auto;font:500 12px var(--font-mono);letter-spacin
 <div class="page">
 <header class="bar wrap">
   <div class="bar-in">
-    <a class="logo" href="https://genius-studios.de" target="_blank" rel="noopener"><img id="logo-top" alt="Genius Studios" width="560" height="247"><span>Master-Briefing</span></a>
+    <a class="logo" href="https://genius-studios.de" target="_blank" rel="noopener"><img id="logo-top" alt="Genius Studios" width="560" height="247"></a>
     <nav class="links" aria-label="Seite"><a href="#app">Briefing</a><a href="#send-card">Übergabe</a><a href="#archiv">Archiv</a><a href="https://genius-studios.de" target="_blank" rel="noopener">Genius Studios</a></nav>
     <div class="actions">
-      <button type="button" class="btn ghost menu-btn" id="btn-menu" aria-expanded="false" aria-controls="more" aria-haspopup="menu"><i data-icon="ellipsis"></i>Aktionen</button>
+      <button type="button" class="btn ghost menu-btn" id="btn-menu" aria-expanded="false" aria-controls="more" aria-haspopup="menu"><i data-icon="ellipsis"></i><span class="lbl-act">Aktionen</span></button>
       <button type="button" class="btn primary" id="btn-pdf"><i data-icon="filedown"></i><span>PDF<span class="lbl-long"> erstellen</span></span></button>
       <div class="more" id="more" role="menu">
         <div class="mlabel">Briefing</div>
