@@ -43,11 +43,23 @@ const ICONS = {
   history:'<path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/><path d="M12 7v5l4 2"/>',
   eye:'<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
   layers:'<path d="m12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83Z"/><path d="m22 17.65-9.17 4.16a2 2 0 0 1-1.66 0L2 17.65"/><path d="m22 12.65-9.17 4.16a2 2 0 0 1-1.66 0L2 12.65"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  moon:'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   pen:'<path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z"/>',
 };
 const ico = (n, cls = '') => `<svg class="i ${cls}" viewBox="0 0 24 24" aria-hidden="true">${ICONS[n] || ''}</svg>`;
 function hydrateIcons(root = document) { root.querySelectorAll('i[data-icon]').forEach((n) => { n.outerHTML = ico(n.dataset.icon); }); }
 hydrateIcons();
+
+/* ============ Hell/Dunkel ============ */
+try { const th = localStorage.getItem('bp.theme'); if (th === 'light' || th === 'dark') document.documentElement.dataset.theme = th; } catch (e) { /* */ }
+function toggleTheme() {
+  const r = document.documentElement;
+  const dark = r.dataset.theme ? r.dataset.theme === 'dark' : !matchMedia('(prefers-color-scheme: light)').matches;
+  r.dataset.theme = dark ? 'light' : 'dark';
+  try { localStorage.setItem('bp.theme', r.dataset.theme); } catch (e) { /* */ }
+}
+const themeBtn = () => `<button type="button" class="btn icon theme-btn" id="theme-btn" title="Hell/Dunkel umschalten" aria-label="Design hell oder dunkel umschalten">${ico('moon', 'i-moon')}${ico('sun', 'i-sun')}</button>`;
 
 /* ============ Master-Template: Felder & Abschnitte (IDs wie schema.json) ============ */
 const F = {
@@ -251,16 +263,17 @@ const value = (fid) => (S.fields[fid] ? S.fields[fid].value : defaultValue(fid))
 /* ============ Navigationsleiste ============ */
 function renderBar() {
   $('#bar').innerHTML = `
-    <button type="button" class="logo" id="go-home" aria-label="Zur Übersicht"><img src="${LOGO_WHITE}" alt="Genius Studios" width="560" height="247"><span>Blueprint · Produktionsvorbereitung</span></button>
+    <button type="button" class="logo" id="go-home" aria-label="Zur Übersicht"><img class="logo-l" src="${LOGO_WHITE}" alt="Genius Studios" width="560" height="247"><img class="logo-d" src="${LOGO_DARK}" alt="Genius Studios" width="560" height="247"><span>Blueprint · Produktionsvorbereitung</span></button>
     <nav class="links" aria-label="Seite">
       <button type="button" data-go="home" ${!S.cur ? 'aria-current="page"' : ''}>Übersicht</button>
       ${S.cur ? '<button type="button" aria-current="page">Blueprint</button>' : ''}
       <button type="button" id="nav-help">So funktioniert's</button>
     </nav>
-    <div class="actions">${me ? `<button type="button" class="me" id="me-chip" title="Person ändern">${avatar(me.name)}<b>${esc(me.name)}</b></button>` : '<button type="button" class="me" id="me-chip" style="padding-left:12px">Name festlegen</button>'}</div>`;
+    <div class="actions">${themeBtn()}${me ? `<button type="button" class="me" id="me-chip" title="Person ändern">${avatar(me.name)}<b>${esc(me.name)}</b></button>` : '<button type="button" class="me" id="me-chip" style="padding-left:12px">Name festlegen</button>'}</div>`;
   $('#go-home').onclick = () => { location.hash = ''; };
   const h = $('[data-go="home"]'); if (h) h.onclick = () => { location.hash = ''; };
   $('#nav-help').onclick = showHelp;
+  $('#theme-btn').onclick = toggleTheme;
   $('#me-chip').onclick = () => askUser(true).then(() => { renderBar(); if (S.cur) renderEditor(); else renderIndex(); });
 }
 function showHelp() {

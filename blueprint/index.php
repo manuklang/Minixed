@@ -30,7 +30,7 @@ $client = [
 		<div id="view"></div>
 		<div class="wrap">
 			<footer class="site">
-				<img src="assets/logo-white.png" alt="Genius Studios" width="560" height="247">
+				<img class="logo-l" src="assets/logo-white.png" alt="Genius Studios" width="560" height="247"><img class="logo-d" src="assets/logo-dark.png" alt="Genius Studios" width="560" height="247">
 				<address>Genius Studios · Im Dachsstück 8 · 65549 Limburg/Lahn<br>Telefon +49 (0) 64 31 – 9 8882222 · <a href="https://genius-studios.de" target="_blank" rel="noopener">genius-studios.de</a></address>
 				<span class="claim">Film · Audio · Broadcast</span>
 			</footer>
